@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - release
-  pull_request:
-    branches: ["release"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -20,10 +18,9 @@ jobs:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 16.10.0
           cache: "yarn" # or 'npm' | 'pnpm'
 
-      # Runs a single command using the runners shell
       - name: Switch to Prod
         run: yarn env:switch:prod
 
@@ -32,12 +29,9 @@ jobs:
 
       - name: Run install
         run: yarn install
+
       - name: Run typescript and linter
         run: yarn tsc && yarn lint
-      - name: Run formatter
-        run: yarn format
-      - name: Run update shared-deps
-        run: yarn update:shared-deps
 
       - name: Login to Docker
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
@@ -47,15 +41,14 @@ jobs:
           docker build -t definya/definya-team:api-latest .
           docker push definya/definya-team:api-latest
 
-      - name: Deploy to VPS
+      - name: Deploy to VPS and Restart nginx-proxy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_KEY }}
+          passphrase: ${{ secrets.VPS_PASSPHRASE }}
           script: |
             docker pull definya/definya-team:api-latest:latest
             docker run -d definya/definya-team:api-latest:latest
-      - name: Restart nginx-proxy on VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 'docker-compose -f ./nginx-proxy/docker-compose.yml restart nginx-proxy'
+            docker-compose -f ./nginx-proxy/docker-compose.yml restart nginx-proxy
