@@ -27,6 +27,18 @@ jobs:
       - name: Recreate .env file from secrets
         run: echo "${{ secrets.API_ENV }}" > .env
 
+      - name: Deploy to VPS and Restart nginx-proxy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          passphrase: ${{ secrets.VPS_PASSPHRASE }}
+          script: |
+            docker pull definya/definya-team:api-latest:latest
+            docker run -d definya/definya-team:api-latest:latest
+            cd nginx-proxy && docker-compose restart
+
       - name: Run install
         run: yarn install
 
@@ -40,15 +52,3 @@ jobs:
         run: |
           docker build -t definya/definya-team:api-latest .
           docker push definya/definya-team:api-latest
-
-      - name: Deploy to VPS and Restart nginx-proxy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_KEY }}
-          passphrase: ${{ secrets.VPS_PASSPHRASE }}
-          script: |
-            docker pull definya/definya-team:api-latest:latest
-            docker run -d definya/definya-team:api-latest:latest
-            docker-compose -f nginx-proxy/docker-compose.yml restart nginx-proxy
