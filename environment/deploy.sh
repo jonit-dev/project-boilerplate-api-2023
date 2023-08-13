@@ -4,7 +4,7 @@
 cd ~/definya/api
 
 # Db backup
-npm run db:export
+npx npm run db:export
 
 # Inform PM2 to initialize the graceful shutdown and run command
 echo "Shutting down instances..."
