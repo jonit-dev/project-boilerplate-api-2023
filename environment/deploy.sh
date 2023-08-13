@@ -19,3 +19,6 @@ echo "Restarting containers..."
 docker-compose restart
 
 echo "Deployment complete."
+
+# Exit with success
+exit 0
