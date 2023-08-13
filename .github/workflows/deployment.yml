@@ -51,4 +51,4 @@ jobs:
           script: |
             docker pull definya/definya-team:api-latest:latest
             docker run -d definya/definya-team:api-latest:latest
-            docker-compose -f ./nginx-proxy/docker-compose.yml restart nginx-proxy
+            docker-compose -f nginx-proxy/docker-compose.yml restart nginx-proxy
