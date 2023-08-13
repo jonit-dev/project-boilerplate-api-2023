@@ -48,12 +48,6 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            which node
-            echo $PATH
-            echo $SHELL
-            which npm
-            npm --version
-
             cd ~/definya/api
             git checkout release
             git pull origin release
