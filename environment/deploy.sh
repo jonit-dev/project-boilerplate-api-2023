@@ -3,8 +3,14 @@
 # Additional deployment steps
 cd ~/definya/api
 
+# debug
+echo $PATH
+echo $SHELL
+which npm
+npm --version
+
 # Db backup
-npx npm run db:export
+npm run db:export
 
 # Inform PM2 to initialize the graceful shutdown and run command
 echo "Shutting down instances..."

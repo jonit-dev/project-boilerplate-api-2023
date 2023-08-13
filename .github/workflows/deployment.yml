@@ -46,6 +46,7 @@ jobs:
             docker pull definya/definya-team:api-latest
 
             cd ~/definya/api
+            git checkout release
             git pull origin release
             bash ./environment/deploy.sh
 
