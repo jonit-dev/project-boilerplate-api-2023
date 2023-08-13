@@ -50,3 +50,5 @@ jobs:
             docker run -d definya/definya-team:api-latest:latest
             docker pull definya/definya-team:nginx-proxy-latest:latest
             docker run -d definya/definya-team:nginx-proxy-latest:latest
+
+            docker-compose -f ./nginx-proxy/docker-compose.yml up -d
