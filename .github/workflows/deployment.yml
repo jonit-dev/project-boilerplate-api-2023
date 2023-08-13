@@ -45,6 +45,12 @@ jobs:
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull definya/definya-team:api-latest
 
+            which node
+            echo $PATH
+            echo $SHELL
+            which npm
+            npm --version
+
             cd ~/definya/api
             git checkout release
             git pull origin release

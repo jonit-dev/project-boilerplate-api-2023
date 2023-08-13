@@ -4,7 +4,6 @@
 cd ~/definya/api
 
 # debug
-whoami
 echo $PATH
 echo $SHELL
 which npm
