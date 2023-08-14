@@ -1,0 +1,17 @@
+version: "3"
+services:
+  rpg-api:
+    image: definya/definya-team:api-latest
+    environment:
+      FORCE_COLOR: "true"
+      CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
+      NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
+      NEW_RELIC_APP_NAME: "Definya API Dev"
+    ports:
+      - "$SERVER_PORT:$SERVER_PORT"
+    networks:
+      - rpg-network
+
+networks:
+  rpg-network:
+    external: true
