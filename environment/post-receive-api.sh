@@ -21,7 +21,7 @@ while read oldrev newrev refname; do
     fi
 done
 
-# Deploy the project
+# Deploy the project!
 
 echo "Deploying project..."
 GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
