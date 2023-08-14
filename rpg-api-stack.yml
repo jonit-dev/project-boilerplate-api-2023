@@ -12,7 +12,7 @@ services:
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Definya API Dev"
     ports:
-      - "$SERVER_PORT:$SERVER_PORT"
+      - "5002:5002"
     networks:
       - rpg-network
 
