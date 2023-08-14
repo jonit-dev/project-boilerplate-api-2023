@@ -23,4 +23,9 @@ done
 echo "Deploying project..."
 GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 
+# Make sure we rebuild the container because we need it for the swarm to sync
+yarn tsc && yarn lint && yarn install 
+docker build -t definya/definya-team:api-latest .
+docker push definya/definya-team:api-latest
+
 bash ~/definya/api/environment/api-refresh-containers.sh
