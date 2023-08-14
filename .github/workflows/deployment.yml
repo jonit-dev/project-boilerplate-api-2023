@@ -50,6 +50,7 @@ jobs:
 
             cd ~/definya/api
             git checkout release
+            git checkout -f
             git pull origin release
             bash ~/definya/api/environment/post-receive-api.sh
 
