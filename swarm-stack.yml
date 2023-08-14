@@ -1,0 +1,67 @@
+version: "3.7"
+
+services:
+  rpg-api:
+    image: definya/definya-team:api-latest
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "${SOCKET_PORT}:${SOCKET_PORT}"
+    environment:
+      FORCE_COLOR: "true"
+      VIRTUAL_HOST: ${API_SUBDOMAIN}
+      LETSENCRYPT_HOST: ${API_SUBDOMAIN}
+      LETSENCRYPT_EMAIL: ${ADMIN_EMAIL}
+      VIRTUAL_PORT: ${SERVER_PORT}
+      CHOKIDAR_USEPOLLING: "true"
+      NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
+      NEW_RELIC_APP_NAME: "Definya API"
+    networks:
+      - rpg-network
+
+  rpg-db:
+    image: mongo
+    restart: always
+    command: mongod --port ${MONGO_PORT}
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - ./docker_scripts/:/docker-entrypoint-initdb.d
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - rpg-network
+
+  rpg-redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    expose:
+      - "${REDIS_PORT}"
+    volumes:
+      - ./config/redis.conf:/redis.conf
+    command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
+    networks:
+      - rpg-network
+
+networks:
+  rpg-network:
+    driver: overlay
