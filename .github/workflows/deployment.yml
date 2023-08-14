@@ -26,13 +26,13 @@ jobs:
           yarn env:switch:prod
           echo "${{ secrets.API_ENV }}" > .env
 
-      # - name: Prepare, build and push Docker image
-      #   run: |
-      #     yarn install
-      #     yarn tsc && yarn lint
-      #     docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-      #     docker build -t definya/definya-team:api-latest .
-      #     docker push definya/definya-team:api-latest
+      - name: Prepare, build and push Docker image
+        run: |
+          yarn install
+          yarn tsc && yarn lint
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t definya/definya-team:api-latest .
+          docker push definya/definya-team:api-latest
 
       - name: SSH into VPS and update containers
         uses: appleboy/ssh-action@master
@@ -47,8 +47,6 @@ jobs:
 
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-            echo "Refreshing containers..."
 
             cd ~/definya/api
 
