@@ -48,10 +48,6 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            cd ~/definya/api
-            git checkout release
-            git checkout -f
-            git pull origin release
             bash ~/definya/api/environment/post-receive-api.sh
 
             cd ~/definya/api/nginx-proxy
