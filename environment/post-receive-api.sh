@@ -4,9 +4,11 @@
 DEPLOY_DIR="/home/jonit/definya/api"
 
 # Set the branch you want to deploy
-BRANCH="master"
+BRANCH="release"
 
-# Exit if the branch being pushed is not the specified branch
+# Get the repository directory
+REPO_DIR="/home/jonit/definya/api.git"
+
 while read oldrev newrev refname; do
     branch=$(git rev-parse --symbolic --abbrev-ref $refname)
     if [ "$branch" != "$BRANCH" ]; then
@@ -17,7 +19,6 @@ done
 
 # Deploy the project
 echo "Deploying project..."
-GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
+git --work-tree=$DEPLOY_DIR --git-dir=$REPO_DIR checkout -f $BRANCH
 
-bash ./backup-and-restart-containers.sh
-
+bash ~/definya/api/environment/backup-and-restart-containers.sh
