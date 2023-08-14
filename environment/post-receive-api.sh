@@ -24,6 +24,6 @@ done
 # Deploy the project
 
 echo "Deploying project..."
-git --work-tree=$DEPLOY_DIR --git-dir=$REPO_DIR checkout -f $BRANCH
+GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 
 bash ~/definya/api/environment/api-refresh-containers.sh
