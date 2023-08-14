@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# avoid npm not found error
+   export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 # Set the deployment directory
 DEPLOY_DIR="/home/jonit/definya/api"
 
