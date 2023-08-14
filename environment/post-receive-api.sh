@@ -22,6 +22,7 @@ while read oldrev newrev refname; do
 done
 
 # Deploy the project
+
 echo "Deploying project..."
 git --work-tree=$DEPLOY_DIR --git-dir=$REPO_DIR checkout -f $BRANCH
 
