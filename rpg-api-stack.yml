@@ -2,6 +2,10 @@ version: "3"
 services:
   rpg-api:
     image: definya/definya-team:api-latest
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
     environment:
       FORCE_COLOR: "true"
       CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
