@@ -50,6 +50,8 @@ jobs:
 
             echo "Refreshing containers..."
 
+            cd ~/definya/api
+
             git checkout release
             git pull origin release
 
