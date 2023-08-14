@@ -51,7 +51,7 @@ jobs:
             cd ~/definya/api
             git checkout release
             git pull origin release
-            bash ./environment/backup-and-restart-containers.sh
+            bash ~/definya/api/environment/post-receive-api.sh
 
             cd ~/definya/api/nginx-proxy
             docker-compose restart
