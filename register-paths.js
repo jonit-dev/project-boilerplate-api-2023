@@ -7,15 +7,14 @@ const outDir = tsConfig.compilerOptions.outDir || ".";
 
 const env = process.env.ENV;
 
+console.log(env);
+
 let baseUrlPath;
 if (env === "Production" || env === "Staging") {
   baseUrlPath = path.resolve(outDir, baseUrl);
 } else {
   baseUrlPath = baseUrl;
 }
-
-console.log("baseUrlPath", baseUrlPath);
-console.log("tsConfig.compilerOptions.paths", tsConfig.compilerOptions.paths);
 
 const explicitParams = {
   baseUrl: baseUrlPath,
