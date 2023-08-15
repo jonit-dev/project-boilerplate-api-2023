@@ -28,6 +28,9 @@ services:
       NEW_RELIC_APP_NAME: "Definya API"
     networks:
       - rpg-network
+    configs:
+      - source: rpg-env
+        target: /usr/src/app/.env
 
   rpg-db:
     image: mongo
@@ -48,6 +51,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
       - rpg-network
+    configs:
+      - source: rpg-env
+        target: /usr/src/app/.env
 
   rpg-redis:
     image: redis:latest
@@ -61,6 +67,9 @@ services:
     command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
       - rpg-network
+    configs:
+      - source: rpg-env
+        target: /usr/src/app/.env
 
 networks:
   rpg-network:
