@@ -22,5 +22,3 @@ const explicitParams = {
   paths: tsConfig.compilerOptions.paths,
 };
 tsConfigPaths.register(explicitParams);
-
-// cleanup();
