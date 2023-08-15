@@ -40,6 +40,7 @@ services:
         max-size: "10m"
         max-file: "3"
     volumes:
+      - rpg-db-data:/data/db
       - ./docker_scripts/:/docker-entrypoint-initdb.d
     ports:
       - "${MONGO_PORT}:${MONGO_PORT}"
@@ -59,6 +60,7 @@ services:
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
+      - rpg-redis-data:/data
       - ./config/redis.conf:/redis.conf
     command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
@@ -78,3 +80,5 @@ configs:
 volumes:
   rpg-app:
   node-modules:
+  rpg-db-data:
+  rpg-redis-data:
