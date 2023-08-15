@@ -34,7 +34,6 @@ services:
 
   rpg-db:
     image: mongo
-    restart: always
     command: mongod --port ${MONGO_PORT}
     logging:
       options:
@@ -57,11 +56,8 @@ services:
 
   rpg-redis:
     image: redis:latest
-    restart: always
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
-    expose:
-      - "${REDIS_PORT}"
     volumes:
       - ./config/redis.conf:/redis.conf
     command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
