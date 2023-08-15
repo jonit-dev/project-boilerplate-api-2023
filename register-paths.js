@@ -14,12 +14,6 @@ if (env === "Production" || env === "Staging") {
   baseUrlPath = baseUrl;
 }
 
-console.log("env", env);
-console.log("baseUrl", baseUrl);
-console.log("outDir", outDir);
-console.log("baseUrlPath", baseUrlPath);
-console.log("tsConfig.compilerOptions.paths", tsConfig.compilerOptions.paths);
-
 const explicitParams = {
   baseUrl: baseUrlPath,
   paths: tsConfig.compilerOptions.paths,
