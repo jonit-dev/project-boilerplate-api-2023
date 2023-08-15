@@ -30,7 +30,7 @@ services:
       - rpg-network
     configs:
       - source: rpg-env
-        target: /usr/src/app/.env
+        target: .env
 
   rpg-db:
     image: mongo
@@ -52,7 +52,7 @@ services:
       - rpg-network
     configs:
       - source: rpg-env
-        target: /usr/src/app/.env
+        target: .env
 
   rpg-redis:
     image: redis:latest
@@ -65,7 +65,7 @@ services:
       - rpg-network
     configs:
       - source: rpg-env
-        target: /usr/src/app/.env
+        target: .env
 
 networks:
   rpg-network:
@@ -73,4 +73,4 @@ networks:
 
 configs:
   rpg-env:
-    file: /usr/src/app/.env
+    file: .env
