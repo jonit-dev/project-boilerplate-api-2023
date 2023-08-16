@@ -8,7 +8,7 @@ import pm2Config from "../../../pm2.json";
 @provide(PM2Helper)
 export class PM2Helper {
   public getPm2TotalInstances(): number {
-    return Number(pm2Config.apps[0].instances);
+    return Number(pm2Config.apps[0].instances) || this.getTotalAvailableCPUs();
   }
 
   public getTotalAvailableCPUs(): number {

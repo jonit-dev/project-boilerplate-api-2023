@@ -49,7 +49,11 @@ export class ServerBootstrap {
       await this.execOneTimeOperations();
     } else {
       // Production/Staging with PM2
+
+      console.log("Current process id", process.env.pm_id);
+
       if (process.env.pm_id === this.pm2Helper.pickLastCPUInstance()) {
+        console.log("Executing one time operations");
         await this.execOneTimeOperations();
       }
     }
