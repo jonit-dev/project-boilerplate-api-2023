@@ -25,13 +25,11 @@ GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 
 cd ~/definya/api
 
-# Generate a timestamp
-TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-
 echo "🐳 Building and pushing Docker image..."
-yarn tsc && yarn lint && yarn install 
-docker build -t definya/definya-team:api-$TIMESTAMP .
-docker push definya/definya-team:api-$TIMESTAMP
+
+yarn tsc && yarn lint && yarn build && yarn install 
+docker build -t definya/definya-team:api-latest .
+docker push definya/definya-team:api-latest
 
 echo "🐳 Updating swarm..."
 
