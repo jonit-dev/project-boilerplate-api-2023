@@ -20,7 +20,7 @@ done
 
 # Deploy the project!
 
-echo "Refreshing source code"
+echo "Refreshing source code..."
 GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 
 cd ~/definya/api
