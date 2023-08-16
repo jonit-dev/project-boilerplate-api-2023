@@ -28,7 +28,7 @@ cd ~/definya/api
 # Generate a timestamp
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 
-# Make sure we rebuild the container because we need it for the swarm to sync
+echo "🐳 Building and pushing Docker image..."
 yarn tsc && yarn lint && yarn install 
 docker build -t definya/definya-team:api-$TIMESTAMP .
 docker push definya/definya-team:api-$TIMESTAMP
