@@ -101,6 +101,7 @@ export class CharacterCrons {
         this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
           reason: "You have were disconnected due to inactivity!",
         });
+
         await this.socketMessaging.sendEventToCharactersAroundCharacter(
           character,
           CharacterSocketEvents.CharacterLogout,
@@ -114,6 +115,13 @@ export class CharacterCrons {
         await this.socketSessionControl.deleteSession(character);
 
         await this.characterLastAction.clearLastAction(character._id);
+
+        this.newRelic.trackMetric(
+          NewRelicMetricCategory.Count,
+          NewRelicSubCategory.Characters,
+          "CharacterInactiveLogOut",
+          1
+        );
       }
     }
   }

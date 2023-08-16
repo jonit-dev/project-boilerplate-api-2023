@@ -23,6 +23,8 @@ import _ from "lodash";
 import { clearCacheForKey } from "speedgoose";
 import { SkillBuff } from "./SkillBuff";
 import { SkillCalculator } from "./SkillCalculator";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
+import { NewRelic } from "@providers/analytics/NewRelic";
 
 @provide(SkillFunctions)
 export class SkillFunctions {
@@ -33,7 +35,8 @@ export class SkillFunctions {
     private characterBuffSkill: CharacterBuffSkill,
     private numberFormatter: NumberFormatter,
     private skillBuff: SkillBuff,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private newRelic: NewRelic
   ) {}
 
   public updateSkillByType(skills: ISkill, skillName: string, bonusOrPenalties: number): boolean {
@@ -50,6 +53,13 @@ export class SkillFunctions {
       skillLevelUp = true;
       skill.level++;
       skill.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(skill.skillPoints, skill.level + 1);
+
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        `${skillName}-SkillUp`,
+        1
+      );
     }
 
     return skillLevelUp;

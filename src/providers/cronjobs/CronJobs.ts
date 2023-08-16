@@ -12,6 +12,7 @@ import { DeleteChatCrons } from "./DeleteChatCrons";
 import { ItemDeleteCrons } from "./ItemDeleteCrons";
 import { MacroCaptchaCrons } from "./MacroCaptchaCrons";
 import { NPCCrons } from "./NPCCrons";
+import { TotalAvaliableGold } from "./TotalAvaliableGold";
 
 @provide(Cronjob)
 export class Cronjob {
@@ -26,7 +27,8 @@ export class Cronjob {
     private cleanupBloodCrons: CleanupBloodCrons,
     private cleanupBodyCrons: CleanupBodyCrons,
     private cleanupEmptyBodyCrons: CleanupEmptyBodyCrons,
-    private macroCaptchaCrons: MacroCaptchaCrons
+    private macroCaptchaCrons: MacroCaptchaCrons,
+    private totalAvaliableGold: TotalAvaliableGold
   ) {}
 
   public start(): void {
@@ -63,6 +65,7 @@ export class Cronjob {
           this.cleanupBodyCrons.schedule();
           this.cleanupEmptyBodyCrons.schedule();
           this.macroCaptchaCrons.schedule();
+          this.totalAvaliableGold.schedule();
         }
         break;
     }
