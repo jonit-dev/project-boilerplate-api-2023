@@ -7,6 +7,10 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
     logging:
       options:
         max-size: "10m"

@@ -25,9 +25,11 @@ GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 
 cd ~/definya/api
 
-echo "🐳 Building and pushing Docker image..."
+echo "🐳 Removing previous volumes..."
+docker volume rm rpg-app node-modules
 
-yarn tsc && yarn lint && yarn build && yarn install 
+echo "🐳 Building and pushing Docker image..."
+yarn lint && yarn install && yarn build 
 docker build -t definya/definya-team:api-latest .
 docker push definya/definya-team:api-latest
 
