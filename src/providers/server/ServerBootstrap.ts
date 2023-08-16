@@ -51,6 +51,7 @@ export class ServerBootstrap {
       // Production/Staging with PM2
 
       console.log("Current process id", process.env.pm_id);
+      console.log(this.pm2Helper.pickLastCPUInstance());
 
       if (process.env.pm_id === this.pm2Helper.pickLastCPUInstance()) {
         console.log("Executing one time operations");
