@@ -62,8 +62,6 @@ services:
     volumes:
       - rpg-redis-data:/data
       - ./config/redis.conf:/redis.conf
-    expose:
-      - "$REDIS_PORT"
     command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
       - rpg-network
