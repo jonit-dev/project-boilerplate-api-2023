@@ -15,9 +15,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    volumes:
-      - rpg-app:/usr/src/app
-      - node-modules:/usr/src/app/node_modules
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
       - "${SOCKET_PORT}:${SOCKET_PORT}"
@@ -82,7 +79,5 @@ configs:
     file: .env
 
 volumes:
-  rpg-app:
-  node-modules:
   rpg-db-data:
   rpg-redis-data:
