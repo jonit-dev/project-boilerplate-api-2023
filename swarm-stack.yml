@@ -30,6 +30,8 @@ services:
     networks:
       - rpg-network
     configs:
+      - source: rpg-env
+        target: .env
     env_file:
       - .env
 
@@ -52,6 +54,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
       - rpg-network
+    configs:
+      - source: rpg-env
+        target: .env
     env_file:
       - .env
 
@@ -65,9 +70,16 @@ services:
     command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
       - rpg-network
+    configs:
+      - source: rpg-env
+        target: .env
     env_file:
       - .env
 
 networks:
   rpg-network:
     driver: overlay
+
+configs:
+  rpg-env:
+    file: .env
