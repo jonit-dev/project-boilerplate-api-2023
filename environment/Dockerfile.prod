@@ -28,5 +28,11 @@ NEW_RELIC_LOG=stdout
 
 RUN npm install -g pm2
 
-# This will run our npm run dev command under package.json
-CMD ["yarn","start:prod"]
+# Copy the entrypoint script
+COPY ./environment/stack-entrypoint.sh /usr/src/app/environment/stack-entrypoint.sh
+
+# Make it executable
+RUN chmod +x /usr/src/app/environment/stack-entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/usr/src/app/environment/stack-entrypoint.sh"]
