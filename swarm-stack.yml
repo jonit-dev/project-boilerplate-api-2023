@@ -83,3 +83,7 @@ networks:
 configs:
   rpg-env:
     file: .env
+
+volumes:
+  rpg-db-data:
+  rpg-redis-data:
