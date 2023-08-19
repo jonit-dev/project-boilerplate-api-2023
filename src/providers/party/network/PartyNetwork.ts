@@ -18,10 +18,10 @@ export class PartyNetwork {
   ) {}
 
   public onAddEventListeners(channel: SocketChannel): void {
-    this.partyNetworkInviteOrCreate.onInviteOrCreateParty(channel);
-    this.partyNetworkLeave.onLeaveParty(channel);
-    this.partyNetworkTransfer.onTranferLeaderShip(channel);
-    this.partyNetworkAcceptInvite.onAcceptInvite(channel);
     this.partyNetworkGetParty.onPartyInfoRead(channel);
+    this.partyNetworkInviteOrCreate.onInviteOrCreateParty(channel);
+    this.partyNetworkAcceptInvite.onAcceptInvite(channel);
+    this.partyNetworkTransfer.onTranferLeaderShip(channel);
+    this.partyNetworkLeave.onLeaveParty(channel);
   }
 }

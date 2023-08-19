@@ -16,7 +16,8 @@ export class PartyNetworkLeave {
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           // #TODO: verify if player emiter is the leader. character._id === data.leaderId
-          const leader = (await Character.findById(character._id).lean()) as ICharacter;
+          console.log(character._id, data.leaderId);
+          const leader = (await Character.findById(data.leaderId).lean()) as ICharacter;
           if (!leader) {
             throw new Error("Error on leave party, character leader not found");
           }
@@ -26,7 +27,7 @@ export class PartyNetworkLeave {
             throw new Error("Error on leave party, character target not found");
           }
 
-          await this.partyManagement.leaveParty(leader, target);
+          await this.partyManagement.leaveParty(leader, target, character);
         } catch (error) {
           console.error(error);
         }

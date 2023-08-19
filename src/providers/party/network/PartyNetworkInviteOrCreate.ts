@@ -15,18 +15,17 @@ export class PartyNetworkInviteOrCreate {
       PartySocketEvents.InviteOrCreate,
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
-          const leader = (await Character.findById(character._id).lean()) as ICharacter;
-
+          const leader = (await Character.findById(data.leaderId).lean()) as ICharacter;
           if (!leader) {
             throw new Error("Error on leave party, character leader not found");
           }
-          const target = (await Character.findById(data.targetId).lean()) as ICharacter;
 
+          const target = (await Character.findById(data.targetId).lean()) as ICharacter;
           if (!target) {
             throw new Error("Error on leave party, character target not found");
           }
 
-          await this.partyManagement.inviteOrCreateParty(leader, target);
+          await this.partyManagement.inviteOrCreateParty(leader, target, character);
         } catch (error) {
           console.error(error);
         }

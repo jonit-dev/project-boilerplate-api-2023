@@ -16,10 +16,9 @@ export class PartyNetworkTranferLeaderShip {
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           const leader = (await Character.findById(character._id).lean()) as ICharacter;
-
           const target = (await Character.findById(data.targetId).lean()) as ICharacter;
 
-          await this.partyManagement.transferLeadership(leader, target);
+          await this.partyManagement.transferLeadership(leader, target, character);
         } catch (error) {
           console.error(error);
         }
