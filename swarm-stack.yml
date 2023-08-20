@@ -7,10 +7,6 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-      update_config:
-        parallelism: 1
-        delay: 10s
-        failure_action: rollback
     logging:
       options:
         max-size: "10m"
@@ -52,6 +48,10 @@ services:
       MONGO_PORT: ${MONGO_PORT}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    deploy: # db should be only on the manager node
+      placement:
+        constraints:
+          - node.role == manager
     networks:
       - rpg-network
     configs:
