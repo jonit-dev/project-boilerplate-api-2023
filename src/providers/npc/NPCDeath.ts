@@ -20,7 +20,14 @@ import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
-import { BattleSocketEvents, IBattleDeath, INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
+import {
+  BattleSocketEvents,
+  CharacterPartyBenefits,
+  IBattleDeath,
+  INPCLoot,
+  ItemSubType,
+  ItemType,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPC_CYCLES } from "./NPCCycle";
@@ -29,6 +36,8 @@ import { NPCFreezer } from "./NPCFreezer";
 import { calculateGold } from "./NPCGold";
 import { NPCSpawn } from "./NPCSpawn";
 import { NPCTarget } from "./movement/NPCTarget";
+import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
+import { Types } from "mongoose";
 
 @provide(NPCDeath)
 export class NPCDeath {
@@ -48,60 +57,47 @@ export class NPCDeath {
   @TrackNewRelicTransaction()
   public async handleNPCDeath(npc: INPC): Promise<void> {
     await this.npcFreezer.freezeNPC(npc);
-
     const hasLocked = await this.locker.lock(`npc-death-${npc._id}`);
-
     if (!hasLocked) {
       return;
     }
-
     try {
       console.log("NPCDeath for npc: ", npc.key);
-
       if (npc.health !== 0) {
         const setHealthToZero = NPC.updateOne({ _id: npc._id }, { $set: { health: 0 } });
         npc.health = 0;
         npc.isAlive = false;
         const saveNPC = npc.save();
-
         await Promise.all([setHealthToZero, saveNPC]);
       }
-
       const npcBody = await this.generateNPCBody(npc);
-
       if (!npcBody) {
         return;
       }
-
-      await this.itemOwnership.removeItemOwnership(npcBody);
-
       const notifyCharactersOfNPCDeath = this.notifyCharactersOfNPCDeath(npc);
-
       const npcWithSkills = await this.getNPCWithSkills(npc);
-
       const goldLoot = this.getGoldLoot(npcWithSkills);
-
-      const npcLoots = npc.loots as unknown as INPCLoot[];
-
+      const totalDropRatioFromParty = await this.calculateTotalDropRatioFromParty(npc);
+      const npcLoots: INPCLoot[] = (npc.loots as unknown as INPCLoot[]).map((loot) => ({
+        itemBlueprintKey: loot.itemBlueprintKey,
+        chance: loot.chance + totalDropRatioFromParty || 0,
+        quantityRange: loot.quantityRange || undefined,
+      }));
       const addLootToNPCBody = this.addLootToNPCBody(npcBody, [...npcLoots, goldLoot], npc.isGiantForm);
-
+      const removeItemOwnership = this.itemOwnership.removeItemOwnership(npcBody.id);
       const clearNPCBehavior = this.clearNPCBehavior(npc);
-
       const updateNPCAfterDeath = this.updateNPCAfterDeath(npcWithSkills);
-
       const releaseXP = this.npcExperience.releaseXP(npc as INPC);
-
-      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "Death", 1);
-
       await Promise.all([
         notifyCharactersOfNPCDeath,
         npcWithSkills,
         goldLoot,
+        totalDropRatioFromParty,
         addLootToNPCBody,
+        removeItemOwnership,
         clearNPCBehavior,
         updateNPCAfterDeath,
         releaseXP,
-        this.locker.unlock(`npc-${npc._id}-battle-cycle`),
       ]);
     } catch (error) {
       console.error(error);
@@ -337,5 +333,29 @@ export class NPCDeath {
     const lootItem = new Item({ ...blueprintData });
 
     return lootItem.maxStackSize > 1;
+  }
+
+  private async calculateTotalDropRatioFromParty(npc: INPC): Promise<number> {
+    let totalDropRatio = 0;
+    let partyIds = new Set<Types.ObjectId>();
+    if (npc.xpToRelease) {
+      partyIds = new Set(npc.xpToRelease.filter((xp) => xp.partyId !== null).map((xp) => xp.partyId));
+    }
+    if (partyIds.size === 0) {
+      return 0;
+    }
+    for (const partyId of partyIds) {
+      totalDropRatio += await this.getPartyAndCalculateDropRatio(partyId);
+    }
+    return totalDropRatio || 0;
+  }
+
+  private async getPartyAndCalculateDropRatio(partyId: Types.ObjectId): Promise<number> {
+    const party = (await CharacterParty.findById(partyId).lean().select("benefits")) as ICharacterParty;
+    if (party?.benefits) {
+      const dropRatioBenefit = party.benefits.find((benefits) => benefits.benefit === CharacterPartyBenefits.DropRatio);
+      return dropRatioBenefit?.value || 0;
+    }
+    return 0;
   }
 }

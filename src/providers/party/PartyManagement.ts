@@ -1,6 +1,7 @@
 import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -22,7 +23,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 @provide(PartyManagement)
 export default class PartyManagement {
@@ -38,12 +39,8 @@ export default class PartyManagement {
     );
   }
 
-  public async inviteOrCreateParty(
-    leader: ICharacter,
-    target: ICharacter,
-    character: ICharacter,
-    maxSize?: number
-  ): Promise<void> {
+  // #TODO REMOVE
+  public async inviteOrCreateParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
     if (!character) {
       throw new Error("Character not found");
     }
@@ -54,12 +51,15 @@ export default class PartyManagement {
     }
 
     const isInParty = await this.checkIfIsInParty(leader);
-    isInParty
-      ? await this.inviteToParty(leader, target, character)
-      : await this.createParty(character, target, maxSize);
+    isInParty ? await this.inviteToParty(leader, target, character) : await this.createParty(character, target);
   }
 
-  public async acepptInvite(leader: ICharacter, target: ICharacter): Promise<void> {
+  public async acepptInvite(leader: ICharacter, target: ICharacter, character): Promise<void> {
+    const isPartyExist = await this.checkIfIsInParty(leader);
+    isPartyExist ? await this.addMemberToParty(leader, target, character) : await this.createParty(leader, target);
+  }
+
+  private async addMemberToParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
     const targetIsInParty = await this.checkIfIsInParty(target);
     if (targetIsInParty) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
@@ -125,6 +125,7 @@ export default class PartyManagement {
     }
 
     const benefits = this.calculatePartyBenefits(2, leader.class !== target.class ? 2 : 1);
+
     const createParty: ICharacterPartyShared = {
       leader: {
         _id: leader._id,
@@ -133,9 +134,9 @@ export default class PartyManagement {
       },
       members: [
         {
-          _id: leader._id,
-          class: leader.class as CharacterClass,
-          name: leader.name,
+          _id: target._id,
+          class: target.class as CharacterClass,
+          name: target.name,
         },
       ],
       maxSize: finalMaxSize,
@@ -147,11 +148,16 @@ export default class PartyManagement {
 
       if (party) {
         await this.applyAllBuffInParty(party);
-        // Send Confirmation message to target
+        const partyInfoData = party as unknown as ICharacterPartyShared;
+        void this.sendMessageToPartyMembers(`${target.name} joined the party`, partyInfoData, true);
+
+        // Send Confirmation message to target #TODO: REMOVE
+        /* 
         this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
           leaderId: leader._id,
           leaderName: leader.name,
         });
+        */
       }
       return party;
     } catch (error) {
@@ -159,19 +165,19 @@ export default class PartyManagement {
     }
   }
 
-  private async inviteToParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
+  public inviteToParty(leader: ICharacter, target: ICharacter, character: ICharacter): void {
     if (!leader || !target) {
       throw new Error("Leader or target not found");
     }
 
-    const checkIfIsLeader = await this.checkIfIsLeader(character._id, leader._id);
-    if (!checkIfIsLeader) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-        message: "You are not the party leader",
-        type: "info",
-      });
-      return;
-    }
+    // const checkIfIsLeader = await this.checkIfIsLeader(character._id, leader._id);
+    // if (!checkIfIsLeader) {
+    //   this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
+    //     message: "You are not the party leader",
+    //     type: "info",
+    //   });
+    //   return;
+    // }
 
     this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
       leaderId: leader._id,
@@ -221,10 +227,14 @@ export default class PartyManagement {
     const isSameAsTarget = target._id.toString() === character._id.toString();
 
     if (isLeader && isSameAsTarget) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: "You must transfer the leadership of the party before leaving!",
-        type: "info",
-      });
+      const party = await this.getPartyByCharacterId(target._id);
+      if (party && party.members!.length !== 0) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "You must transfer the leadership of the party before leaving!",
+          type: "info",
+        });
+        return;
+      }
     } else {
       if (!isSameAsTarget && !isLeader) {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
@@ -240,12 +250,11 @@ export default class PartyManagement {
         });
         return;
       }
+    }
 
-      await this.removeMemberFromParty(leader, target);
-
-      if (isSameAsTarget) {
-        await this.partyInfoRead(character);
-      }
+    await this.removeMemberFromParty(leader, target);
+    if (isSameAsTarget) {
+      await this.partyInfoRead(character);
     }
   }
 
@@ -268,8 +277,9 @@ export default class PartyManagement {
 
     // if (isLeader && party.members.length === 0) {
     if (party.members.length === 0) {
-      const character = (await Character.findById(leader._id).lean()) as ICharacter;
-      await this.deleteParty(character);
+      const leaderData = (await Character.findById(leader._id).lean()) as ICharacter;
+      await this.deleteParty(leaderData);
+      await this.partyInfoRead(target);
 
       return;
     }
@@ -278,6 +288,7 @@ export default class PartyManagement {
     await this.applyAllBuffInParty(updatedParty);
 
     await this.partyInfoRead(leader);
+    await this.partyInfoRead(target);
 
     const partyInfoData = (await this.getPartyByCharacterId(leader._id)) as unknown as ICharacterPartyShared;
     void this.sendMessageToPartyMembers(`${target.name} left the party`, partyInfoData, true);
@@ -286,22 +297,21 @@ export default class PartyManagement {
     // void this.sendMessageToPartyMembers(`${target.name} left the party`, partyInfoData);
   }
 
-  private async deleteParty(character: ICharacter): Promise<void> {
-    const isInParty = await this.checkIfIsInParty(character);
+  private async deleteParty(leader: ICharacter): Promise<void> {
+    const isInParty = await this.checkIfIsInParty(leader);
     if (!isInParty) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
         message: "You are not in a party",
         type: "info",
       });
       return;
     }
 
-    const party = (await this.getPartyByCharacterId(character._id)) as ICharacterParty;
+    const party = (await this.getPartyByCharacterId(leader._id)) as ICharacterParty;
     if (party && party !== null) {
-      await this.removeAllBuffInParty(party);
-      await CharacterParty.deleteById(party._id);
-
-      await this.partyInfoRead(character);
+      // await this.removeAllBuffInParty(party);
+      await CharacterParty.deleteOne({ _id: party._id });
+      await this.partyInfoRead(leader);
     }
   }
 
@@ -550,6 +560,20 @@ export default class PartyManagement {
           );
         }
       }
+
+      // send to leader.
+      const leaderData = (await Character.findById(partyInfo.leader._id).lean()) as ICharacter;
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(leaderData.channelId!, UISocketEvents.ShowMessage, {
+        message: messageToSend,
+        type: "info",
+      });
+      if (isToSendPartyData) {
+        this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
+          leaderData.channelId!,
+          PartySocketEvents.PartyInfoOpen,
+          partyInfo
+        );
+      }
     }
   }
 
@@ -573,8 +597,6 @@ export default class PartyManagement {
   }
 
   private async checkIfIsLeader(characterId: string, leaderId: string): Promise<boolean> {
-    console.log({ characterId: characterId, leaderId: leaderId });
-
     const party = (await CharacterParty.findOne({ "leader._id": characterId })) as ICharacterParty;
     if (!party || party === null) {
       return false;
@@ -595,25 +617,51 @@ export default class PartyManagement {
   }
 
   private async haveFreeSlots(leader: ICharacter): Promise<boolean> {
-    console.log(leader._id);
     const party = (await CharacterParty.findOne({ "leader._id": leader._id })
       .lean({ virtuals: true })
       .select("maxSize size members")) as ICharacterParty;
 
     if (!party) {
-      console.log("False 1");
-      return false;
+      return true;
     }
 
     const maxSize = party.maxSize;
     const actualSize = party.size;
 
     if (actualSize! >= maxSize) {
-      console.log("False 2");
       return false;
     }
 
     return true;
+  }
+
+  public async isWithinRange(
+    target: INPC,
+    charactersId: Types.ObjectId[],
+    maxDistance: number
+  ): Promise<Types.ObjectId[]> {
+    const charactersInRange: Types.ObjectId[] = [];
+    const maxDistanceSquared = maxDistance * maxDistance;
+    const characters = (await Character.find({
+      _id: { $in: charactersId },
+    })
+      .lean()
+      .select("_id scene x y")) as ICharacter[];
+    if (!characters) {
+      return [];
+    }
+    for (const character of characters) {
+      if (target.scene !== character.scene) {
+        continue;
+      }
+      const dx = target.x - character.x;
+      const dy = target.y - character.y;
+      const distanceSquared = dx * dx + dy * dy;
+      if (distanceSquared <= maxDistanceSquared) {
+        charactersInRange.push(character._id);
+      }
+    }
+    return charactersInRange;
   }
   // #endregion
 }

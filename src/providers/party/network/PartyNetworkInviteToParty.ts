@@ -5,28 +5,27 @@ import { IPartyManagementFromClient, PartySocketEvents } from "@rpg-engine/share
 import { provide } from "inversify-binding-decorators";
 import PartyManagement from "../PartyManagement";
 
-@provide(PartyNetworkAcceptInvite)
-export class PartyNetworkAcceptInvite {
+@provide(PartyNetworkInviteToParty)
+export class PartyNetworkInviteToParty {
   constructor(private socketAuth: SocketAuth, private partyManagement: PartyManagement) {}
-  // #TODO REMOVE
-  public onAcceptInvite(channel: SocketChannel): void {
+
+  public onInviteToParty(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PartySocketEvents.AcceptInvite,
+      PartySocketEvents.Invite,
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
           const leader = (await Character.findById(data.leaderId).lean()) as ICharacter;
-
           if (!leader) {
-            throw new Error("Error on joing party, character leader not found");
+            throw new Error("Error on leave party, character leader not found");
           }
 
           const target = (await Character.findById(data.targetId).lean()) as ICharacter;
           if (!target) {
-            throw new Error("Error on joing party, character target not found");
+            throw new Error("Error on leave party, character target not found");
           }
 
-          await this.partyManagement.acepptInvite(leader, target, character);
+          await this.partyManagement.inviteToParty(leader, target, character);
         } catch (error) {
           console.error(error);
         }
