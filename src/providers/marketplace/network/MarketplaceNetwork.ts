@@ -1,6 +1,7 @@
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { provide } from "inversify-binding-decorators";
 import { MarketplaceGetItemsNetwork } from "./MarketplaceGetItemsNetwork";
+import { MarketplaceGetPVPZoneNetwork } from "./MarketplaceGetPVPZoneNetwork";
 import { MarketplaceItemAddRemoveNetwork } from "./MarketplaceItemAddRemoveNetwork";
 import { MarketplaceItemBuyNetwork } from "./MarketplaceItemBuyNetwork";
 import { MarketplaceMoneyWithdrawNetwork } from "./MarketplaceMoneyWithdrawNetwork";
@@ -11,7 +12,8 @@ export class MarketplaceNetwork {
     private marketplaceGetItemsNetwork: MarketplaceGetItemsNetwork,
     private marketplaceItemAddRemoveNetwork: MarketplaceItemAddRemoveNetwork,
     private marketplaceItemBuyNetwork: MarketplaceItemBuyNetwork,
-    private marketplaceMoneyWithdrawNetwork: MarketplaceMoneyWithdrawNetwork
+    private marketplaceMoneyWithdrawNetwork: MarketplaceMoneyWithdrawNetwork,
+    private marketplaceGetPVPZoneNetwork: MarketplaceGetPVPZoneNetwork
   ) {}
 
   public onAddEventListeners(channel: SocketChannel): void {
@@ -19,5 +21,6 @@ export class MarketplaceNetwork {
     this.marketplaceItemAddRemoveNetwork.onItemAddRemove(channel);
     this.marketplaceItemBuyNetwork.onItemBuy(channel);
     this.marketplaceMoneyWithdrawNetwork.onMoneyWithdraw(channel);
+    this.marketplaceGetPVPZoneNetwork.onGetPVPZone(channel);
   }
 }

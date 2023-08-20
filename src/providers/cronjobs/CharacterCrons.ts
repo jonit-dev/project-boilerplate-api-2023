@@ -8,7 +8,7 @@ import {
   NewRelicSubCategory,
   NewRelicTransactionCategory,
 } from "@providers/types/NewRelicTypes";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
@@ -56,6 +56,13 @@ export class CharacterCrons {
         }
       );
     });
+
+    // Check for clean skull from character
+    nodeCron.schedule("* * * * *", async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupSkullCrons", async () => {
+        await this.cleanSkullCharacters();
+      });
+    });
   }
 
   private async unbanCharacters(): Promise<void> {
@@ -101,6 +108,7 @@ export class CharacterCrons {
         this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
           reason: "You have were disconnected due to inactivity!",
         });
+
         await this.socketMessaging.sendEventToCharactersAroundCharacter(
           character,
           CharacterSocketEvents.CharacterLogout,
@@ -114,7 +122,55 @@ export class CharacterCrons {
         await this.socketSessionControl.deleteSession(character);
 
         await this.characterLastAction.clearLastAction(character._id);
+
+        this.newRelic.trackMetric(
+          NewRelicMetricCategory.Count,
+          NewRelicSubCategory.Characters,
+          "CharacterInactiveLogOut",
+          1
+        );
       }
+    }
+  }
+
+  private async cleanSkullCharacters(): Promise<void> {
+    const now = new Date();
+
+    const charactersWithSkull = (await Character.find({
+      skullExpiredAt: { $lt: now },
+      hasSkull: true,
+    }).lean()) as ICharacter[];
+
+    if (charactersWithSkull.length === 0) return;
+
+    // Prepare the bulk update operation
+    const bulkOps = charactersWithSkull.map((character) => ({
+      updateOne: {
+        filter: { _id: character._id },
+        update: {
+          $set: { hasSkull: false },
+          $unset: { skullType: "", skullExpiredAt: "" },
+        },
+      },
+    }));
+
+    // Execute the bulk update
+    await Character.bulkWrite(bulkOps);
+
+    // Send socket messages
+    for (const character of charactersWithSkull) {
+      const payload: ICharacterAttributeChanged = {
+        targetId: character._id,
+        hasSkull: false,
+      };
+
+      await this.socketMessaging.sendEventToCharactersAroundCharacter(
+        character,
+        CharacterSocketEvents.AttributeChanged,
+        payload,
+        true
+      );
+      this.socketMessaging.sendMessageToCharacter(character, "Your skull was dismissed!");
     }
   }
 }

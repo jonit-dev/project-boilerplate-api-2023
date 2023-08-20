@@ -1,8 +1,8 @@
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { IMarketplaceGetItems, MarketplaceSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MarketplaceGetItems } from "../MarketplaceGetItems";
-import { IMarketplaceGetItems, MarketplaceSocketEvents } from "@rpg-engine/shared";
 
 @provide(MarketplaceGetItemsNetwork)
 export class MarketplaceGetItemsNetwork {
@@ -13,7 +13,7 @@ export class MarketplaceGetItemsNetwork {
       channel,
       MarketplaceSocketEvents.GetItems,
       async ({ npcId, options }: IMarketplaceGetItems, character) => {
-        this.marketplaceGetItems.getItems(character, npcId, options);
+        await this.marketplaceGetItems.getItems(character, npcId, options);
       }
     );
   }

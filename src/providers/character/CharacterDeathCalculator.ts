@@ -3,7 +3,7 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterDeathCalculator)
 export class CharacterDeathCalculator {
-  public calculateSkillLoss(skills: ISkill): number {
+  public calculateSkillLoss(skills: ISkill, multiply = 1): number {
     // Define the XP/SP loss based on character level
     const skillLossPercentageLevel = {
       5: 0,
@@ -20,7 +20,7 @@ export class CharacterDeathCalculator {
 
     for (const [threshold, xpLoss] of Object.entries(skillLossPercentageLevel)) {
       if (level <= Number(threshold)) {
-        return xpLoss;
+        return xpLoss * multiply;
       }
     }
 

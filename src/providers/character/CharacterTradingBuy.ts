@@ -22,6 +22,8 @@ import { CharacterTradingValidation } from "./CharacterTradingValidation";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterWeight } from "./weight/CharacterWeight";
+import { NewRelic } from "@providers/analytics/NewRelic";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 
 @provide(CharacterTradingBuy)
 export class CharacterTradingBuy {
@@ -32,7 +34,8 @@ export class CharacterTradingBuy {
     private characterItemInventory: CharacterItemInventory,
     private characterWeight: CharacterWeight,
     private characterTradingValidation: CharacterTradingValidation,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
@@ -162,6 +165,13 @@ export class CharacterTradingBuy {
     this.sendRefreshItemsEvent(payloadUpdate, character);
 
     await clearCacheForKey(`${character._id}-inventory`);
+
+    this.newRelic.trackMetric(
+      NewRelicMetricCategory.Count,
+      tradingEntityType === TradingEntity.NPC ? NewRelicSubCategory.NPCs : NewRelicSubCategory.Marketplace,
+      "Buy",
+      1
+    );
 
     return true;
   }

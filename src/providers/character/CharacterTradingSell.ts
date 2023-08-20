@@ -25,6 +25,8 @@ import { CharacterItemContainer } from "./characterItems/CharacterItemContainer"
 import { CharacterItemInventory } from "./characterItems/CharacterItemInventory";
 import { CharacterItemSlots } from "./characterItems/CharacterItemSlots";
 import { CharacterWeight } from "./weight/CharacterWeight";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
+import { NewRelic } from "@providers/analytics/NewRelic";
 
 @provide(CharacterTradingSell)
 export class CharacterTradingSell {
@@ -37,7 +39,8 @@ export class CharacterTradingSell {
     private mathHelper: MathHelper,
     private characterItemSlots: CharacterItemSlots,
     private characterTradingBalance: CharacterTradingBalance,
-    private characterInventory: CharacterInventory
+    private characterInventory: CharacterInventory,
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
@@ -74,6 +77,13 @@ export class CharacterTradingSell {
     await this.sendRefreshItemsEvent(character);
 
     await clearCacheForKey(`${character._id}-inventory`);
+
+    this.newRelic.trackMetric(
+      NewRelicMetricCategory.Count,
+      entityType === TradingEntity.NPC ? NewRelicSubCategory.NPCs : NewRelicSubCategory.Marketplace,
+      "Sell",
+      1
+    );
   }
 
   private mergeSameItems(items: ITradeRequestItem[]): ITradeRequestItem[] {

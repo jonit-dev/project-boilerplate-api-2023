@@ -10,6 +10,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
@@ -19,15 +20,18 @@ import round from "lodash/round";
 export class NPCFreezer {
   public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private npcView: NPCView, private newRelic: NewRelic) {}
+  constructor(private npcView: NPCView, private newRelic: NewRelic, private inMemoryHashTable: InMemoryHashTable) {}
 
   public init(): void {
     this.setCPUUsageCheckInterval();
   }
 
   @TrackNewRelicTransaction()
-  public tryToFreezeNPC(npc: INPC): void {
-    if (this.freezeCheckIntervals.has(npc.id) || !npc.isBehaviorEnabled) {
+  public async tryToFreezeNPC(npc: INPC): Promise<void> {
+    const namespace = "isBehaviorEnabled";
+    const isBehaviorEnabled = (await this.inMemoryHashTable.get(namespace, npc.id)) || false;
+
+    if (this.freezeCheckIntervals.has(npc.id) || !isBehaviorEnabled) {
       return;
     }
 
@@ -49,8 +53,8 @@ export class NPCFreezer {
     if (appEnv.general.ENV === EnvType.Development) {
       console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
     }
-
-    await NPC.updateOne({ _id: npc._id, scene: npc.scene }, { isBehaviorEnabled: false });
+    const namespace = "isBehaviorEnabled";
+    await this.inMemoryHashTable.set(namespace, npc.id, false);
     const npcCycle = NPC_CYCLES.get(npc.id);
     if (npcCycle) {
       await npcCycle.clear();
@@ -78,7 +82,9 @@ export class NPCFreezer {
         );
       }
 
-      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
+      const namespace = "isBehaviorEnabled";
+      const totalActiveNPCs = await this.inMemoryHashTable.countBooleanEnabledValues(namespace, true);
+
       const freezeTasks: any[] = [];
 
       if (totalActiveNPCs >= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
