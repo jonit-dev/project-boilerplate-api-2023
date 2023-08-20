@@ -10,10 +10,6 @@ cd ~/definya/api
 echo "🐳 Exporting database..."
 npm run db:export:swarm
 
-# Inform PM2 to initialize the graceful shutdown and run command
-echo "🐳 Sending PM2 Graceful shutdown signal to swarm..."
-bash ./environment/swarm-sigint-all.sh $SERVICE_NAME;
-
 # Update the service to restart containers
 echo "Restarting service..."
 docker service update --force --with-registry-auth $SERVICE_NAME

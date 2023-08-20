@@ -7,10 +7,15 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
     logging:
       options:
         max-size: "10m"
         max-file: "3"
+    stop_signal: SIGINT
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
       - "${SOCKET_PORT}:${SOCKET_PORT}"
