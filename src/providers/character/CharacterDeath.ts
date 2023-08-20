@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterPvPKillLog } from "@entities/ModuleCharacter/CharacterPvPKillLogModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
@@ -42,12 +43,11 @@ import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
+import { CharacterSkull } from "./CharacterSkull";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterBuffActivator } from "./characterBuff/CharacterBuffActivator";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
 import { CharacterWeight } from "./weight/CharacterWeight";
-import { CharacterPvPKillLog } from "@entities/ModuleCharacter/CharacterPvPKillLogModel";
-import { CharacterSkull } from "./CharacterSkull";
 
 export const DROPPABLE_EQUIPMENT = [
   "head",
@@ -97,8 +97,6 @@ export class CharacterDeath {
       if (killer) {
         await this.clearAttackerTarget(killer);
       }
-
-      await entityEffectUse.clearAllEntityEffects(character);
 
       const characterDeathData: IBattleDeath = {
         id: character.id,
@@ -175,6 +173,8 @@ export class CharacterDeath {
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
+      await entityEffectUse.clearAllEntityEffects(character); // make sure to clear all entity effects before respawn
+
       await this.respawnCharacter(character);
     }
   }
@@ -204,6 +204,7 @@ export class CharacterDeath {
       { _id: character._id },
       {
         $set: {
+          isOnline: false,
           health: character.maxHealth,
           mana: character.maxMana,
           x: character.initialX,
