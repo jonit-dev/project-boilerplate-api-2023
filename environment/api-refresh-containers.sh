@@ -10,7 +10,7 @@ cd ~/definya/api
 echo "🐳 Exporting database..."
 npm run db:export:swarm
 
-# Update the service to restart containers!
+# Update the service to restart containers!!
 echo "🐳Restarting swarm service..."
 
 docker service update --force --with-registry-auth $SERVICE_NAME
