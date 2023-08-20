@@ -33,6 +33,7 @@ import { throttle } from "lodash";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
 
+import { CRAFTING_DIFFICULTY_RATIO } from "@providers/constants/CraftingConstants";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemCraftable)
@@ -533,8 +534,8 @@ export class ItemCraftable {
   }
 
   private isCraftSuccessful(skillsAverage: number, baseChance: number): boolean {
-    const bonusScale = 1 + (baseChance - 1) / 20; // scale bonus based on base chance
-    const successChance = baseChance + Math.sqrt(skillsAverage * bonusScale) * 3;
+    const bonusScale = 1 + (baseChance - 1) / 40;
+    const successChance = baseChance + skillsAverage * bonusScale * CRAFTING_DIFFICULTY_RATIO;
     const roll = random(0, 100);
     return roll <= successChance;
   }

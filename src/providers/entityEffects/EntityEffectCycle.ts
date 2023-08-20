@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
+import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container, newRelic, npcExperience } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
@@ -42,6 +43,18 @@ export class EntityEffectCycle {
       const currentEffectIndex = appliedEffects.findIndex((effect) => effect.key === entityEffect.key);
       if (currentEffectIndex < 0) {
         return;
+      }
+
+      if (target.type === EntityType.Character) {
+        const targetCharacter = target as ICharacter;
+
+        const characterValidation = container.get(CharacterValidation);
+
+        const hasBasicValidation = characterValidation.hasBasicValidation(targetCharacter);
+
+        if (!hasBasicValidation) {
+          return;
+        }
       }
 
       const attacker = await this.getTarget(attackerId, attackerType, true);
