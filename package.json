@@ -26,7 +26,7 @@
     "configure": "./environment/configure.sh",
     "db:export": "./environment/db-export.sh",
     "db:export:swarm": "./environment/db-export-swarm.sh",
-    "db:import": "echo 'Please import by running bash ./environment/db-import.sh'",
+    "db:import:swarm": "echo 'Please import by running bash ./environment/db-import-swarm.sh",
     "db:download": "./environment/db-download.sh",
     "cache:clear": "sudo rm -rf ./src/providers/data/cache/**"
   },
