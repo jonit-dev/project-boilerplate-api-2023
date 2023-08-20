@@ -7,14 +7,12 @@ SERVICE_NAME="swarm-stack_rpg-api"
 cd ~/definya/api
 
 # Export database
+echo "🐳 Exporting database..."
 npm run db:export:swarm
 
 # Inform PM2 to initialize the graceful shutdown and run command
-echo "Shutting down instances..."
-docker service ps --format "{{.Node}} {{.Name}}.{{.ID}}" $SERVICE_NAME | while read node task_name; do
-  container_id=$(docker --host $node ps --filter "name=$task_name" --format "{{.ID}}")
-  docker --host $node exec $container_id bash -c 'pm2 sendSignal SIGINT rpg-api'
-done
+echo "🐳 Sending PM2 Graceful shutdown signal to swarm..."
+bash ./swarm-sigint-all.sh $SERVICE_NAME;
 
 # Update the service to restart containers
 echo "Restarting service..."
