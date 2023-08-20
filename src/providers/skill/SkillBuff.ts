@@ -2,15 +2,18 @@ import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { CharacterBuffType } from "@rpg-engine/shared";
+import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
+import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
+import { CharacterBuffType, CharacterTrait } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import { SkillsAvailable } from "./SkillTypes";
-import { TraitGetter } from "./TraitGetter";
 
 @provide(SkillBuff)
 export class SkillBuff {
-  constructor(private traitGetter: TraitGetter) {}
+  constructor(
+    private characterBuffTracker: CharacterBuffTracker,
+    private characterBonusOrPenalties: CharacterClassBonusOrPenalties
+  ) {}
 
   @TrackNewRelicTransaction()
   public async getSkillsWithBuff(character: ICharacter): Promise<ISkill> {
@@ -23,6 +26,8 @@ export class SkillBuff {
     if (!skills) {
       throw new Error("Skills not found for character ", character._id.toString());
     }
+
+    const parsedBonusAndPenalties = await this.characterBonusOrPenalties.getClassBonusOrPenaltiesBuffs(character._id);
 
     // Clone the original skills
     const clonedSkills = _.cloneDeep(skills);
@@ -50,12 +55,34 @@ export class SkillBuff {
           continue;
         }
 
-        clonedSkills[buff.trait].buffAndDebuff = await this.traitGetter.getSkillLevelWithBuffs(
-          skills,
-          buff.trait as SkillsAvailable
+        clonedSkills[buff.trait].buffAndDebuff = await this.characterBuffTracker.getAllBuffPercentageChanges(
+          character._id,
+          buff.trait as CharacterTrait
         );
       }
+
+      for (const [key, value] of Object.entries(parsedBonusAndPenalties)) {
+        const currentValue = clonedSkills[key].buffAndDebuff;
+
+        if (!clonedSkills[key]) {
+          continue;
+        }
+
+        // if we have nothing set, just consider the bonus and penalties from class
+        if (!clonedSkills[key].buffAndDebuff) {
+          clonedSkills[key].buffAndDebuff = value;
+        }
+
+        // if we already have something there, just increment with the bonus and penalties from class
+
+        clonedSkills[key].buffAndDebuff = (currentValue ?? 0) + value;
+
+        if (clonedSkills[key].buffAndDebuff === 0) {
+          delete clonedSkills[key].buffAndDebuff;
+        }
+      }
     }
+
     return clonedSkills;
   }
 }

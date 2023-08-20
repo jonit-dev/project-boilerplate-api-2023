@@ -19,7 +19,7 @@ export const spellSilence: Partial<ISpell> = {
   description: "A spell that prevents the target from casting spells for a short period.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "vocem inhibeo",
-  manaCost: 300,
+  manaCost: 150,
   minLevelRequired: 15,
   minMagicLevelRequired: 17,
   cooldown: 120,

@@ -75,9 +75,14 @@ export class ItemUse {
       return false;
     }
 
-    this.applyItemUsage(bluePrintItem, character.id);
+    if (useItem && useItem.subType === ItemSubType.Food && useItem.healthRecovery) {
+      this.applyItemUsage(bluePrintItem, character.id, useItem.healthRecovery);
+    } else {
+      this.applyItemUsage(bluePrintItem, character.id);
+    }
 
-    await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1);
+    const rarity = useItem.rarity || undefined;
+    await this.characterItemInventory.decrementItemFromInventoryByKey(useItem.key, character, 1, rarity);
 
     await this.characterWeight.updateCharacterWeight(character);
 
@@ -112,7 +117,7 @@ export class ItemUse {
     return true;
   }
 
-  private applyItemUsage(bluePrintItem: Partial<IItem>, characterId: string): void {
+  private applyItemUsage(bluePrintItem: Partial<IItem>, characterId: string, healthRecovery?: number): void {
     const intervals = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
 
     new ItemUseCycle(async () => {
@@ -120,9 +125,18 @@ export class ItemUse {
         const character = await Character.findOne({ _id: characterId });
 
         if (character) {
-          bluePrintItem.usableEffect?.(character);
-          await character.save();
-          await this.sendItemConsumptionEvent(character);
+          try {
+            if (healthRecovery) {
+              bluePrintItem.usableEffect?.(character, healthRecovery);
+            } else {
+              bluePrintItem.usableEffect?.(character);
+            }
+
+            await character.save();
+            await this.sendItemConsumptionEvent(character);
+          } catch (error) {
+            console.error("An error occurred in applyItemUsage: ", error);
+          }
         }
       });
     }, intervals);

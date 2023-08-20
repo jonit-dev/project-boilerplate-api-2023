@@ -1,14 +1,14 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { MarketplaceItemBuy } from "../MarketplaceItemBuy";
-import { IMarketplaceItem, MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, unitTestHelper } from "@providers/inversify/container";
-import { Types } from "mongoose";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { IMarketplaceItem, MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { MarketplaceMoney } from "@entities/ModuleMarketplace/MarketplaceMoneyModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { CharacterInventory } from "@providers/character/CharacterInventory";
+import { container, unitTestHelper } from "@providers/inversify/container";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { Types } from "mongoose";
+import { MarketplaceItemBuy } from "../MarketplaceItemBuy";
 
 describe("MarketplaceItemBuy.ts", () => {
   let marketplaceItemBuy: MarketplaceItemBuy;
@@ -18,7 +18,7 @@ describe("MarketplaceItemBuy.ts", () => {
   let testMarketplaceItem: IMarketplaceItem;
   let testNPC: INPC;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     marketplaceItemBuy = container.get(MarketplaceItemBuy);
     characterInventory = container.get(CharacterInventory);
   });

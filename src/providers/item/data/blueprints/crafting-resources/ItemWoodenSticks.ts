@@ -10,7 +10,7 @@ export const itemWoodenSticks: ICraftableItemBlueprint = {
   name: "Wooden Sticks",
   description: "Wooden sticks used for crafting.",
   weight: 0.4,
-  maxStackSize: 25,
+  maxStackSize: 999,
   basePrice: 1,
   canSell: false,
 };

@@ -3,11 +3,10 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER } from "@providers/constants/EntityEffectsConstants";
-import { container } from "@providers/inversify/container";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { BasicAttribute } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import random from "lodash/random";
 
 interface ICalculateDamageOptions {
   maxBonusDamage?: number;
@@ -16,7 +15,7 @@ interface ICalculateDamageOptions {
 
 @provide(CalculateEffectDamage)
 export class CalculateEffectDamage {
-  constructor() {}
+  constructor(private skillGetter: TraitGetter) {}
 
   @TrackNewRelicTransaction()
   public async calculateEffectDamage(
@@ -24,33 +23,101 @@ export class CalculateEffectDamage {
     target: ICharacter | INPC,
     options?: ICalculateDamageOptions
   ): Promise<number> {
-    const MIN_DAMAGE = 1;
-    const MIN_ATTACKER_LEVEL = 1;
+    const minRawDamage = 1;
+    const minAttackerLevel = 1;
     try {
-      const attackerSkills = attacker.skills as ISkill;
-      const attackerLevel = attackerSkills?.level ?? MIN_ATTACKER_LEVEL;
+      let attackerSkills = attacker.skills as ISkill;
 
-      const targetSkill = (await Skill.findOne({ _id: target.skills }).lean()) as ISkill;
+      if (!attackerSkills?.level) {
+        attackerSkills = (await Skill.findById(target.skills)
+          .lean({
+            virtuals: true,
+            defaults: true,
+          })
+          .cacheQuery({
+            cacheKey: `${target._id}-skills`,
+          })) as ISkill;
+      }
 
-      const skillGetter = container.get(TraitGetter);
+      const attackerLevel = attackerSkills?.level ?? minAttackerLevel;
 
-      const resistanceLevel = await skillGetter.getSkillLevelWithBuffs(targetSkill, BasicAttribute.Resistance);
-      const magicResistanceLevel = await skillGetter.getSkillLevelWithBuffs(
-        targetSkill,
-        BasicAttribute.MagicResistance
+      const targetSkill = (await Skill.findById(target.skills)
+        .lean({
+          virtuals: true,
+          defaults: true,
+        })
+        .cacheQuery({
+          cacheKey: `${target._id}-skills`,
+        })) as ISkill;
+
+      const { resistanceLevel, magicResistanceLevel } = await this.getTargetResistances(targetSkill);
+
+      const { attackerMagicLevel, attackerStrengthLevel } = await this.getAttackerMagicStrengthLevel(attackerSkills);
+
+      const effectDamage = this.calculateTotalEffectDamage(
+        attackerLevel,
+        attackerMagicLevel,
+        attackerStrengthLevel,
+        minRawDamage,
+        resistanceLevel,
+        magicResistanceLevel,
+        options
       );
 
-      const maxDamage = Math.ceil(
-        attackerLevel * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER + (options?.maxBonusDamage ?? 0)
-      );
-      const effectDamageRaw = _.random(MIN_DAMAGE, maxDamage);
-      const maxDefense = _.random(MIN_DAMAGE, resistanceLevel + magicResistanceLevel);
-      const effectDamage = effectDamageRaw - maxDefense + (options?.finalBonusDamage ?? 0);
-
-      return effectDamage < MIN_DAMAGE ? MIN_DAMAGE : effectDamage;
+      return effectDamage;
     } catch (err) {
       console.error(err);
-      return MIN_DAMAGE;
+      return minRawDamage;
     }
+  }
+
+  private calculateTotalEffectDamage(
+    attackerLevel: number,
+    attackerStrengthLevel: number,
+    attackerMagicLevel: number,
+    minRawDamage: number,
+    resistanceLevel: number,
+    magicResistanceLevel: number,
+    options?: ICalculateDamageOptions
+  ): number {
+    const maxDamage = Math.ceil(
+      attackerLevel * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER +
+        Math.max(attackerMagicLevel, attackerStrengthLevel) * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER +
+        (options?.maxBonusDamage ?? 0)
+    );
+
+    const minDamage = minRawDamage + Math.round(attackerLevel / 10);
+
+    const effectDamageRaw = random(minRawDamage, maxDamage);
+    const maxDefense = random(minRawDamage, resistanceLevel + magicResistanceLevel);
+
+    const effectDamage = effectDamageRaw - maxDefense + (options?.finalBonusDamage ?? 0);
+
+    return effectDamage < minDamage ? minDamage : effectDamage;
+  }
+
+  private async getAttackerMagicStrengthLevel(attackerSkills: ISkill): Promise<{
+    attackerMagicLevel: number;
+    attackerStrengthLevel: number;
+  }> {
+    const attackerMagicLevel = await this.skillGetter.getSkillLevelWithBuffs(attackerSkills, BasicAttribute.Magic);
+    const attackerStrengthLevel = await this.skillGetter.getSkillLevelWithBuffs(
+      attackerSkills,
+      BasicAttribute.Strength
+    );
+
+    return { attackerMagicLevel, attackerStrengthLevel };
+  }
+
+  private async getTargetResistances(
+    targetSkill: ISkill
+  ): Promise<{ resistanceLevel: number; magicResistanceLevel: number }> {
+    const resistanceLevel = await this.skillGetter.getSkillLevelWithBuffs(targetSkill, BasicAttribute.Resistance);
+    const magicResistanceLevel = await this.skillGetter.getSkillLevelWithBuffs(
+      targetSkill,
+      BasicAttribute.MagicResistance
+    );
+
+    return { resistanceLevel, magicResistanceLevel };
   }
 }

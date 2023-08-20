@@ -21,7 +21,7 @@ export const spellFrenzy: Partial<ISpell> = {
   description: "A spell that causes a frenzy by increasing your attack speed but lowering your defense.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "kartal insanus",
-  manaCost: 120,
+  manaCost: 80,
   minLevelRequired: 7,
   minMagicLevelRequired: 6,
   cooldown: 120,

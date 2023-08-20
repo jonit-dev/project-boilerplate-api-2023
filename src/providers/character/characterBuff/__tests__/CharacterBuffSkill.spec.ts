@@ -7,6 +7,7 @@ import {
   BasicAttribute,
   CharacterBuffDurationType,
   CharacterBuffType,
+  CharacterClass,
   CombatSkill,
   ICharacterPermanentBuff,
   ICharacterTemporaryBuff,
@@ -29,9 +30,14 @@ describe("CharacterBuffSkill", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await unitTestHelper.createMockCharacter(null, {
-      hasSkills: true,
-    });
+    testCharacter = await unitTestHelper.createMockCharacter(
+      {
+        class: CharacterClass.None,
+      },
+      {
+        hasSkills: true,
+      }
+    );
   });
 
   describe("Core functionality", () => {

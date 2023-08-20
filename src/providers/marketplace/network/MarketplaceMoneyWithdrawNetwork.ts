@@ -1,8 +1,8 @@
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
+import { IMarketplaceWithdrawMoney, MarketplaceSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MarketplaceMoneyWithdraw } from "../MarketplaceMoneyWithdraw";
-import { IMarketplaceWithdrawMoney, MarketplaceSocketEvents } from "@rpg-engine/shared";
 
 @provide(MarketplaceMoneyWithdrawNetwork)
 export class MarketplaceMoneyWithdrawNetwork {
@@ -13,12 +13,12 @@ export class MarketplaceMoneyWithdrawNetwork {
       channel,
       MarketplaceSocketEvents.WithdrawMoney,
       async ({ npcId }: IMarketplaceWithdrawMoney, character) => {
-        this.marketplaceMoneyWithdraw.withdrawMoneyFromMarketplace(character, npcId);
+        await this.marketplaceMoneyWithdraw.withdrawMoneyFromMarketplace(character, npcId);
       }
     );
 
     this.socketAuth.authCharacterOn(channel, MarketplaceSocketEvents.GetAvailableMoney, async (_, character) => {
-      this.marketplaceMoneyWithdraw.getAvailableMoney(character);
+      await this.marketplaceMoneyWithdraw.getAvailableMoney(character);
     });
   }
 }

@@ -6,6 +6,7 @@ import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import {
+  ML_INCREASE_RATIO,
   SP_CRAFTING_INCREASE_RATIO,
   SP_INCREASE_RATIO,
   SP_MAGIC_INCREASE_TIMES_MANA,
@@ -27,6 +28,8 @@ import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
+import { NewRelic } from "@providers/analytics/NewRelic";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -40,7 +43,8 @@ export class SkillIncrease {
     private characterWeight: CharacterWeight,
     private skillMapper: SkillCraftingMapper,
     private numberFormatter: NumberFormatter,
-    private npcExperience: NPCExperience
+    private npcExperience: NPCExperience,
+    private newRelic: NewRelic
   ) {}
 
   /**
@@ -49,7 +53,12 @@ export class SkillIncrease {
    *
    */
   @TrackNewRelicTransaction()
-  public async increaseSkillsOnBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
+  public async increaseSkillsOnBattle(
+    attacker: ICharacter,
+    target: ICharacter | INPC,
+    damage: number,
+    spellHit?: boolean
+  ): Promise<void> {
     const skills = await this.fetchCharacterSkills(attacker);
 
     const weapon = await this.characterWeapon.getWeapon(attacker);
@@ -61,6 +70,10 @@ export class SkillIncrease {
     }
 
     await this.npcExperience.recordXPinBattle(attacker, target, damage);
+
+    if (spellHit) {
+      return;
+    }
 
     const canIncreaseSP = this.skillGainValidation.canUpdateSkills(attacker, skills, skillName);
     if (!canIncreaseSP) return;
@@ -89,7 +102,7 @@ export class SkillIncrease {
 
     if (increasedStrengthSP?.skillLevelUp && attacker.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(increasedStrengthSP, attacker, target);
-      await this.characterWeight.updateCharacterWeight(attacker);
+      void this.characterWeight.updateCharacterWeight(attacker);
     }
 
     if (increasedWeaponSP?.skillLevelUp && attacker.channelId) {
@@ -152,6 +165,10 @@ export class SkillIncrease {
     attribute: BasicAttribute,
     skillPointsCalculator?: Function
   ): Promise<void> {
+    if (!character.skills) {
+      throw new Error(`skills not found for character ${character.id}`);
+    }
+
     const skills = await this.fetchCharacterSkills(character);
 
     const canIncreaseSP = this.skillGainValidation.canUpdateSkills(character, skills as ISkill, attribute);
@@ -257,6 +274,13 @@ export class SkillIncrease {
         updatedSkillDetails.skillPoints,
         updatedSkillDetails.level + 1
       );
+
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        `${skillToUpdate}-SkillUp`,
+        1
+      );
     }
 
     skills[skillToUpdate] = updatedSkillDetails;
@@ -285,7 +309,7 @@ export class SkillIncrease {
 
   private getMagicSkillIncreaseCalculator(spellPower: number): Function {
     return ((power: number, skillDetails: ISkillDetails): number => {
-      const manaSp = Math.round((power ?? 0) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+      const manaSp = Math.round((spellPower * ML_INCREASE_RATIO + power) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
       return this.calculateNewSP(skillDetails) + manaSp;
     }).bind(this, spellPower);
   }

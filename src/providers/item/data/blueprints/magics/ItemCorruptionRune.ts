@@ -25,7 +25,7 @@ export const itemCorruptionRune: IRuneItemBlueprint = {
   useWithMaxDistanceGrid: RangeTypes.High,
   power: MagicPower.UltraHigh,
   canSell: false,
-  minMagicLevelRequired: 10,
+  minMagicLevelRequired: 15,
   animationKey: AnimationEffectKeys.HitCorruption,
   projectileAnimationKey: AnimationEffectKeys.Dark,
   usableEffectKey: UsableEffectsBlueprint.CorruptionRuneUsableEffect,

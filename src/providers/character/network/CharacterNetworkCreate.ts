@@ -18,6 +18,7 @@ import {
   AnimationDirection,
   AvailableWeather,
   CharacterClass,
+  CharacterSkullType,
   CharacterSocketEvents,
   EnvType,
   ICharacterCreateFromClient,
@@ -38,6 +39,7 @@ import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
 import { ItemCleaner } from "@providers/item/ItemCleaner";
 import { Locker } from "@providers/locks/Locker";
+import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
@@ -67,7 +69,8 @@ export class CharacterNetworkCreate {
     private itemCleaner: ItemCleaner,
     private characterBuffValidation: CharacterBuffValidation,
     private battleTargeting: BattleTargeting,
-    private locker: Locker
+    private locker: Locker,
+    private skillStatsIncrease: SkillStatsIncrease
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -166,6 +169,9 @@ export class CharacterNetworkCreate {
           maxMana: character.maxMana,
           textureKey: character.textureKey,
           alpha: await this.specialEffect.getOpacity(character),
+          isGiantForm: character.isGiantForm,
+          hasSkull: character.hasSkull,
+          skullType: character.skullType as CharacterSkullType,
         };
 
         switch (appEnv.general.ENV) {
@@ -240,6 +246,8 @@ export class CharacterNetworkCreate {
           maxMana: nearbyCharacter.maxMana,
           textureKey: nearbyCharacter.textureKey,
           alpha: await this.specialEffect.getOpacity(nearbyCharacter),
+          hasSkull: nearbyCharacter.hasSkull,
+          skullType: nearbyCharacter.skullType as CharacterSkullType,
         };
 
         // tell the emitter about these other characters too

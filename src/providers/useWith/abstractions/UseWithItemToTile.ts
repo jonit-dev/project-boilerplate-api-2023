@@ -153,7 +153,7 @@ export class UseWithItemToTile {
       return;
     }
 
-    await this.characterWeight.updateCharacterWeight(character);
+    void this.characterWeight.updateCharacterWeight(character);
 
     if (successAnimationEffectKey) {
       await this.animationEffect.sendAnimationEventToCharacter(

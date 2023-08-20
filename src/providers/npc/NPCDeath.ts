@@ -13,6 +13,7 @@ import {
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
@@ -51,7 +52,8 @@ export class NPCDeath {
     private npcSpawn: NPCSpawn,
     private npcExperience: NPCExperience,
     private locker: Locker,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -160,10 +162,11 @@ export class NPCDeath {
           nextSpawnTime,
           currentMovementType: currentMovementType,
           appliedEntityEffects: undefined,
-          isBehaviorEnabled: false,
         },
       }
     );
+    const namespace = "isBehaviorEnabled";
+    await this.inMemoryHashTable.set(namespace, npc._id, false);
   }
 
   @TrackNewRelicTransaction()
@@ -282,13 +285,25 @@ export class NPCDeath {
 
     let lootItem = new Item({ ...blueprintData });
 
-    if (lootItem.attack || lootItem.defense) {
+    const itemTypesWithoutRarity = [ItemType.CraftingResource, ItemType.Quest, ItemType.Information];
+
+    if (lootItem.attack || (lootItem.defense && !itemTypesWithoutRarity.includes(lootItem.type as ItemType))) {
       const rarityAttributes = this.itemRarity.setItemRarityOnLootDrop(lootItem);
       lootItem = new Item({
         ...blueprintData,
         attack: rarityAttributes.attack,
         defense: rarityAttributes.defense,
         rarity: rarityAttributes.rarity,
+      });
+    }
+
+    if (lootItem.subType === ItemSubType.Food) {
+      const rarityAttributesFood = await this.itemRarity.setItemRarityOnLootDropForFood(lootItem);
+      lootItem = new Item({
+        ...blueprintData,
+        healthRecovery: rarityAttributesFood?.healthRecovery,
+        usableEffectDescription: rarityAttributesFood?.usableEffectDescription,
+        rarity: rarityAttributesFood?.rarity,
       });
     }
 
@@ -315,7 +330,9 @@ export class NPCDeath {
     };
     const lootMultiplier = lootMultipliers[blueprintData?.type] || NPC_LOOT_CHANCE_MULTIPLIER;
 
-    return loot.chance * lootMultiplier * multiplier;
+    const finalMultiplier = lootMultiplier * multiplier;
+
+    return loot.chance * finalMultiplier;
   }
 
   private getLootQuantity(loot: INPCLoot): number {

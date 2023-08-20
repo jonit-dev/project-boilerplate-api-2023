@@ -29,6 +29,11 @@ export class CharacterMonitor {
   }
 
   public watch(character: ICharacter, callback: CharacterMonitorCallback): void {
+    // clear out previous callbacks
+    if (this.charactersCallbacks.has(String(character._id))) {
+      this.charactersCallbacks.delete(String(character._id));
+    }
+
     this.charactersCallbacks.set(String(character._id), callback);
   }
 

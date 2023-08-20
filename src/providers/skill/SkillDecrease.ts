@@ -2,7 +2,14 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterDeathCalculator } from "@providers/character/CharacterDeathCalculator";
-import { BASIC_ATTRIBUTES, COMBAT_SKILLS, ISkillDetails, SKILLS_MAP, calculateSPToNextLevel } from "@rpg-engine/shared";
+import {
+  BASIC_ATTRIBUTES,
+  COMBAT_SKILLS,
+  CharacterSkullType,
+  ISkillDetails,
+  SKILLS_MAP,
+  calculateSPToNextLevel,
+} from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { SkillCalculator } from "./SkillCalculator";
 import { SkillFunctions } from "./SkillFunctions";
@@ -37,7 +44,17 @@ export class SkillDecrease {
       return false;
     }
 
-    const xpLossOnDeath = this.characterDeathCalculator.calculateSkillLoss(skills);
+    let xpLossOnDeath = this.characterDeathCalculator.calculateSkillLoss(skills);
+    if (character.hasSkull) {
+      switch (character.skullType) {
+        case CharacterSkullType.YellowSkull:
+          xpLossOnDeath *= 1.3;
+          break;
+        case CharacterSkullType.RedSkull:
+          xpLossOnDeath *= 2;
+          break;
+      }
+    }
 
     const currentXP = Math.round(skills.experience);
     const deathPenaltyXp = Math.round(currentXP * (xpLossOnDeath / 100));
@@ -62,7 +79,9 @@ export class SkillDecrease {
 
     try {
       for (let i = 0; i < BASIC_ATTRIBUTES.length; i++) {
-        const decreasedSP = this.decreaseSP(skills, BASIC_ATTRIBUTES[i]);
+        let multiply = 1;
+        if (character.hasSkull && character.skullType === CharacterSkullType.RedSkull) multiply = 2;
+        const decreasedSP = this.decreaseSP(skills, BASIC_ATTRIBUTES[i], multiply);
         await this.skillFunctions.updateSkills(skills, character);
 
         if (decreasedSP) {
@@ -87,7 +106,9 @@ export class SkillDecrease {
     let hasDecreasedSP = false;
     try {
       for (let i = 0; i < COMBAT_SKILLS.length; i++) {
-        const decreasedSP = this.decreaseSP(skills, COMBAT_SKILLS[i]);
+        let multiply = 1;
+        if (character.hasSkull && character.skullType === CharacterSkullType.RedSkull) multiply = 2;
+        const decreasedSP = this.decreaseSP(skills, COMBAT_SKILLS[i], multiply);
 
         if (decreasedSP) {
           hasDecreasedSP = true;
@@ -104,7 +125,7 @@ export class SkillDecrease {
     }
   }
 
-  private decreaseSP(skills: ISkill, skillKey: string): boolean {
+  private decreaseSP(skills: ISkill, skillKey: string, multiply = 1): boolean {
     const skillToUpdate = SKILLS_MAP.get(skillKey);
 
     if (!skillToUpdate) {
@@ -113,7 +134,7 @@ export class SkillDecrease {
 
     const skill = skills[skillToUpdate] as ISkillDetails;
 
-    const spLossOnDeath = this.characterDeathCalculator.calculateSkillLoss(skills);
+    const spLossOnDeath = this.characterDeathCalculator.calculateSkillLoss(skills, multiply);
 
     const skillPoints = Math.round(skill.skillPoints);
     const deathPenaltySP = Math.round(skillPoints * (spLossOnDeath / 100));

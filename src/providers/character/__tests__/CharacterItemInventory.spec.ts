@@ -3,7 +3,8 @@ import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { OthersBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { FoodsBlueprint, OthersBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
+import { ItemSubType } from "@rpg-engine/shared";
 import { Types } from "mongoose";
 import { CharacterTradingBalance } from "../CharacterTradingBalance";
 import { CharacterItemInventory } from "../characterItems/CharacterItemInventory";
@@ -11,6 +12,7 @@ import { CharacterItemInventory } from "../characterItems/CharacterItemInventory
 describe("CharacterItemInventory.ts", () => {
   let characterItemInventory: CharacterItemInventory;
   let testCharacter: ICharacter;
+  let testCharacter2: ICharacter;
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
   let characterTradingBalance: CharacterTradingBalance;
@@ -21,9 +23,16 @@ describe("CharacterItemInventory.ts", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await unitTestHelper.createMockCharacter(null, { hasInventory: true, hasEquipment: true });
+    testCharacter = await unitTestHelper.createMockCharacter(null, {
+      hasSkills: true,
+      hasInventory: true,
+      hasEquipment: true,
+    });
     inventory = await testCharacter.inventory;
     inventoryContainer = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
+    testCharacter2 = await unitTestHelper.createMockCharacter(null, {
+      hasSkills: true,
+    });
   });
 
   afterEach(async () => {
@@ -458,6 +467,62 @@ describe("CharacterItemInventory.ts", () => {
 
     const item2 = await Item.findOne({ _id: goldCoins2._id });
     expect(item2).toBeNull();
+  });
+
+  it("should properly add an item to the inventory", async () => {
+    const sword = await unitTestHelper.createMockItemFromBlueprint(SwordsBlueprint.Sword);
+    const extraProps = { attack: sword.attack, defense: sword.defense };
+
+    const result = await characterItemInventory.addItemToInventory(sword.key, testCharacter, extraProps);
+
+    expect(result).toBe(true);
+    const updatedInventoryContainer = (await ItemContainer.findById(
+      inventory.itemContainer
+    )) as unknown as IItemContainer;
+    const addedItem = updatedInventoryContainer.slots[0];
+    expect(addedItem).toBeTruthy();
+    // @ts-ignore
+    expect(addedItem.attack).toBeGreaterThanOrEqual(extraProps.attack);
+    // @ts-ignore
+    expect(addedItem.defense).toBeGreaterThanOrEqual(extraProps.defense);
+  });
+
+  it("should return false if the inventory doesn't exist", async () => {
+    const sword = await unitTestHelper.createMockItemFromBlueprint(SwordsBlueprint.Sword);
+    const extraProps = { attack: sword.attack, defense: sword.defense };
+
+    const result = await characterItemInventory.addItemToInventory(sword.key, testCharacter2, extraProps);
+
+    expect(result).toBe(false);
+  });
+
+  it("should return false if the blueprint isn't found", async () => {
+    const fakeBlueprint = "fakeBlueprint";
+    const extraProps = { attack: 10, defense: 2 };
+    const result = await characterItemInventory.addItemToInventory(fakeBlueprint, testCharacter, extraProps);
+
+    expect(result).toBe(false);
+  });
+
+  it("should properly add a food item to the inventory with correct health recovery", async () => {
+    const apple = await unitTestHelper.createMockItemFromBlueprint(FoodsBlueprint.Apple);
+    const extraProps = {
+      healthRecovery: apple.healthRecovery,
+      rarity: apple.rarity,
+      usableEffectDescription: apple.usableEffectDescription,
+    };
+
+    const result = await characterItemInventory.addItemToInventory(apple.key, testCharacter, extraProps);
+
+    expect(result).toBe(true);
+    const updatedInventoryContainer = (await ItemContainer.findById(
+      inventory.itemContainer
+    )) as unknown as IItemContainer;
+    const addedItem = updatedInventoryContainer.slots[0];
+
+    expect(addedItem).toBeTruthy();
+    expect(addedItem.subType).toBe(ItemSubType.Food);
+    expect(addedItem.healthRecovery).toBeGreaterThan(0);
   });
 
   describe("Edge case - Depot x Inventory", () => {

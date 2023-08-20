@@ -21,7 +21,7 @@ export const spellRage: Partial<ISpell> = {
     "This spell unleashes a primal fury, imbuing the caster with untold strength and recklessness, but at a great cost to their defensive capabilities",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "furore",
-  manaCost: 110,
+  manaCost: 90,
   minLevelRequired: 4,
   minMagicLevelRequired: 3,
   cooldown: 60,

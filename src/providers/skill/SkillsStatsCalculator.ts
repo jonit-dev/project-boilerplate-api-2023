@@ -1,18 +1,29 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { Equipment } from "@entities/ModuleCharacter/EquipmentModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
-import { INCREASE_BONUS_FACTION } from "@providers/constants/SkillConstants";
+import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import {
+  DAMAGE_ATTRIBUTE_WEIGHT,
+  DAMAGE_COMBAT_SKILL_WEIGHT,
+  INCREASE_BONUS_FACTION,
+} from "@providers/constants/SkillConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EquipmentStatsCalculator } from "@providers/equipment/EquipmentStatsCalculator";
 import { container } from "@providers/inversify/container";
 import { BasicAttribute } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { capitalize } from "lodash";
+import { SkillsAvailable } from "./SkillTypes";
 import { TraitGetter } from "./TraitGetter";
 
 @provide(SkillStatsCalculator)
 export class SkillStatsCalculator {
-  constructor(private inMemoryHashTable: InMemoryHashTable, private traitGetter: TraitGetter) {}
+  constructor(
+    private inMemoryHashTable: InMemoryHashTable,
+    private traitGetter: TraitGetter,
+    private characterWeapon: CharacterWeapon
+  ) {}
 
   public async getAttack(skill: ISkill): Promise<number> {
     return await this.getTotalAttackOrDefense(skill, true);
@@ -31,86 +42,100 @@ export class SkillStatsCalculator {
   }
 
   private async getTotalAttackOrDefense(skills: ISkill, isAttack: boolean, isMagic: boolean = false): Promise<number> {
-    if (!skills.owner) {
-      return 0;
+    if (!skills.owner) return 0;
+
+    const ownerType = skills.owner.toString();
+
+    if (skills.ownerType === "Character") {
+      const cachedValue = await this.getCachedAttackOrDefense(ownerType, isAttack);
+      if (cachedValue) return cachedValue;
     }
 
-    const redisAttack = await this.inMemoryHashTable.get(skills.owner.toString(), "totalAttack");
-    const redisDefense = await this.inMemoryHashTable.get(skills.owner.toString(), "totalDefense");
-
-    if (redisAttack && isAttack && skills.ownerType === "Character") {
-      return redisAttack.attack;
-    } else if (redisDefense && isAttack === false && skills.ownerType === "Character") {
-      return redisDefense.defense;
-    }
-
-    const equipment = await Equipment.findOne({ owner: skills.owner })
-      .lean({ virtuals: true, defaults: true })
-      .cacheQuery({
-        cacheKey: `${skills.owner}-equipment`,
-      });
-    const [dataOfWeather, character] = await Promise.all([
+    const [equipment, dataOfWeather, character] = await Promise.all([
+      this.getEquipment(ownerType),
       MapControlTimeModel.findOne().lean(),
-      Character.findById(skills.owner).lean(),
+      Character.findById(skills.owner).lean() as unknown as ICharacter,
     ]);
 
     if (skills.ownerType === "Character" && equipment) {
-      const equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
-
-      const totalEquippedAttack = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "attack");
-      const totalEquippedDefense = await equipmentStatsCalculator.getTotalEquipmentStats(equipment._id, "defense");
-
-      const totalEquipped = isAttack ? totalEquippedAttack : totalEquippedDefense;
-      let baseValue = 0;
-      switch (true) {
-        case isAttack && !isMagic:
-          const strengthLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Strength);
-
-          baseValue = strengthLevel;
-          break;
-        case !isAttack && !isMagic:
-          const resistanceLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Resistance);
-
-          baseValue = resistanceLevel;
-          break;
-        case isAttack && isMagic:
-          const magicLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Magic);
-
-          baseValue = magicLevel;
-          break;
-        case !isAttack && isMagic:
-          const magicResistanceLevel = await this.traitGetter.getSkillLevelWithBuffs(
-            skills,
-            BasicAttribute.MagicResistance
-          );
-
-          baseValue = magicResistanceLevel;
-          break;
-        default:
-          break;
-      }
-
-      const totalValueNoBonus = baseValue + skills.level + totalEquipped;
-      const totalValueWithBonus = totalValueNoBonus + totalValueNoBonus * INCREASE_BONUS_FACTION;
-
-      if (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") {
-        await this.updateValuesRedis(isAttack, skills.owner.toString(), totalValueWithBonus);
-
-        return totalValueWithBonus || 0;
-      }
-
-      if (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night") {
-        await this.updateValuesRedis(isAttack, skills.owner.toString(), totalValueWithBonus);
-        return totalValueWithBonus || 0;
-      }
-
-      await this.updateValuesRedis(isAttack, skills.owner.toString(), totalValueNoBonus);
-      return totalValueNoBonus || 0;
+      return await this.calculateCharacterTotal(skills, isAttack, isMagic, equipment, dataOfWeather, character);
     }
 
-    // for regular NPCs
-    // remember that for NPCs we dont calculate buffs yet
+    // For regular NPCs
     return isAttack ? skills.strength.level + skills.level : skills.resistance.level + skills.level;
+  }
+
+  private async getCachedAttackOrDefense(ownerType: string, isAttack: boolean): Promise<number | null> {
+    const attackOrDefense = isAttack ? "attack" : "defense";
+    const cachedValue = await this.inMemoryHashTable.get(ownerType, `total${capitalize(attackOrDefense)}`);
+    return cachedValue ? cachedValue[attackOrDefense] : null;
+  }
+
+  private async getEquipment(owner: string): Promise<IEquipment> {
+    return (await Equipment.findOne({ owner })
+      .lean({ virtuals: true, defaults: true })
+      .cacheQuery({ cacheKey: `${owner}-equipment` })) as unknown as IEquipment;
+  }
+
+  private async calculateCharacterTotal(
+    skills: ISkill,
+    isAttack: boolean,
+    isMagic: boolean,
+    equipment: IEquipment,
+    dataOfWeather,
+    character: ICharacter
+  ): Promise<number> {
+    const equipmentStatsCalculator = container.get<EquipmentStatsCalculator>(EquipmentStatsCalculator);
+    const totalEquipped = await equipmentStatsCalculator.getTotalEquipmentStats(
+      equipment._id,
+      isAttack ? "attack" : "defense"
+    );
+
+    const baseValue = await this.getBaseValue(character, skills, isAttack, isMagic);
+    const totalValueNoBonus = baseValue + skills.level + totalEquipped;
+    const totalValueWithBonus = totalValueNoBonus + totalValueNoBonus * INCREASE_BONUS_FACTION;
+
+    if (this.hasWeatherBonus(character, dataOfWeather)) {
+      await this.updateValuesRedis(isAttack, skills.owner!.toString(), totalValueWithBonus);
+      return totalValueWithBonus;
+    }
+
+    await this.updateValuesRedis(isAttack, skills.owner!.toString(), totalValueNoBonus);
+    return totalValueNoBonus;
+  }
+
+  private async getBaseValue(
+    character: ICharacter,
+    skills: ISkill,
+    isAttack: boolean,
+    isMagic: boolean
+  ): Promise<number> {
+    const basicAttribute = this.getAttribute(isAttack, isMagic);
+    const basicAttributeLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, basicAttribute);
+
+    const combatSkill = await this.characterWeapon.getSkillNameByWeapon(character);
+
+    let combatSkillLevel = 0;
+
+    if (combatSkill) {
+      combatSkillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, combatSkill as SkillsAvailable);
+    }
+
+    return basicAttributeLevel * DAMAGE_ATTRIBUTE_WEIGHT + combatSkillLevel * DAMAGE_COMBAT_SKILL_WEIGHT;
+  }
+
+  private getAttribute(isAttack: boolean, isMagic: boolean): BasicAttribute {
+    if (isAttack && !isMagic) return BasicAttribute.Strength;
+    if (!isAttack && !isMagic) return BasicAttribute.Resistance;
+    if (isAttack && isMagic) return BasicAttribute.Magic;
+    return BasicAttribute.MagicResistance;
+  }
+
+  private hasWeatherBonus(character: ICharacter, dataOfWeather): boolean {
+    return (
+      (character?.faction === "Life Bringer" && dataOfWeather?.period === "Morning") ||
+      (character?.faction === "Shadow Walker" && dataOfWeather?.period === "Night")
+    );
   }
 
   private async updateValuesRedis(isAttack: boolean, ownerSkill: string, value: number): Promise<void> {

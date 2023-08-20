@@ -12,7 +12,7 @@ export const recipeGoldenArrow: IUseWithCraftingRecipe = {
       qty: 1,
     },
     {
-      key: CraftingResourcesBlueprint.SmallWoodenStick,
+      key: CraftingResourcesBlueprint.ElvenWood,
       qty: 1,
     },
     {

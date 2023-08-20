@@ -3,6 +3,7 @@ import { spellCorruptionBolt } from "./SpellCorruptionBolt";
 import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
 import { spellCurseOfWeakness } from "./SpellCurseOfWeakness";
 import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";
+import { spellFireStorm } from "./SpellFireStorm";
 import { spellPolymorph } from "./SpellPolymorph";
 import { spellVeilofUndeath } from "./SpellVeilofUndeath";
 
@@ -13,4 +14,5 @@ export const sorcererSpellsIndex = {
   [SpellsBlueprint.SpellPolymorph]: spellPolymorph,
   [SpellsBlueprint.CorruptionBolt]: spellCorruptionBolt,
   [SpellsBlueprint.SorcererVeilofUndeath]: spellVeilofUndeath,
+  [SpellsBlueprint.FireStorm]: spellFireStorm,
 };

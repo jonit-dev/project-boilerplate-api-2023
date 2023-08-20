@@ -20,4 +20,10 @@ GET {{baseUrl}}/scripts/fix-depot-reference HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
+
+### Scripts :: Max Health Max Mana
+GET {{baseUrl}}/scripts/max-health-max-mana HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
  

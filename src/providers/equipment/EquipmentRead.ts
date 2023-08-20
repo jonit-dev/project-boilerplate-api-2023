@@ -6,6 +6,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { EquipmentSocketEvents, IEquipmentRead, IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { clearCacheForKey } from "speedgoose";
 import { EquipmentSlots } from "./EquipmentSlots";
 
 @provide(EquipmentRead)
@@ -19,6 +20,9 @@ export class EquipmentRead {
 
   @TrackNewRelicTransaction()
   public async onEquipmentRead(character: ICharacter): Promise<void> {
+    await clearCacheForKey(`${character._id}-equipment`);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+
     const equipmentSet = await Equipment.findById(character.equipment)
       .lean()
       .cacheQuery({

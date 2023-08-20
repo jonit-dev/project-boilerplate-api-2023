@@ -103,7 +103,8 @@ export class HitTarget {
     attacker: ICharacter | INPC,
     target: ICharacter | INPC,
     magicAttack?: boolean,
-    bonusDamage?: number
+    bonusDamage?: number,
+    spellHit?: boolean
   ): Promise<void> {
     if (!target.isAlive) {
       return;
@@ -139,7 +140,7 @@ export class HitTarget {
       if (damage > 0) {
         if (attacker.type === "Character") {
           const character = attacker as ICharacter;
-          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage);
+          await this.skillIncrease.increaseSkillsOnBattle(character, target, damage, spellHit);
         }
 
         if (attacker.class === CharacterClass.Berserker) {
@@ -223,18 +224,18 @@ export class HitTarget {
     }
 
     if (battleEvent === BattleEventType.Block && target.type === "Character") {
-      void this.skillIncrease.increaseShieldingSP(target as ICharacter);
+      await this.skillIncrease.increaseShieldingSP(target as ICharacter);
     }
 
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
-      void this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
+      await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
     }
 
-    void this.warnCharacterIfNotInView(attacker as ICharacter, target);
+    await this.warnCharacterIfNotInView(attacker as ICharacter, target);
 
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
-    void this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
-    void this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
+    await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
+    await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
   }
 
   @TrackNewRelicTransaction()
@@ -294,7 +295,12 @@ export class HitTarget {
       channelIds.push(character.channelId);
     }
 
-    this.socketMessaging.sendEventToAllUsers(BattleSocketEvents.BattleEvent, battleEventPayload);
+    await this.socketMessaging.sendEventToCharactersAroundCharacter(
+      character,
+      BattleSocketEvents.BattleEvent,
+      battleEventPayload,
+      true
+    );
   }
 
   private async applyEntityEffectsIfApplicable(npc: INPC, target: ICharacter | INPC): Promise<void> {

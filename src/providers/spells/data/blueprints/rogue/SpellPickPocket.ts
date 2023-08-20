@@ -17,7 +17,7 @@ export const spellPickPocket: Partial<ISpell> = {
   description: "A spell designed for stealing an item from a character.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "levis manus",
-  manaCost: 300,
+  manaCost: 200,
   minLevelRequired: 20,
   minMagicLevelRequired: 25,
   cooldown: 300,

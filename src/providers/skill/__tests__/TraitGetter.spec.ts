@@ -2,7 +2,14 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { CharacterAttributes, CharacterBuffDurationType, CharacterBuffType, CraftingSkill } from "@rpg-engine/shared";
+import {
+  BasicAttribute,
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  CharacterClass,
+  CraftingSkill,
+} from "@rpg-engine/shared";
 import { TraitGetter } from "../TraitGetter";
 
 describe("TraitGetter", () => {
@@ -21,6 +28,17 @@ describe("TraitGetter", () => {
     });
 
     await testCharacter.populate("skills").execPopulate();
+  });
+
+  describe("Class bonus and penalties", () => {
+    it("should properly get a skill trait with class bonus and penalties applied", async () => {
+      testCharacter.class = CharacterClass.Berserker;
+      await testCharacter.save();
+
+      const result = await traitGetter.getSkillLevelWithBuffs(testCharacter.skills as ISkill, BasicAttribute.Strength);
+
+      expect(result).toEqual(1.2);
+    });
   });
 
   describe("Skills getter", () => {

@@ -25,7 +25,7 @@ export const spellFrostBolt: Partial<ISpell> = {
   description: "Cast a deadly frost bolt at your target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "ning lhegren",
-  manaCost: 160,
+  manaCost: 80,
   minLevelRequired: 12,
   minMagicLevelRequired: 12,
   cooldown: 12,
@@ -40,7 +40,7 @@ export const spellFrostBolt: Partial<ISpell> = {
     const hitTarget = container.get(HitTarget);
     const spellCalculator = container.get(SpellCalculator);
 
-    await hitTarget.hit(character, target, true, MagicPower.Medium);
+    await hitTarget.hit(character, target, true, MagicPower.Medium, true);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectFreezing);
 

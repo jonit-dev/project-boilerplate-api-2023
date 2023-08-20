@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
@@ -17,6 +18,7 @@ import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import { Time } from "@providers/time/Time";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationEffectKeys,
   CharacterPartyBenefits,
@@ -52,7 +54,8 @@ export class NPCExperience {
     private time: Time,
     private skillLvUpStatsIncrease: SkillStatsIncrease,
     private locker: Locker,
-    private partyManagement: PartyManagement
+    private partyManagement: PartyManagement,
+    private newRelic: NewRelic
   ) {}
 
   /**
@@ -84,6 +87,7 @@ export class NPCExperience {
       const expMultiplier = target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1;
       let baseExp = record!.xp * expMultiplier;
       let expRecipients: Types.ObjectId[] = [];
+
       if (record!.partyId) {
         const party = await this.partyManagement.getPartyByCharacterId(characterAndSkills.character._id);
         if (!party) {
@@ -95,10 +99,12 @@ export class NPCExperience {
       } else {
         expRecipients.push(record!.charId);
       }
+
       const charactersInRange = await this.partyManagement.isWithinRange(target, expRecipients, 150);
       if (charactersInRange.length === 0) {
         continue;
       }
+
       const expPerRecipient = Number((baseExp / charactersInRange.length).toFixed(2));
       for (const characterInRange of charactersInRange) {
         const recipientCharacterAndSkills = await this.validateCharacterAndSkills(characterInRange);
@@ -270,8 +276,12 @@ export class NPCExperience {
   ): Promise<void> {
     let levelUp = false;
     let previousLevel = 0;
-    skills.experience += exp;
+
+    const characterMode: Modes = Object.values(Modes).find((mode) => mode === character.mode) ?? Modes.SoftMode;
+
+    skills.experience += exp * MODE_EXP_MULTIPLIER[characterMode];
     skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
+
     while (skills.xpToNextLevel <= 0) {
       if (previousLevel === 0) {
         previousLevel = skills.level;
@@ -288,6 +298,13 @@ export class NPCExperience {
         // importing directly to avoid circular dependency issues. Good luck trying to solve.
         await spellLearn.learnLatestSkillLevelSpells(character._id, true);
       }, 5000);
+
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        `${character.class}-LevelUp`,
+        1
+      );
     }
     await this.warnCharactersAroundAboutExpGains(character, exp);
   }

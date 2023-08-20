@@ -19,7 +19,7 @@ export const spellShapeshift: Partial<ISpell> = {
   description: "A spell designed to turn a druid into a Bear. Raise Attack and Resistance.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "talas qabi",
-  manaCost: 200,
+  manaCost: 120,
   minLevelRequired: 10,
   minMagicLevelRequired: 10,
   cooldown: 60,

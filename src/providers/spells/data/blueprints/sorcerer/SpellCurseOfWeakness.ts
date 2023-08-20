@@ -22,7 +22,7 @@ export const spellCurseOfWeakness: Partial<ISpell> = {
   description: "A sorcerer's spell designed to reduce the strength and resistance of a target.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "dhagnir-lûth",
-  manaCost: 120,
+  manaCost: 60,
   minLevelRequired: 10,
   minMagicLevelRequired: 10,
   cooldown: 120,

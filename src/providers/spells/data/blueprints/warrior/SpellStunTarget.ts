@@ -19,7 +19,7 @@ export const spellStunTarget: Partial<ISpell> = {
   description: "A spell designed for a warrior to stun a target in battle.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "talas tamb-eth",
-  manaCost: 60,
+  manaCost: 50,
   minLevelRequired: 4,
   minMagicLevelRequired: 8,
   cooldown: 40,

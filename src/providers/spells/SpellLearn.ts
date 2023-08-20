@@ -32,7 +32,7 @@ export class SpellLearn {
     }
     const learned: string[] = [];
     spells.forEach((spell) => {
-      if (this.spellValidation.isAvailableForCharacterClass(spell, character)) {
+      if (this.spellValidation.isAvailableForCharacter(spell, character)) {
         learned.push(spell.name + " (" + spell.magicWords + ")");
       }
     });
@@ -71,7 +71,7 @@ export class SpellLearn {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
     const learned = character.learnedSpells ?? [];
     spells.forEach((spell) => {
-      if (!learned.includes(spell.key) && this.spellValidation.isAvailableForCharacterClass(spell, character)) {
+      if (!learned.includes(spell.key) && this.spellValidation.isAvailableForCharacter(spell, character)) {
         learned.push(spell.key);
       }
     });

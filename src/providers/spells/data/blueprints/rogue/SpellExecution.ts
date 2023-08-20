@@ -17,7 +17,7 @@ export const rogueSpellExecution: Partial<ISpell> = {
   description: "The Execution spell is designed to instantly eliminate opponents if target's health is <= 30%",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "supplicium furtim",
-  manaCost: 100,
+  manaCost: 80,
   minLevelRequired: 6,
   minMagicLevelRequired: 6,
   cooldown: 150,

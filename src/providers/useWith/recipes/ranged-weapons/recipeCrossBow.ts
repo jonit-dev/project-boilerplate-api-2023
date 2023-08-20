@@ -7,12 +7,12 @@ export const recipeCrossBow: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 5,
-    },
-    {
       key: CraftingResourcesBlueprint.SteelIngot,
       qty: 2,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [CraftingSkill.Lumberjacking, 5],

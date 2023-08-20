@@ -19,7 +19,7 @@ export const corruptionRuneUsableEffect: IUsableEffectRune = {
 
     const pointModifier = await spellCalculator.calculateBasedOnSkillLevel(caster, BasicAttribute.Magic, {
       min: 3,
-      max: 5,
+      max: 4,
     });
 
     let totalPoints = pointModifier * points;

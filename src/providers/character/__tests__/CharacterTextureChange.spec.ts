@@ -17,6 +17,7 @@ describe("CharacterTextureChange.ts", () => {
   const mockSocketMessaging = {
     sendEventToAllUsers: jest.fn(),
     sendMessageToCharacter: jest.fn(),
+    sendEventToCharactersAroundCharacter: jest.fn(),
   };
 
   const mockInMemoryHashTable = {
@@ -55,10 +56,15 @@ describe("CharacterTextureChange.ts", () => {
     mockInMemoryHashTable.get.mockResolvedValue(testCharacter.textureKey);
     await characterTextureChange.changeTexture(testCharacter, textureKey, timeInterval);
 
-    expect(mockSocketMessaging.sendEventToAllUsers).toBeCalledWith(CharacterSocketEvents.AttributeChanged, {
-      targetId: testCharacter._id,
-      textureKey: textureKey,
-    });
+    expect(mockSocketMessaging.sendEventToCharactersAroundCharacter).toBeCalledWith(
+      testCharacter,
+      CharacterSocketEvents.AttributeChanged,
+      {
+        targetId: testCharacter._id,
+        textureKey: textureKey,
+      },
+      true
+    );
 
     expect(mockSocketMessaging.sendMessageToCharacter).toBeCalledWith(
       testCharacter,
@@ -82,7 +88,7 @@ describe("CharacterTextureChange.ts", () => {
     } catch (error) {
       expect(error).toEqual(expectedError);
 
-      expect(mockSocketMessaging.sendEventToAllUsers).toHaveBeenCalledTimes(1);
+      expect(mockSocketMessaging.sendEventToCharactersAroundCharacter).toHaveBeenCalledTimes(1);
 
       expect(mockInMemoryHashTable.delete).not.toHaveBeenCalled();
     }

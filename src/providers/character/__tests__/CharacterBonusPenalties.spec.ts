@@ -62,10 +62,10 @@ describe("Case CharacterBonusPenalties", () => {
 
     const newSKill = (await Skill.findById(testCharacter.skills)) as ISkill;
 
-    expect(newSKill!.strength.skillPoints).toEqual(15.64);
-    expect(newSKill!.dagger.skillPoints).toEqual(15.32);
-    expect(newSKill!.fishing.skillPoints).toEqual(15.44);
-    expect(newSKill!.lumberjacking.skillPoints).toEqual(15.52);
+    expect(newSKill!.strength.skillPoints).toEqual(15.56);
+    expect(newSKill!.dagger.skillPoints).toEqual(15.48);
+    expect(newSKill!.fishing.skillPoints).toEqual(15.46);
+    expect(newSKill!.lumberjacking.skillPoints).toEqual(15.44);
   });
 
   it("applyRaceBonusPenalties should lvl up and send event", async () => {
@@ -85,13 +85,13 @@ describe("Case CharacterBonusPenalties", () => {
 
     const skillsAfterUpdate = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
-    expect(skillsAfterUpdate.magic.skillPoints).toEqual(74.96);
+    expect(skillsAfterUpdate.magic.skillPoints).toEqual(74.8);
     expect(skillsAfterUpdate.magic.level).toEqual(3);
-    expect(skillsAfterUpdate.magic.skillPointsToNextLevel).toEqual(101.04);
+    expect(skillsAfterUpdate.magic.skillPointsToNextLevel).toEqual(101.2);
 
-    expect(skillsAfterUpdate.alchemy.skillPoints).toEqual(74.4);
+    expect(skillsAfterUpdate.alchemy.skillPoints).toEqual(74.38);
     expect(skillsAfterUpdate.alchemy.level).toEqual(3);
-    expect(skillsAfterUpdate.alchemy.skillPointsToNextLevel).toEqual(101.6);
+    expect(skillsAfterUpdate.alchemy.skillPointsToNextLevel).toEqual(101.62);
 
     expect(sendSkillLevelUpEvents).toHaveBeenCalled();
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId!, UISocketEvents.ShowMessage, {

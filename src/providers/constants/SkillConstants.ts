@@ -1,5 +1,8 @@
 import { CharacterClass, LifeBringerRaces, Modes, ShadowWalkerRaces } from "@rpg-engine/shared";
 
+export const DAMAGE_ATTRIBUTE_WEIGHT = 1;
+export const DAMAGE_COMBAT_SKILL_WEIGHT = 1.5;
+
 export const EXP_RATIO = 1.5;
 
 export const SP_INCREASE_RATIO = 0.7;
@@ -11,7 +14,10 @@ export const INCREASE_BONUS_FACTION = 0.1;
 
 export const SP_INCREASE_SECONDS_COOLDOWN = 8;
 
-export const BASIC_INCREASE_HEALTH_MANA = 0.04;
+export const HEALTH_MANA_BASE_INCREASE_RATE = 10;
+
+export const ML_INCREASE_RATIO = 0.75;
+
 export const CUSTOM_SKILL_COOLDOWNS = {
   resistance: 10,
   distance: 8,
@@ -454,6 +460,6 @@ export const RACE_BONUS_OR_PENALTIES = [
 // Mode
 export const MODE_EXP_MULTIPLIER: { [key in Modes]: number } = {
   [Modes.SoftMode]: 0.8,
-  [Modes.HardcoreMode]: 1.2,
-  [Modes.PermadeathMode]: 1.5,
+  [Modes.HardcoreMode]: 1.25,
+  [Modes.PermadeathMode]: 1.7,
 };

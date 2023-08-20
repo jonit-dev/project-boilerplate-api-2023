@@ -9,6 +9,7 @@ import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemsBlueprintIndex } from "@providers/item/data";
 import {
   CraftingResourcesBlueprint,
+  FoodsBlueprint,
   OthersBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -345,6 +346,25 @@ describe("NPCDeath.ts", () => {
     await npcDeath.handleNPCDeath(testNPC);
 
     expect(spyOnSetItemRarityOnLootDrop).toHaveBeenCalled();
+  });
+
+  it("should call setItemRarityOnLootDropForFood if the loot item is food", async () => {
+    // @ts-ignore
+    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+    testNPC.loots = [
+      // @ts-ignore
+      { itemBlueprintKey: FoodsBlueprint.Apple, chance: 100, quantityRange: [1, 1] },
+    ];
+
+    await testNPC.save();
+
+    // @ts-ignore
+    const spyOnSetItemRarityOnLootDropForFood = jest.spyOn(npcDeath.itemRarity, "setItemRarityOnLootDropForFood");
+
+    await npcDeath.handleNPCDeath(testNPC);
+
+    expect(spyOnSetItemRarityOnLootDropForFood).toHaveBeenCalled();
   });
 
   it("should update NPC data after death", async () => {

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import {
-  BASIC_INCREASE_HEALTH_MANA,
   CLASS_BONUS_OR_PENALTIES,
-  RACE_BONUS_OR_PENALTIES,
   MODE_EXP_MULTIPLIER,
+  RACE_BONUS_OR_PENALTIES,
 } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
 import { blueprintManager, container, redisManager } from "@providers/inversify/container";
 import { MapLoader } from "@providers/map/MapLoader";
@@ -46,8 +45,11 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   EXP_RATIO: 1,
   CLASS_BONUS_OR_PENALTIES,
   RACE_BONUS_OR_PENALTIES,
-  BASIC_INCREASE_HEALTH_MANA,
+  ML_INCREASE_RATIO: 1.5,
   MODE_EXP_MULTIPLIER,
+  HEALTH_MANA_BASE_INCREASE_RATE: 10,
+  DAMAGE_ATTRIBUTE_WEIGHT: 1,
+  DAMAGE_COMBAT_SKILL_WEIGHT: 1.5,
 }));
 
 jest.mock("@providers/constants/LootConstants", () => ({
@@ -63,6 +65,7 @@ jest.mock("@providers/constants/LootConstants", () => ({
 
 jest.mock("@providers/constants/CraftingConstants", () => ({
   CRAFTING_MIN_LEVEL_RATIO: 1,
+  CRAFTING_DIFFICULTY_RATIO: 1.5,
 }));
 
 jest.mock("@providers/constants/ItemConstants", () => ({

@@ -25,7 +25,7 @@ export const darkRuneUsableEffect: IUsableEffectRune = {
     totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
     itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
-    console.log("target.health", target.health);
+
     return totalPoints;
   },
   usableEffectDescription: "Deals dark damage to the target",

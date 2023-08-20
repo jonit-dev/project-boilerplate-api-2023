@@ -7,7 +7,7 @@ import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { container, entityEffectUse, unitTestHelper } from "@providers/inversify/container";
 import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
-import { Modes } from "@rpg-engine/shared";
+import { CharacterSkullType, Modes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
 import { CharacterDeath } from "../CharacterDeath";
@@ -112,6 +112,36 @@ describe("CharacterDeath.ts", () => {
 
       expect(spyDropCharacterItemsOnBody).not.toHaveBeenCalled();
       expect(spyPenalties).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Soft mode with skull penalty", () => {
+    let characterDeath: CharacterDeath;
+    let testCharacter: ICharacter;
+    let testNPC: INPC;
+    beforeAll(() => {
+      characterDeath = container.get<CharacterDeath>(CharacterDeath);
+    });
+
+    beforeEach(async () => {
+      testCharacter = await unitTestHelper.createMockCharacter({
+        mode: Modes.SoftMode,
+        hasSkull: true,
+        skullType: CharacterSkullType.WhiteSkull,
+      });
+    });
+
+    it("should apply penalties for character even on soft mode", async () => {
+      // @ts-ignore
+      const spyDropCharacterItemsOnBody = jest.spyOn(characterDeath, "dropCharacterItemsOnBody");
+      // @ts-ignore
+      const spyPenalties = jest.spyOn(characterDeath, "applyPenalties");
+
+      // character dies
+      await characterDeath.handleCharacterDeath(testNPC, testCharacter);
+
+      expect(spyDropCharacterItemsOnBody).toHaveBeenCalled();
+      expect(spyPenalties).toHaveBeenCalled();
     });
   });
 

@@ -14,6 +14,7 @@ import { BattleCycle } from "../BattleCycle";
 import { BattleTargeting } from "../BattleTargeting";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
 import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidation";
+import { CharacterSkull } from "@providers/character/CharacterSkull";
 
 @provide(BattleCharacterAttack)
 export class BattleCharacterAttack {
@@ -25,7 +26,9 @@ export class BattleCharacterAttack {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private characterValidation: CharacterValidation,
     private battleCycle: BattleCycle,
-    private characterWeapon: CharacterWeapon
+    private characterWeapon: CharacterWeapon,
+
+    private characterSkull: CharacterSkull
   ) {}
 
   public async onHandleCharacterBattleLoop(character: ICharacter, target: ICharacter | INPC): Promise<void> {
@@ -138,6 +141,13 @@ export class BattleCharacterAttack {
       const checkRangeAndAttack = await this.battleAttackTarget.checkRangeAndAttack(character, target);
 
       if (checkRangeAndAttack) {
+        // check for skull
+        if (
+          target.type === "Character" &&
+          this.characterSkull.checkForUnjustifiedAttack(character, target as ICharacter)
+        ) {
+          await this.characterSkull.updateWhiteSkull(character._id.toString(), target._id.toString());
+        }
         return true;
       } else {
         return false;

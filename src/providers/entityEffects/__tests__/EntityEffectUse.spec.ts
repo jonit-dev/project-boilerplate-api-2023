@@ -228,7 +228,7 @@ describe("EntityEffectUse.ts", () => {
       expect(entityEffectSpy).not.toHaveBeenCalled();
     });
 
-    // TODO: Refactor, flaky tests
+    //! Flaky test - temporarily suspended
     // it("should call applyEntityEffects when attacker attack type is Melee and entity effects attack type Melee", async () => {
     //   testAttacker.entityEffects = [EntityEffectBlueprint.Poison];
     //   testAttacker.attackType = EntityAttackType.Melee;

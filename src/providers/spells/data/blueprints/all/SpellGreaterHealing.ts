@@ -12,7 +12,7 @@ export const spellGreaterHealing: Partial<ISpell> = {
 
   castingType: SpellCastingType.SelfCasting,
   magicWords: "greater faenya",
-  manaCost: 30,
+  manaCost: 25,
   minLevelRequired: 4,
   minMagicLevelRequired: 4,
   cooldown: 10,

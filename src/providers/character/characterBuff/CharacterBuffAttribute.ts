@@ -137,7 +137,7 @@ export class CharacterBuffAttribute {
     characterId: string,
     buff: ICharacterBuff
   ): Promise<IBuffValueCalculations> {
-    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffAbsoluteChanges(characterId, buff.trait);
+    const totalTraitSummedBuffs = await this.characterBuffTracker.getAllBuffPercentageChanges(characterId, buff.trait);
 
     const updatedCharacter = (await Character.findById(characterId).lean()) as ICharacter;
 
@@ -145,14 +145,18 @@ export class CharacterBuffAttribute {
       throw new Error("Character not found");
     }
 
-    const baseTraitValue = Number((updatedCharacter[buff.trait] - totalTraitSummedBuffs).toFixed(2));
+    const baseTraitValue = Number((updatedCharacter[buff.trait] / (1 + totalTraitSummedBuffs / 100)).toFixed(2));
 
-    // Calculate the new buffed value by applying the percentage buff on the BASE VALUE (additive buff!)
-    const updatedTraitValue =
-      Number((baseTraitValue * (1 + buff.buffPercentage / 100)).toFixed(2)) + totalTraitSummedBuffs;
+    // Calculates if there is already a buff, then takes it with the current buff
+    const totalBuffPercentage = totalTraitSummedBuffs + buff.buffPercentage;
+
+    // Calculate the total applied buff
+    const buffTrait = Number((baseTraitValue * (1 + buff.buffPercentage / 100)).toFixed(2));
+
+    const updatedTraitValue = Number((baseTraitValue * (1 + totalBuffPercentage / 100)).toFixed(2));
 
     // Calculate the absolute change of the new buff
-    const buffAbsoluteChange = Number((updatedTraitValue - baseTraitValue).toFixed(2)) - totalTraitSummedBuffs;
+    const buffAbsoluteChange = Number((buffTrait - baseTraitValue).toFixed(2));
 
     return {
       baseTraitValue,

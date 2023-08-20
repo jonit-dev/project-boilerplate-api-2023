@@ -5,6 +5,7 @@ import { TraitGetter } from "@providers/skill/TraitGetter";
 import { ItemRarities } from "@rpg-engine/shared";
 import _ from "lodash";
 import { ItemRarity } from "../ItemRarity";
+import { FoodsBlueprint } from "../data/types/itemsBlueprintTypes";
 
 describe("ItemRarity", () => {
   let itemRarity: ItemRarity;
@@ -86,6 +87,41 @@ describe("ItemRarity", () => {
         // @ts-ignore
         const rarityHighProficiency = await itemRarity.randomizeRarity(true, 10);
         expect(rarityHighProficiency).not.toEqual(ItemRarities.Common);
+      });
+    });
+
+    describe("Food rarity", () => {
+      it("should assign rarity to a loot food item", async () => {
+        const apple = await unitTestHelper.createMockItemFromBlueprint(FoodsBlueprint.Apple);
+        const result = await itemRarity.setItemRarityOnLootDropForFood(apple);
+        expect(result).toBeDefined();
+        // @ts-ignore
+        expect(result.rarity).toBeDefined();
+        // @ts-ignore
+        expect(result.healthRecovery).toBeGreaterThan(0);
+        // @ts-ignore
+        expect(result.usableEffectDescription).toBeDefined();
+      });
+
+      it("should increase healthRecovery based on rarity", () => {
+        const mockFoodItem = { healthRecovery: 10, rarity: ItemRarities.Common };
+        // @ts-ignore
+        const result = itemRarity.randomizeRarityBuffForFood(mockFoodItem);
+        expect(result).toBeDefined();
+        expect(result.healthRecovery).toBeGreaterThanOrEqual(mockFoodItem.healthRecovery);
+        expect(result.rarity).toBeDefined();
+        expect(result.usableEffectDescription).toBeDefined();
+      });
+
+      it("should assign rarity to a crafted food item", async () => {
+        const mockSkillId = "60bd68e8e7f23824c4de76bb";
+        const apple = await unitTestHelper.createMockItemFromBlueprint(FoodsBlueprint.Apple);
+        const result = await itemRarity.setItemRarityOnFoodCraft(testCharacter._id, apple, mockSkillId);
+        expect(result).toBeDefined();
+        expect(result.rarity).toBeDefined();
+        // @ts-ignore
+        expect(result.healthRecovery).toBeGreaterThan(0);
+        expect(result.usableEffectDescription).toBeDefined();
       });
     });
   });

@@ -16,7 +16,7 @@ export const recipeDragonBow: IUseWithCraftingRecipe = {
       qty: 10,
     },
     {
-      key: CraftingResourcesBlueprint.GreaterWoodenLog,
+      key: CraftingResourcesBlueprint.WoodenBoard,
       qty: 10,
     },
     {

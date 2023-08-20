@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterPvPKillLog } from "@entities/ModuleCharacter/CharacterPvPKillLogModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
@@ -10,7 +11,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { EquipmentSlotTypes } from "@providers/equipment/EquipmentSlots";
+import { EquipmentSlotTypes, EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import {
@@ -22,20 +23,27 @@ import { Locker } from "@providers/locks/Locker";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SkillDecrease } from "@providers/skill/SkillDecrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { Time } from "@providers/time/Time";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   BattleSocketEvents,
   CharacterBuffType,
+  CharacterSkullType,
+  EntityType,
   IBattleDeath,
+  IEquipmentAndInventoryUpdatePayload,
   IUIShowMessage,
+  ItemSocketEvents,
   Modes,
   UISocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import _, { random } from "lodash";
 import { Types } from "mongoose";
+import { clearCacheForKey } from "speedgoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
+import { CharacterSkull } from "./CharacterSkull";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterBuffActivator } from "./characterBuff/CharacterBuffActivator";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
@@ -68,35 +76,33 @@ export class CharacterDeath {
     private inMemoryHashTable: InMemoryHashTable,
     private characterBuffActivator: CharacterBuffActivator,
     private locker: Locker,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private time: Time,
+    private equipmentSlots: EquipmentSlots,
+    private characterSkull: CharacterSkull
   ) {}
 
   @TrackNewRelicTransaction()
   public async handleCharacterDeath(killer: INPC | ICharacter | null, character: ICharacter): Promise<void> {
     try {
+      // try to avoid concurrency issues. Dont remove this for now, because in prod sometimes this method is executed twice.
+      await this.time.waitForMilliseconds(random(1, 50));
+
       const canProceed = await this.locker.lock(`character-death-${character.id}`);
 
       if (!canProceed) {
         return;
       }
 
-      if (character.health > 0) {
-        // if by any reason the char is not dead, make sure it is.
-        await Character.updateOne({ _id: character._id }, { $set: { health: 0 } });
-        character.health = 0;
-        character.isAlive = false;
-      }
-
       if (killer) {
         await this.clearAttackerTarget(killer);
       }
-
-      await entityEffectUse.clearAllEntityEffects(character);
 
       const characterDeathData: IBattleDeath = {
         id: character.id,
         type: "Character",
       };
+
       this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
 
       // communicate all players around that character is dead
@@ -109,6 +115,29 @@ export class CharacterDeath {
 
       const characterBody = await this.generateCharacterBody(character);
 
+      if (killer?.type === EntityType.Character) {
+        const characterKiller = killer as ICharacter;
+
+        // insert to kill log table
+        const characterDeathLog = new CharacterPvPKillLog({
+          killer: characterKiller._id.toString(),
+          target: character._id.toString(),
+          isJustify: !this.characterSkull.checkForUnjustifiedAttack(characterKiller, character),
+          x: character.x,
+          y: character.y,
+          createdAt: new Date(),
+        });
+
+        await characterDeathLog.save();
+
+        if (!characterDeathLog.isJustify) {
+          await this.characterSkull.updateSkullAfterKill(killer._id.toString());
+        }
+        if (characterKiller.mode === Modes.SoftMode) {
+          return;
+        }
+      }
+
       if (!character.mode) {
         await this.applyPenalties(character, characterBody);
         return;
@@ -119,7 +148,10 @@ export class CharacterDeath {
           await this.applyPenalties(character, characterBody);
           break;
         case Modes.SoftMode:
-          // do nothing
+          // If character has Skull => auto Hardcore mode/Permadeath penalty
+          if (character.hasSkull) {
+            await this.applyPenalties(character, characterBody);
+          }
           break;
         case Modes.PermadeathMode:
           // penalties forcing all equip/inventory loss
@@ -133,15 +165,16 @@ export class CharacterDeath {
 
       this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Death", 1);
 
-      await this.inMemoryHashTable.delete("character-weapon", character._id);
-      await this.inMemoryHashTable.delete("character-max-weights", character._id);
-      await this.inMemoryHashTable.delete("inventory-weight", character._id);
-      await this.inMemoryHashTable.delete("equipment-weight", character._id);
+      await this.clearCache(character);
 
       await this.characterWeight.updateCharacterWeight(character);
+
+      await this.sendRefreshEquipmentEvent(character);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
+      await entityEffectUse.clearAllEntityEffects(character); // make sure to clear all entity effects before respawn
+
       await this.respawnCharacter(character);
     }
   }
@@ -171,6 +204,7 @@ export class CharacterDeath {
       { _id: character._id },
       {
         $set: {
+          isOnline: false,
           health: character.maxHealth,
           mana: character.maxMana,
           x: character.initialX,
@@ -182,6 +216,41 @@ export class CharacterDeath {
     );
 
     await this.locker.unlock(`character-death-${character.id}`);
+  }
+
+  private async clearCache(character: ICharacter): Promise<void> {
+    await this.inMemoryHashTable.delete("character-weapon", character._id);
+    await this.inMemoryHashTable.delete("character-max-weights", character._id);
+    await this.inMemoryHashTable.delete("inventory-weight", character._id);
+    await this.inMemoryHashTable.delete("equipment-weight", character._id);
+    await clearCacheForKey(`${character._id}-equipment`);
+    await clearCacheForKey(`${character._id}-inventory`);
+    await this.inMemoryHashTable.delete("equipment-slots", character._id);
+  }
+
+  private async sendRefreshEquipmentEvent(character: ICharacter): Promise<void> {
+    const equipment = (await Equipment.findById(character.equipment)
+      .lean()
+      .cacheQuery({
+        cacheKey: `${character._id}-equipment`,
+      })) as IEquipment;
+
+    const equipmentSet = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
+
+    const inventory = await this.characterInventory.getInventory(character);
+
+    const inventoryContainer = (await ItemContainer.findById(inventory?.itemContainer)) as any;
+
+    this.socketMessaging.sendEventToUser<IEquipmentAndInventoryUpdatePayload>(
+      character.channelId!,
+      ItemSocketEvents.EquipmentAndInventoryUpdate,
+      {
+        inventory: inventoryContainer,
+        equipment: equipmentSet,
+        openEquipmentSetOnUpdate: false,
+        openInventoryOnUpdate: false,
+      }
+    );
   }
 
   private async softDeleteCharacterOnPermaDeathMode(character: ICharacter): Promise<void> {
@@ -271,7 +340,18 @@ export class CharacterDeath {
     inventory: IItem,
     forceDropAll: boolean = false
   ): Promise<void> {
-    const n = _.random(0, 100);
+    let n = _.random(0, 100);
+    if (character.hasSkull && character.skullType) {
+      // if has yellow, 30% more. If has red => all loss
+      switch (character.skullType) {
+        case CharacterSkullType.YellowSkull:
+          n = n * 0.7;
+          break;
+        case CharacterSkullType.RedSkull:
+          forceDropAll = true;
+          break;
+      }
+    }
     let isDeadBodyLootable = false;
 
     const skills = (await Skill.findById(character.skills)
@@ -411,6 +491,11 @@ export class CharacterDeath {
   ): Promise<void> {
     if (character.mode === Modes.PermadeathMode) {
       await this.dropCharacterItemsOnBody(character, characterBody, forceDropAll);
+      return;
+    }
+
+    // If character mode is soft and has no skull => no penalty
+    if (character.mode === Modes.SoftMode && !character.hasSkull) {
       return;
     }
 
