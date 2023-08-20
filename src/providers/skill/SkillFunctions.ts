@@ -112,7 +112,8 @@ export class SkillFunctions {
     // now we need to clear up caching
     await clearCacheForKey(`characterBuffs_${character._id}`);
     await clearCacheForKey(`${character._id}-skills`);
-    await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+    await this.inMemoryHashTable.deleteAll(`load-craftable-items:${character._id}`);
+    await this.inMemoryHashTable.deleteAll(`load-craftable-items-sugested:${character._id}`);
 
     const levelUpEventPayload: ISkillEventFromServer = {
       characterId: character.id,

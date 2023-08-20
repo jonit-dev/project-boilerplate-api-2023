@@ -55,7 +55,8 @@ export class CharacterItemContainer {
     }
 
     const clearCache = async (): Promise<void> => {
-      await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+      await this.inMemoryHashTable.deleteAll(`load-craftable-items:${character._id}`);
+      await this.inMemoryHashTable.deleteAll(`load-craftable-items-sugested:${character._id}`);
       await this.inMemoryHashTable.delete("character-max-weights", character._id);
     };
 
@@ -195,7 +196,8 @@ export class CharacterItemContainer {
 
       if (result && item.type === ItemType.CraftingResource) {
         // clear the cache for the craftable items
-        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
+        await this.inMemoryHashTable.deleteAll(`load-craftable-items:${character._id}`);
+        await this.inMemoryHashTable.deleteAll(`load-craftable-items-sugested:${character._id}`);
       }
 
       if (result && shouldAddOwnership) {
