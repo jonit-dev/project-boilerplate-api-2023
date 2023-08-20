@@ -11,6 +11,7 @@ echo "🐳 Exporting database..."
 npm run db:export:swarm
 
 # Update the service to restart containers
+
 echo "Restarting service..."
 docker service update --force --with-registry-auth $SERVICE_NAME
 
