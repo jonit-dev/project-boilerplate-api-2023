@@ -19,6 +19,10 @@ export class CreateCharacterUseCase {
       throw new BadRequestError("Character creation error: User not found!");
     }
 
+    if (user.characters && user.characters.length >= 7) {
+      throw new BadRequestError("Maximum character limit reached");
+    }
+
     const isValidTextureKey = await this.factionRepository.exists(newCharacter.race, newCharacter.textureKey);
     if (!isValidTextureKey) {
       throw new BadRequestError(
