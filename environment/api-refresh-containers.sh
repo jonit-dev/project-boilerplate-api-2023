@@ -13,6 +13,6 @@ npm run db:export:swarm
 # Update the service to restart containers
 echo "🐳Restarting swarm service..."
 
-docker service update --force --with-registry-auth $SERVICE_NAME --args "pm2 sendSignal SIGINT rpg-api"
+docker service update --force --with-registry-auth $SERVICE_NAME
 
 echo "Deployment complete."
