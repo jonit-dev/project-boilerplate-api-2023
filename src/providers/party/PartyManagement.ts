@@ -54,12 +54,14 @@ export default class PartyManagement {
     isInParty ? await this.inviteToParty(leader, target, character) : await this.createParty(character, target);
   }
 
-  public async acepptInvite(leader: ICharacter, target: ICharacter, character): Promise<void> {
+  public async acepptInvite(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
     const isPartyExist = await this.checkIfIsInParty(leader);
+    console.log(`acepptInvite -  isPartyExist ${isPartyExist}`);
     isPartyExist ? await this.addMemberToParty(leader, target, character) : await this.createParty(leader, target);
   }
 
   private async addMemberToParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
+    console.log("addMemberToParty");
     const targetIsInParty = await this.checkIfIsInParty(target);
     if (targetIsInParty) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
@@ -110,6 +112,7 @@ export default class PartyManagement {
     target: ICharacter,
     maxSize?: number
   ): Promise<ICharacterParty | undefined> {
+    console.log("createParty");
     const targetIsInParty = await this.checkIfIsInParty(target);
     if (targetIsInParty) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
@@ -150,14 +153,6 @@ export default class PartyManagement {
         await this.applyAllBuffInParty(party);
         const partyInfoData = party as unknown as ICharacterPartyShared;
         void this.sendMessageToPartyMembers(`${target.name} joined the party`, partyInfoData, true);
-
-        // Send Confirmation message to target #TODO: REMOVE
-        /* 
-        this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
-          leaderId: leader._id,
-          leaderName: leader.name,
-        });
-        */
       }
       return party;
     } catch (error) {
@@ -169,15 +164,6 @@ export default class PartyManagement {
     if (!leader || !target) {
       throw new Error("Leader or target not found");
     }
-
-    // const checkIfIsLeader = await this.checkIfIsLeader(character._id, leader._id);
-    // if (!checkIfIsLeader) {
-    //   this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-    //     message: "You are not the party leader",
-    //     type: "info",
-    //   });
-    //   return;
-    // }
 
     this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
       leaderId: leader._id,
@@ -209,6 +195,14 @@ export default class PartyManagement {
     if (!party) {
       throw new Error("Party not found");
     }
+
+    const members = party.members.filter((member) => member._id.toString() !== target._id.toString());
+    party.members = members;
+    party.members.push({
+      _id: leader._id,
+      class: leader.class as CharacterClass,
+      name: leader.name,
+    });
 
     party.leader = {
       _id: target._id,
@@ -273,9 +267,6 @@ export default class PartyManagement {
     const benefits = this.calculatePartyBenefits(party.size - 1, this.getDifferentClasses(party));
     party.benefits = benefits;
 
-    // const isLeader = await this.checkIfIsLeader(leader._id);
-
-    // if (isLeader && party.members.length === 0) {
     if (party.members.length === 0) {
       const leaderData = (await Character.findById(leader._id).lean()) as ICharacter;
       await this.deleteParty(leaderData);
@@ -292,9 +283,6 @@ export default class PartyManagement {
 
     const partyInfoData = (await this.getPartyByCharacterId(leader._id)) as unknown as ICharacterPartyShared;
     void this.sendMessageToPartyMembers(`${target.name} left the party`, partyInfoData, true);
-
-    // const partyInfoData = updatedParty as unknown as ICharacterPartyShared;
-    // void this.sendMessageToPartyMembers(`${target.name} left the party`, partyInfoData);
   }
 
   private async deleteParty(leader: ICharacter): Promise<void> {
