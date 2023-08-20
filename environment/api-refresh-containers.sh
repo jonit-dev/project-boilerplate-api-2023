@@ -7,7 +7,7 @@ SERVICE_NAME="swarm-stack_rpg-api"
 cd ~/definya/api
 
 # Export database
-npm run db:export
+npm run db:export:swarm
 
 # Inform PM2 to initialize the graceful shutdown and run command
 echo "Shutting down instances..."
