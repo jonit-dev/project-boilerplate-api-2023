@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
@@ -15,6 +16,7 @@ import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import { Time } from "@providers/time/Time";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import {
   AnimationEffectKeys,
   DisplayTextSocketEvents,
@@ -46,7 +48,8 @@ export class NPCExperience {
     private animationEffect: AnimationEffect,
     private time: Time,
     private skillLvUpStatsIncrease: SkillStatsIncrease,
-    private locker: Locker
+    private locker: Locker,
+    private newRelic: NewRelic
   ) {}
 
   /**
@@ -126,6 +129,13 @@ export class NPCExperience {
           // importing directly to avoid circular dependency issues. Good luck trying to solve.
           await spellLearn.learnLatestSkillLevelSpells(character._id, true);
         }, 5000);
+
+        this.newRelic.trackMetric(
+          NewRelicMetricCategory.Count,
+          NewRelicSubCategory.Characters,
+          `${character.class}-LevelUp`,
+          1
+        );
       }
 
       await this.warnCharactersAroundAboutExpGains(character, exp);

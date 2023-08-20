@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 import { CharacterBuff, ICharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterPvPKillLog } from "@entities/ModuleCharacter/CharacterPvPKillLogModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
@@ -27,6 +28,7 @@ import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/Ne
 import {
   BattleSocketEvents,
   CharacterBuffType,
+  CharacterSkullType,
   EntityType,
   IBattleDeath,
   IEquipmentAndInventoryUpdatePayload,
@@ -41,6 +43,7 @@ import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeathCalculator } from "./CharacterDeathCalculator";
 import { CharacterInventory } from "./CharacterInventory";
+import { CharacterSkull } from "./CharacterSkull";
 import { CharacterTarget } from "./CharacterTarget";
 import { CharacterBuffActivator } from "./characterBuff/CharacterBuffActivator";
 import { CharacterItemContainer } from "./characterItems/CharacterItemContainer";
@@ -75,7 +78,8 @@ export class CharacterDeath {
     private locker: Locker,
     private newRelic: NewRelic,
     private time: Time,
-    private equipmentSlots: EquipmentSlots
+    private equipmentSlots: EquipmentSlots,
+    private characterSkull: CharacterSkull
   ) {}
 
   @TrackNewRelicTransaction()
@@ -93,8 +97,6 @@ export class CharacterDeath {
       if (killer) {
         await this.clearAttackerTarget(killer);
       }
-
-      await entityEffectUse.clearAllEntityEffects(character);
 
       const characterDeathData: IBattleDeath = {
         id: character.id,
@@ -116,6 +118,21 @@ export class CharacterDeath {
       if (killer?.type === EntityType.Character) {
         const characterKiller = killer as ICharacter;
 
+        // insert to kill log table
+        const characterDeathLog = new CharacterPvPKillLog({
+          killer: characterKiller._id.toString(),
+          target: character._id.toString(),
+          isJustify: !this.characterSkull.checkForUnjustifiedAttack(characterKiller, character),
+          x: character.x,
+          y: character.y,
+          createdAt: new Date(),
+        });
+
+        await characterDeathLog.save();
+
+        if (!characterDeathLog.isJustify) {
+          await this.characterSkull.updateSkullAfterKill(killer._id.toString());
+        }
         if (characterKiller.mode === Modes.SoftMode) {
           return;
         }
@@ -131,7 +148,10 @@ export class CharacterDeath {
           await this.applyPenalties(character, characterBody);
           break;
         case Modes.SoftMode:
-          // do nothing
+          // If character has Skull => auto Hardcore mode/Permadeath penalty
+          if (character.hasSkull) {
+            await this.applyPenalties(character, characterBody);
+          }
           break;
         case Modes.PermadeathMode:
           // penalties forcing all equip/inventory loss
@@ -153,6 +173,8 @@ export class CharacterDeath {
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
+      await entityEffectUse.clearAllEntityEffects(character); // make sure to clear all entity effects before respawn
+
       await this.respawnCharacter(character);
     }
   }
@@ -182,6 +204,7 @@ export class CharacterDeath {
       { _id: character._id },
       {
         $set: {
+          isOnline: false,
           health: character.maxHealth,
           mana: character.maxMana,
           x: character.initialX,
@@ -317,7 +340,18 @@ export class CharacterDeath {
     inventory: IItem,
     forceDropAll: boolean = false
   ): Promise<void> {
-    const n = _.random(0, 100);
+    let n = _.random(0, 100);
+    if (character.hasSkull && character.skullType) {
+      // if has yellow, 30% more. If has red => all loss
+      switch (character.skullType) {
+        case CharacterSkullType.YellowSkull:
+          n = n * 0.7;
+          break;
+        case CharacterSkullType.RedSkull:
+          forceDropAll = true;
+          break;
+      }
+    }
     let isDeadBodyLootable = false;
 
     const skills = (await Skill.findById(character.skills)
@@ -457,6 +491,11 @@ export class CharacterDeath {
   ): Promise<void> {
     if (character.mode === Modes.PermadeathMode) {
       await this.dropCharacterItemsOnBody(character, characterBody, forceDropAll);
+      return;
+    }
+
+    // If character mode is soft and has no skull => no penalty
+    if (character.mode === Modes.SoftMode && !character.hasSkull) {
       return;
     }
 

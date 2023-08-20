@@ -28,6 +28,8 @@ import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
+import { NewRelic } from "@providers/analytics/NewRelic";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -41,7 +43,8 @@ export class SkillIncrease {
     private characterWeight: CharacterWeight,
     private skillMapper: SkillCraftingMapper,
     private numberFormatter: NumberFormatter,
-    private npcExperience: NPCExperience
+    private npcExperience: NPCExperience,
+    private newRelic: NewRelic
   ) {}
 
   /**
@@ -270,6 +273,13 @@ export class SkillIncrease {
       updatedSkillDetails.skillPointsToNextLevel = this.skillCalculator.calculateSPToNextLevel(
         updatedSkillDetails.skillPoints,
         updatedSkillDetails.level + 1
+      );
+
+      this.newRelic.trackMetric(
+        NewRelicMetricCategory.Count,
+        NewRelicSubCategory.Characters,
+        `${skillToUpdate}-SkillUp`,
+        1
       );
     }
 

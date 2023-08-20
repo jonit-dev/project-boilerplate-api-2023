@@ -8,7 +8,7 @@ import {
   NewRelicSubCategory,
   NewRelicTransactionCategory,
 } from "@providers/types/NewRelicTypes";
-import { CharacterSocketEvents } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
@@ -56,6 +56,13 @@ export class CharacterCrons {
         }
       );
     });
+
+    // Check for clean skull from character
+    nodeCron.schedule("* * * * *", async () => {
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupSkullCrons", async () => {
+        await this.cleanSkullCharacters();
+      });
+    });
   }
 
   private async unbanCharacters(): Promise<void> {
@@ -101,6 +108,7 @@ export class CharacterCrons {
         this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
           reason: "You have were disconnected due to inactivity!",
         });
+
         await this.socketMessaging.sendEventToCharactersAroundCharacter(
           character,
           CharacterSocketEvents.CharacterLogout,
@@ -114,7 +122,44 @@ export class CharacterCrons {
         await this.socketSessionControl.deleteSession(character);
 
         await this.characterLastAction.clearLastAction(character._id);
+
+        this.newRelic.trackMetric(
+          NewRelicMetricCategory.Count,
+          NewRelicSubCategory.Characters,
+          "CharacterInactiveLogOut",
+          1
+        );
       }
+    }
+  }
+
+  private async cleanSkullCharacters(): Promise<void> {
+    const now = new Date();
+
+    const charactersWithSkull = await Character.find({
+      skullExpiredAt: { $lt: now },
+      hasSkull: true,
+    });
+
+    // Remove character's skull
+    for (const character of charactersWithSkull) {
+      character.hasSkull = false;
+      character.skullType = undefined;
+      character.skullExpiredAt = undefined;
+
+      const payload: ICharacterAttributeChanged = {
+        targetId: character._id,
+        hasSkull: false,
+      };
+
+      await character.save();
+      await this.socketMessaging.sendEventToCharactersAroundCharacter(
+        character,
+        CharacterSocketEvents.AttributeChanged,
+        payload,
+        true
+      );
+      this.socketMessaging.sendMessageToCharacter(character, "You are free from skull!");
     }
   }
 }

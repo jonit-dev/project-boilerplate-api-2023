@@ -8,10 +8,6 @@ export const recipeAmuletOfDeath: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 30,
-    },
-    {
       key: CraftingResourcesBlueprint.Rope,
       qty: 10,
     },
@@ -24,18 +20,37 @@ export const recipeAmuletOfDeath: IUseWithCraftingRecipe = {
       qty: 100,
     },
     {
-      key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 10,
+      key: CraftingResourcesBlueprint.BlueSapphire,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.RedSapphire,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.Jade,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.PhoenixFeather,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.CorruptionOre,
+      qty: 100,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.RedSapphire, 30],
       [CraftingResourcesBlueprint.Rope, 10],
-      [CraftingResourcesBlueprint.Skull, 25],
-      [MagicsBlueprint.CorruptionRune, 25],
-      [CraftingResourcesBlueprint.DragonTooth, 10],
+      [CraftingResourcesBlueprint.Skull, 100],
+      [MagicsBlueprint.CorruptionRune, 100],
+      [CraftingResourcesBlueprint.BlueSapphire, 100],
+      [CraftingResourcesBlueprint.RedSapphire, 100],
+      [CraftingResourcesBlueprint.CorruptionOre, 100],
+      [CraftingResourcesBlueprint.Jade, 100],
+      [CraftingResourcesBlueprint.PhoenixFeather, 100],
     ]),
   ],
 };

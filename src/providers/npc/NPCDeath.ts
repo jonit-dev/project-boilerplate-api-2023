@@ -13,6 +13,7 @@ import {
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_GIANT_FORM_LOOT_MULTIPLIER } from "@providers/constants/NPCConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemRarity } from "@providers/item/ItemRarity";
@@ -42,7 +43,8 @@ export class NPCDeath {
     private npcSpawn: NPCSpawn,
     private npcExperience: NPCExperience,
     private locker: Locker,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -164,10 +166,11 @@ export class NPCDeath {
           nextSpawnTime,
           currentMovementType: currentMovementType,
           appliedEntityEffects: undefined,
-          isBehaviorEnabled: false,
         },
       }
     );
+    const namespace = "isBehaviorEnabled";
+    await this.inMemoryHashTable.set(namespace, npc._id, false);
   }
 
   @TrackNewRelicTransaction()

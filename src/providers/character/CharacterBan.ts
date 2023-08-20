@@ -1,13 +1,15 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterBan)
 export class CharacterBan {
-  constructor(private socketMessaging: SocketMessaging) {}
+  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic) {}
 
   @TrackNewRelicTransaction()
   public async addPenalty(character: ICharacter): Promise<void> {
@@ -28,6 +30,8 @@ export class CharacterBan {
         character.hasPermanentBan = true;
         await character.save();
       }
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Penalty", 1);
     }
   }
 
@@ -49,6 +53,8 @@ export class CharacterBan {
         character.hasPermanentBan = true;
         await character.save();
       }
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Banned", 1);
     }
   }
 }
