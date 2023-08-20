@@ -7,8 +7,11 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-    stop_signal: SIGINT
-    stop_grace_period: 10s
+      update_config:
+        order: start-first
+        parallelism: 1
+      stop_signal: SIGINT
+      stop_grace_period: 10s
     logging:
       options:
         max-size: "10m"
