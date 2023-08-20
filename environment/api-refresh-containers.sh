@@ -12,7 +12,7 @@ npm run db:export:swarm
 
 # Inform PM2 to initialize the graceful shutdown and run command
 echo "🐳 Sending PM2 Graceful shutdown signal to swarm..."
-bash ./swarm-sigint-all.sh $SERVICE_NAME;
+bash ./environment/swarm-sigint-all.sh $SERVICE_NAME;
 
 # Update the service to restart containers
 echo "Restarting service..."
