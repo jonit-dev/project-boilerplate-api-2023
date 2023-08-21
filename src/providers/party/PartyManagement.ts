@@ -549,16 +549,18 @@ export default class PartyManagement {
 
       // send to leader.
       const leaderData = (await Character.findById(partyInfo.leader._id).lean()) as ICharacter;
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(leaderData.channelId!, UISocketEvents.ShowMessage, {
-        message: messageToSend,
-        type: "info",
-      });
-      if (isToSendPartyData) {
-        this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
-          leaderData.channelId!,
-          PartySocketEvents.PartyInfoOpen,
-          partyInfo
-        );
+      if (leaderData) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(leaderData.channelId!, UISocketEvents.ShowMessage, {
+          message: messageToSend,
+          type: "info",
+        });
+        if (isToSendPartyData) {
+          this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
+            leaderData.channelId!,
+            PartySocketEvents.PartyInfoOpen,
+            partyInfo
+          );
+        }
       }
     }
   }

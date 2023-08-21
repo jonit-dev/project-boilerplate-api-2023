@@ -127,7 +127,7 @@ describe("Party Benefits", () => {
     // @ts-ignore
     await partyManagement.createParty(characterLeader, firstMember);
     // @ts-ignore
-    await partyManagement.addMemberToParty(characterLeader, secondMember, characterLeader);
+    await partyManagement.addMemberToParty(characterLeader, secondMember, secondMember);
 
     // @ts-ignore
     const party = await partyManagement.getPartyByCharacterId(characterLeader._id);
