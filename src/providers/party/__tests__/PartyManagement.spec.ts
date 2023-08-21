@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { CharacterClass, PartySocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import PartyManagement from "../PartyManagement";
+import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { PartyNetworkInviteToParty } from "../network/PartyNetworkInviteToParty";
 
 describe("Party Management", () => {

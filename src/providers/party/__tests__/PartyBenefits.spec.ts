@@ -17,12 +17,21 @@ describe("Party Benefits", () => {
   let firstMember: ICharacter;
   let secondMember: ICharacter;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     partyManagement = container.get<PartyManagement>(PartyManagement);
+  });
 
-    characterLeader = await unitTestHelper.createMockCharacter(null, {
-      hasSkills: true,
-    });
+  beforeEach(async () => {
+    characterLeader = await unitTestHelper.createMockCharacter(
+      {
+        class: CharacterClass.Rogue,
+      },
+      {
+        hasEquipment: true,
+        hasSkills: true,
+        hasInventory: true,
+      }
+    );
 
     firstMember = await unitTestHelper.createMockCharacter(
       {
@@ -45,6 +54,10 @@ describe("Party Benefits", () => {
         hasInventory: true,
       }
     );
+
+    await characterLeader.save();
+    await firstMember.save();
+    await secondMember.save();
   });
 
   afterAll(() => {
@@ -114,7 +127,7 @@ describe("Party Benefits", () => {
     // @ts-ignore
     await partyManagement.createParty(characterLeader, firstMember);
     // @ts-ignore
-    await partyManagement.inviteToParty(characterLeader, secondMember);
+    await partyManagement.addMemberToParty(characterLeader, secondMember, characterLeader);
 
     // @ts-ignore
     const party = await partyManagement.getPartyByCharacterId(characterLeader._id);
@@ -128,9 +141,9 @@ describe("Party Benefits", () => {
     // @ts-ignore
     await partyManagement.createParty(characterLeader, firstMember);
     // @ts-ignore
-    await partyManagement.inviteToParty(characterLeader, secondMember);
-
-    await partyManagement.leaveParty(secondMember, secondMember);
+    await partyManagement.addMemberToParty(characterLeader, secondMember, characterLeader);
+    // @ts-ignore
+    await partyManagement.leaveParty(secondMember, secondMember, secondMember);
 
     // @ts-ignore
     const party = await partyManagement.getPartyByCharacterId(characterLeader._id);
