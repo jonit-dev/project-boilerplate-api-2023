@@ -95,8 +95,6 @@ services:
   # ACME Companion Service
   acme-companion:
     image: nginxproxy/acme-companion
-    volumes_from:
-      - nginx-proxy
     volumes:
       - certs:/etc/nginx/certs:rw
       - acme:/etc/acme.sh
