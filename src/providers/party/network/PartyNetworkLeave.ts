@@ -15,8 +15,6 @@ export class PartyNetworkLeave {
       PartySocketEvents.LeaveParty,
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
-          // #TODO: verify if player emiter is the leader. character._id === data.leaderId
-          console.log(character._id, data.leaderId);
           const leader = (await Character.findById(data.leaderId).lean()) as ICharacter;
           if (!leader) {
             throw new Error("Error on leave party, character leader not found");

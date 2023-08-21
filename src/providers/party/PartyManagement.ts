@@ -51,11 +51,12 @@ export default class PartyManagement {
     }
 
     const isInParty = await this.checkIfIsInParty(leader);
-    isInParty ? await this.inviteToParty(leader, target, character) : await this.createParty(character, target);
+    isInParty ? this.inviteToParty(leader, target, character) : await this.createParty(character, target);
   }
 
   public async acepptInvite(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
     const isPartyExist = await this.checkIfIsInParty(leader);
+
     isPartyExist ? await this.addMemberToParty(leader, target, character) : await this.createParty(leader, target);
   }
 
