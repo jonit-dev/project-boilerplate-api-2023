@@ -76,6 +76,36 @@ services:
     env_file:
       - .env
 
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./temp-dns.definya.com.conf:/etc/nginx/vhost.d/temp-dns.definya.com:ro
+    networks:
+      - rpg-network
+
+  # ACME Companion Service
+  acme-companion:
+    image: nginxproxy/acme-companion
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - rpg-network
+    environment:
+      DEFAULT_EMAIL: admin@definya.com
+
 networks:
   rpg-network:
     driver: overlay
@@ -87,3 +117,10 @@ configs:
 volumes:
   rpg-db-data:
   rpg-redis-data:
+  # nginx-proxy
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
+  acme:
