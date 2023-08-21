@@ -51,7 +51,40 @@ export default class PartyManagement {
     }
 
     const isInParty = await this.checkIfIsInParty(leader);
-    isInParty ? this.inviteToParty(leader, target, character) : await this.createParty(character, target);
+    isInParty ? await this.inviteToParty(leader, target, character) : await this.createParty(character, target);
+  }
+
+  public async inviteToParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
+    if (!leader || !target) {
+      throw new Error("Leader or target not found");
+    }
+
+    const isTargetInParty = await this.checkIfIsInParty(target);
+    if (isTargetInParty) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: `${target.name} already is in a party`,
+        type: "info",
+      });
+      return;
+    }
+
+    if (!(await this.haveFreeSlots(leader))) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
+        message: "The party is already full",
+        type: "info",
+      });
+      return;
+    }
+
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
+      message: "The party is already full",
+      type: "info",
+    });
+
+    this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
+      leaderId: leader._id,
+      leaderName: leader.name,
+    });
   }
 
   public async acepptInvite(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
@@ -158,23 +191,12 @@ export default class PartyManagement {
     }
   }
 
-  public inviteToParty(leader: ICharacter, target: ICharacter, character: ICharacter): void {
-    if (!leader || !target) {
-      throw new Error("Leader or target not found");
-    }
-
-    this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
-      leaderId: leader._id,
-      leaderName: leader.name,
-    });
-  }
-
   public async transferLeadership(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
     const inSameParty = await this.checkIfSameParty(leader, target);
 
     if (!inSameParty) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-        message: "The target character is not in your party",
+        message: `${target.name} is not in your party!`,
         type: "info",
       });
       return;
@@ -217,6 +239,16 @@ export default class PartyManagement {
   public async leaveParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
     const isLeader = await this.checkIfIsLeader(character._id, leader._id);
     const isSameAsTarget = target._id.toString() === character._id.toString();
+
+    const isTargetInTheParty = await this.checkIfIsInParty(target);
+
+    if (!isTargetInTheParty) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message: `${target.name} is not in your party!`,
+        type: "info",
+      });
+      return;
+    }
 
     if (isLeader && isSameAsTarget) {
       const party = await this.getPartyByCharacterId(target._id);
