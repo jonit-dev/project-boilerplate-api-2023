@@ -90,6 +90,9 @@ export class NPCDeath {
       const clearNPCBehavior = this.clearNPCBehavior(npc);
       const updateNPCAfterDeath = this.updateNPCAfterDeath(npcWithSkills);
       const releaseXP = this.npcExperience.releaseXP(npc as INPC);
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "Death", 1);
+
       await Promise.all([
         notifyCharactersOfNPCDeath,
         npcWithSkills,

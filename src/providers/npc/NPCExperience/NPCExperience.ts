@@ -84,7 +84,26 @@ export class NPCExperience {
       if (!characterAndSkills) {
         continue;
       }
-      const expMultiplier = target.isGiantForm ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER : 1;
+
+      const character = (await Character.findById(record!.charId).lean({
+        virtuals: true,
+        defaults: true,
+      })) as ICharacter;
+
+      if (!character) {
+        return this.releaseXP(target);
+      }
+
+      const characterMode: Modes = Object.values(
+        Modes
+      ).find((mode) => mode === character.mode) ?? Modes.SoftMode;
+
+      const expMultiplier = (
+        target.isGiantForm 
+          ? NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER 
+          : 1
+      ) * MODE_EXP_MULTIPLIER[characterMode];
+      
       let baseExp = record!.xp * expMultiplier;
       let expRecipients: Types.ObjectId[] = [];
 
