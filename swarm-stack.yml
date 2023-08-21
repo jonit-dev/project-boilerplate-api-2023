@@ -91,6 +91,8 @@ services:
       - ./temp-dns.definya.com.conf:/etc/nginx/vhost.d/temp-dns.definya.com:ro
     networks:
       - rpg-network
+    labels:
+      com.github.nginx-proxy.nginx: "true"
 
   # ACME Companion Service
   acme-companion:
@@ -103,7 +105,13 @@ services:
       - rpg-network
     environment:
       DEFAULT_EMAIL: admin@definya.com
+      NGINX_DOCKER_GEN_CONTAINER: docker-gen
+      NGINX_PROXY_CONTAINER: nginx-proxy
 
+  docker-gen:
+    image: jwilder/docker-gen
+    labels:
+      com.github.nginx-proxy.docker-gen: "true"
 networks:
   rpg-network:
     driver: overlay
