@@ -142,6 +142,9 @@ export class UnitTestHelper {
       await npcSkills.save();
     }
 
+    testNPC.x = 0;
+    testNPC.y = 0;
+
     await testNPC.save();
 
     return testNPC;
@@ -217,6 +220,8 @@ export class UnitTestHelper {
       ...extraProps,
     });
 
+    newItem.x = 0;
+    newItem.y = 0;
     await newItem.save();
 
     return newItem;
@@ -353,6 +358,9 @@ export class UnitTestHelper {
       await equipment.save();
       testCharacter.equipment = equipment._id;
     }
+
+    testCharacter.x = 0;
+    testCharacter.y = 0;
 
     await testCharacter.save();
 
