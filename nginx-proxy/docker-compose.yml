@@ -35,3 +35,11 @@ services:
 networks:
   rpg-network:
     driver: overlay
+
+volumes:
+  conf:
+  vhost:
+  html:
+  dhparam:
+  certs:
+  acme:
