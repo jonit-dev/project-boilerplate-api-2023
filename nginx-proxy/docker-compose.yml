@@ -1,5 +1,4 @@
 version: "2"
-
 services:
   nginx-proxy:
     image: nginxproxy/nginx-proxy
@@ -31,11 +30,8 @@ services:
       - rpg-network
     environment:
       DEFAULT_EMAIL: admin@definya.com
+      NGINX_PROXY_CONTAINER: nginx-proxy # Referencing the service name
 
-volumes:
-  conf:
-  vhost:
-  html:
-  dhparam:
-  certs:
-  acme:
+networks:
+  rpg-network:
+    driver: overlay
