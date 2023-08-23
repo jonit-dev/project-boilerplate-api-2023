@@ -11,9 +11,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
-      - "${SOCKET_PORT}:${SOCKET_PORT}"
     environment:
       FORCE_COLOR: "true"
       CHOKIDAR_USEPOLLING: "true"
@@ -27,21 +24,30 @@ services:
     env_file:
       - .env
     labels:
-      # Basic setup
+      # Basic setup for API
       - traefik.enable=true
       - traefik.http.routers.rpg-api.rule=Host(`temp-na.definya.com`)
       - traefik.http.routers.rpg-api.entrypoints=websecure
       - traefik.http.routers.rpg-api.tls.certresolver=myresolver
-      - traefik.http.services.rpg-api.loadbalancer.server.port=${SERVER_PORT}
+      - traefik.http.services.rpg-api-service.loadbalancer.server.port=${SERVER_PORT}
+      - traefik.http.routers.rpg-api.service=rpg-api-service
       # WebSocket specific routing
-      - traefik.http.routers.rpg-api-socket.rule=Host(`temp-na.definya.com`) && Path(`/socket.io/`)
+      - traefik.http.routers.rpg-api-socket.rule=Host(`temp-na-ssh.definya.com`) && Path(`/socket.io/`)
       - traefik.http.routers.rpg-api-socket.entrypoints=websecure
       - traefik.http.routers.rpg-api-socket.tls.certresolver=myresolver
+      - traefik.http.services.rpg-api-socket-service.loadbalancer.server.port=${SOCKET_PORT}
+      - traefik.http.routers.rpg-api-socket.service=rpg-api-socket-service
+
+      # WebSocket specific headers
+      - traefik.http.routers.rpg-api-socket.middlewares=rpg-api-socket-headers
       - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.X-Forwarded-For=$proxy_add_x_forwarded_for
       - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.Upgrade=$http_upgrade
       - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.Connection=upgrade
-      - traefik.http.routers.rpg-api-socket.middlewares=rpg-api-socket-headers
 
+      # add sticky session for websockets
+      - "traefik.http.services.rpg-api-service.loadbalancer.sticky=true"
+      - "traefik.http.services.rpg-api-service.loadbalancer.sticky.cookie.name=StickyCookie"
+      - "traefik.http.services.rpg-api-service.loadbalancer.sticky.cookie.secure=true"
   rpg-db:
     image: mongo
     command: mongod --port ${MONGO_PORT}
@@ -105,9 +111,10 @@ services:
       # Redirect HTTP to HTTPS
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      # Logging & Debugging
       - --accesslog=true
       - --accesslog.filepath=./traeffik-logfile.log
-      - --tracing.jaeger=true
+      - --log.level=DEBUG
     ports:
       - "80:80"
       - "443:443"
@@ -115,7 +122,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./letsencrypt:/letsencrypt
-
     networks:
       - rpg-network
 
