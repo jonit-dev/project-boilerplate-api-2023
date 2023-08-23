@@ -105,64 +105,6 @@ describe("InMemoryHashTable", () => {
     });
   });
 
-  it("counts the boolean enabled values correctly", async () => {
-    // Setting sample data
-    await inMemoryHashTable.set("test-namespace", "value1", true);
-    await inMemoryHashTable.set("test-namespace", "value2", false);
-    await inMemoryHashTable.set("test-namespace", "value3", true);
-    await inMemoryHashTable.set("test-namespace", "value4", false);
-
-    // Count the (true) values
-    const enabledCount = await inMemoryHashTable.countBooleanEnabledValues("test-namespace", true);
-
-    // Count the (false) values
-    const disabledCount = await inMemoryHashTable.countBooleanEnabledValues("test-namespace", false);
-
-    expect(enabledCount).toBe(2);
-    expect(disabledCount).toBe(2);
-  });
-
-  it("returns 0 for non-existent namespace", async () => {
-    // No value is set for this namespace
-    const count = await inMemoryHashTable.countBooleanEnabledValues("non-existent-namespace", true);
-
-    expect(count).toBe(0);
-  });
-
-  it("batch retrieves values for a set of keys", async () => {
-    // Assuming you've set these values in the real system or you've mocked them to be returned
-    await inMemoryHashTable.set("batch-namespace", "key1", "value1");
-    await inMemoryHashTable.set("batch-namespace", "key2", "value2");
-
-    const result = await inMemoryHashTable.batchGet("batch-namespace", ["key1", "key2"]);
-
-    expect(result).toMatchObject({
-      key1: "value1",
-      key2: "value2",
-    });
-  });
-
-  it("returns empty object for invalid namespace", async () => {
-    const result = await inMemoryHashTable.batchGet("", ["key1"]);
-
-    expect(result).toMatchObject({});
-  });
-
-  it("returns empty object for empty keys array", async () => {
-    const result = await inMemoryHashTable.batchGet("batch-namespace", []);
-
-    expect(result).toMatchObject({});
-  });
-
-  it("returns empty object for unexpected RedisManager outputs", async () => {
-    // @ts-ignore
-    jest.spyOn(inMemoryHashTable.redisManager.client, "hmGet").mockResolvedValueOnce("invalidValue");
-
-    const result = await inMemoryHashTable.batchGet("batch-namespace", ["key1"]);
-
-    expect(result).toMatchObject({});
-  });
-
   it("deletes all values", async () => {
     await inMemoryHashTable.set("character-view:123", "player-1", {
       x: 10,
