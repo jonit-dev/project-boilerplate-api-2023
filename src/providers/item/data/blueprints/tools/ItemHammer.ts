@@ -9,7 +9,7 @@ import {
   UseWithItemToTile,
 } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { IToolItemBlueprint, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
+import { IToolItemBlueprint, ItemRarities, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -39,6 +39,8 @@ export const itemHammer: IToolItemBlueprint = {
     skillIncrease: SkillIncrease
   ) => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
+    const rarityOfTool = originItem.rarity ?? ItemRarities.Common;
+
     const rewards = new Map<string, IUseWithItemToTileReward[]>([
       [
         CraftingResourcesBlueprint.IronOre,
@@ -46,7 +48,7 @@ export const itemHammer: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.IronIngot,
             qty: [2, 4],
-            chance: await itemCraftable.getCraftChance(character, 65),
+            chance: await itemCraftable.getCraftChance(character, 65, rarityOfTool),
           },
         ],
       ],
@@ -56,7 +58,7 @@ export const itemHammer: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.CopperIngot,
             qty: [2, 4],
-            chance: await itemCraftable.getCraftChance(character, 60),
+            chance: await itemCraftable.getCraftChance(character, 60, rarityOfTool),
           },
         ],
       ],
@@ -66,7 +68,7 @@ export const itemHammer: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.SilverIngot,
             qty: [2, 4],
-            chance: await itemCraftable.getCraftChance(character, 55),
+            chance: await itemCraftable.getCraftChance(character, 55, rarityOfTool),
           },
         ],
       ],
@@ -76,7 +78,7 @@ export const itemHammer: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.GoldenIngot,
             qty: [2, 4],
-            chance: await itemCraftable.getCraftChance(character, 50),
+            chance: await itemCraftable.getCraftChance(character, 50, rarityOfTool),
           },
         ],
       ],
@@ -86,7 +88,7 @@ export const itemHammer: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.GreenIngot,
             qty: [2, 4],
-            chance: await itemCraftable.getCraftChance(character, 45),
+            chance: await itemCraftable.getCraftChance(character, 45, rarityOfTool),
           },
         ],
       ],
@@ -96,7 +98,7 @@ export const itemHammer: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.ObsidiumIngot,
             qty: [2, 4],
-            chance: await itemCraftable.getCraftChance(character, 45),
+            chance: await itemCraftable.getCraftChance(character, 45, rarityOfTool),
           },
         ],
       ],
@@ -106,7 +108,7 @@ export const itemHammer: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.CorruptionIngot,
             qty: [2, 4],
-            chance: await itemCraftable.getCraftChance(character, 45),
+            chance: await itemCraftable.getCraftChance(character, 45, rarityOfTool),
           },
         ],
       ],

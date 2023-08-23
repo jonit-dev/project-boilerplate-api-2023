@@ -5,7 +5,7 @@ import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { IToolItemBlueprint, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
+import { IToolItemBlueprint, ItemRarities, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -35,6 +35,7 @@ export const itemCarpentersAxe: IToolItemBlueprint = {
     skillIncrease: SkillIncrease
   ): Promise<void> => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
+    const rarityOfTool = originItem.rarity ?? ItemRarities.Common;
 
     await useWithItemToTile.execute(
       character,
@@ -47,22 +48,22 @@ export const itemCarpentersAxe: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.GreaterWoodenLog,
             qty: [3, 4],
-            chance: await itemCraftable.getCraftChance(character, 30),
+            chance: await itemCraftable.getCraftChance(character, 30, rarityOfTool),
           },
           {
             key: CraftingResourcesBlueprint.WoodenSticks,
             qty: [2, 3],
-            chance: await itemCraftable.getCraftChance(character, 10),
+            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
           },
           {
             key: CraftingResourcesBlueprint.SmallWoodenStick,
             qty: [2, 3],
-            chance: await itemCraftable.getCraftChance(character, 10),
+            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
           },
           {
             key: CraftingResourcesBlueprint.ElvenWood,
             qty: [1, 2],
-            chance: await itemCraftable.getCraftChance(character, 5),
+            chance: await itemCraftable.getCraftChance(character, 5, rarityOfTool),
           },
         ],
       },
