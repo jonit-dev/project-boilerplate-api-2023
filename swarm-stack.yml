@@ -16,8 +16,8 @@ services:
       - "${SOCKET_PORT}:${SOCKET_PORT}"
     environment:
       FORCE_COLOR: "true"
-      VIRTUAL_HOST: temp-na.definya.com
-      LETSENCRYPT_HOST: temp-na.definya.com
+      VIRTUAL_HOST: ${API_SUBDOMAIN}
+      LETSENCRYPT_HOST: ${API_SUBDOMAIN}
       LETSENCRYPT_EMAIL: ${ADMIN_EMAIL}
       VIRTUAL_PORT: ${SERVER_PORT}
       CHOKIDAR_USEPOLLING: "true"
