@@ -16,10 +16,6 @@ services:
       - "${SOCKET_PORT}:${SOCKET_PORT}"
     environment:
       FORCE_COLOR: "true"
-      VIRTUAL_HOST: ${API_SUBDOMAIN}
-      LETSENCRYPT_HOST: ${API_SUBDOMAIN}
-      LETSENCRYPT_EMAIL: ${ADMIN_EMAIL}
-      VIRTUAL_PORT: ${SERVER_PORT}
       CHOKIDAR_USEPOLLING: "true"
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Definya API"
@@ -30,6 +26,21 @@ services:
         target: .env
     env_file:
       - .env
+    labels:
+      # Basic setup
+      - traefik.enable=true
+      - traefik.http.routers.rpg-api.rule=Host(`temp-na.definya.com`)
+      - traefik.http.routers.rpg-api.entrypoints=websecure
+      - traefik.http.routers.rpg-api.tls.certresolver=myresolver
+      - traefik.http.services.rpg-api.loadbalancer.server.port=${SERVER_PORT}
+      # WebSocket specific routing
+      - traefik.http.routers.rpg-api-socket.rule=Host(`temp-na.definya.com`) && Path(`/socket.io/`)
+      - traefik.http.routers.rpg-api-socket.entrypoints=websecure
+      - traefik.http.routers.rpg-api-socket.tls.certresolver=myresolver
+      - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.X-Forwarded-For=$proxy_add_x_forwarded_for
+      - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.Upgrade=$http_upgrade
+      - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.Connection=upgrade
+      - traefik.http.routers.rpg-api-socket.middlewares=rpg-api-socket-headers
 
   rpg-db:
     image: mongo
@@ -76,6 +87,38 @@ services:
     env_file:
       - .env
 
+  traefik:
+    image: traefik:v2.4
+    command:
+      # Basic setup
+      - --api.insecure=true
+      - "--api.dashboard=true"
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # Setup SSL
+      - --certificatesresolvers.myresolver.acme.httpchallenge=true
+      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.myresolver.acme.email=admin@definya.com
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      # Redirect HTTP to HTTPS
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - --accesslog=true
+      - --accesslog.filepath=./traeffik-logfile.log
+      - --tracing.jaeger=true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "5003:8080" # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt:/letsencrypt
+
+    networks:
+      - rpg-network
+
 networks:
   rpg-network:
     driver: overlay
@@ -87,10 +130,3 @@ configs:
 volumes:
   rpg-db-data:
   rpg-redis-data:
-  # nginx proxy
-  conf:
-  vhost:
-  html:
-  dhparam:
-  certs:
-  acme:
