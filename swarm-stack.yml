@@ -106,7 +106,6 @@ services:
         - traefik.http.services.traefik-dashboard.loadbalancer.server.port=5003
     command:
       # Basic setup
-      - --api
       - --api.insecure=true
       - --api.dashboard=true
       - --providers.docker=true
@@ -135,13 +134,10 @@ services:
       - ./letsencrypt:/letsencrypt
     networks:
       - rpg-network
-      - public
 
 networks:
   rpg-network:
     driver: overlay
-  public:
-    external: true
 
 configs:
   rpg-env:
