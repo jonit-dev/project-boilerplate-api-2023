@@ -98,6 +98,7 @@ services:
           - node.role == manager
     command:
       # Basic setup
+      - --api
       - --api.insecure=true
       - --api.dashboard=true
       - --providers.docker=true
@@ -126,6 +127,7 @@ services:
       - ./letsencrypt:/letsencrypt
     networks:
       - rpg-network
+      - public
     labels:
       - traefik.enable=true
       # Dashboard router
@@ -138,6 +140,8 @@ services:
 networks:
   rpg-network:
     driver: overlay
+  public:
+    external: true
 
 configs:
   rpg-env:
