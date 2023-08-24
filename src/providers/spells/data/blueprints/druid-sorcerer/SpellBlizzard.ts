@@ -28,7 +28,7 @@ export const spellBlizzard: Partial<ISpell> = {
     "Conjures a relentless tempest of ice and snow, enveloping the designated area in a freezing whirlwind of wintry fury.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "losse ninqe lanta",
-  manaCost: 40,
+  manaCost: 70,
   minLevelRequired: 12,
   minMagicLevelRequired: 10,
   cooldown: 20,
