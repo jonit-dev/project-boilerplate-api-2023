@@ -26,7 +26,6 @@ const v4Client = {
   expire: promisify(client.expire).bind(client),
   mGet: promisify(client.mget).bind(client),
   pTTL: promisify(client.pttl).bind(client),
-  hmGet: promisify(client.hmget).bind(client),
   pSetEx: (key: string, ms: number, value: string) => setEx(key, ms / 1000, value),
   on: () => undefined,
   // Add additional functions as needed...

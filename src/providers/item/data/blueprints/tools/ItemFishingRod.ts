@@ -9,6 +9,7 @@ import {
   AnimationEffectKeys,
   EntityAttackType,
   IToolItemBlueprint,
+  ItemRarities,
   ItemSlotType,
   ItemSubType,
   ItemType,
@@ -40,6 +41,7 @@ export const itemFishingRod: IToolItemBlueprint = {
     skillIncrease: SkillIncrease
   ): Promise<void> => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
+    const rarityOfTool = originItem.rarity ?? ItemRarities.Common;
 
     await useWithItemToTile.execute(
       character,
@@ -72,17 +74,17 @@ export const itemFishingRod: IToolItemBlueprint = {
           {
             key: FoodsBlueprint.WildSalmon,
             qty: [1, 3],
-            chance: await itemCraftable.getCraftChance(character, 2.5),
+            chance: await itemCraftable.getCraftChance(character, 2.5, rarityOfTool),
           },
           {
             key: FoodsBlueprint.Tuna,
             qty: [2, 3],
-            chance: await itemCraftable.getCraftChance(character, 10),
+            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
           },
           {
             key: FoodsBlueprint.BrownFish,
             qty: [1, 2],
-            chance: await itemCraftable.getCraftChance(character, 10),
+            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
           },
         ],
       },

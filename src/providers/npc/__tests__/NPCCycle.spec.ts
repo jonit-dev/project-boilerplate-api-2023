@@ -1,5 +1,4 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { inMemoryHashTable } from "@providers/inversify/container";
 import { NPCCycle } from "../NPCCycle";
 
 let npcCycle: NPCCycle;
@@ -7,13 +6,13 @@ let id: string;
 let fn: Function;
 let intervalSpeed: number;
 describe("NPCCycle.ts", () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     id = "62b792030c3f470048781135";
     fn = jest.fn();
     intervalSpeed = -1;
 
     // Create an NPCCycle instance
-    npcCycle = new NPCCycle(id, fn, intervalSpeed, inMemoryHashTable);
+    npcCycle = new NPCCycle(id, fn, intervalSpeed);
   });
   beforeEach(async () => {});
   afterEach(() => {
