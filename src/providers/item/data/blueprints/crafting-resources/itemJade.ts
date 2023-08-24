@@ -10,6 +10,6 @@ export const itemJade: ICraftableItemBlueprint = {
   name: "Jade",
   description: "A piece of jade. The eye of Dursed Dragon.",
   weight: 3,
-  maxStackSize: 10,
+  maxStackSize: 100,
   basePrice: 20,
 };
