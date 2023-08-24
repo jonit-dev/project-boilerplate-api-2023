@@ -1,8 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { HitTarget } from "@providers/battle/HitTarget";
 import { SpellArea } from "@providers/battle/SpellArea";
-import { SPELL_AREA_CROSS_BLAST_RADIUS } from "@providers/constants/SpellConstants";
+import { SPELL_AREA_DIAMOND_BLAST_RADIUS } from "@providers/constants/SpellConstants";
+import { entityEffectFreezing } from "@providers/entityEffects/data/blueprints/entityEffectFreezing";
 import { characterBuffActivator, container } from "@providers/inversify/container";
+import { UsableEffectsBlueprint } from "@providers/item/data/usableEffects/types";
 import {
   AnimationEffectKeys,
   BasicAttribute,
@@ -17,7 +20,6 @@ import {
   SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { UsableEffectsBlueprint } from "@providers/item/data/usableEffects/types";
 
 export const spellBlizzard: Partial<ISpell> = {
   key: SpellsBlueprint.Blizzard,
@@ -25,11 +27,11 @@ export const spellBlizzard: Partial<ISpell> = {
   description:
     "Conjures a relentless tempest of ice and snow, enveloping the designated area in a freezing whirlwind of wintry fury.",
   castingType: SpellCastingType.RangedCasting,
-  magicWords: "clacial cale",
-  manaCost: 10, // 74
-  minLevelRequired: 5, // 12
-  minMagicLevelRequired: 5, // 7
-  cooldown: 3, // 20
+  magicWords: "losse ninqe lanta",
+  manaCost: 40,
+  minLevelRequired: 12,
+  minMagicLevelRequired: 10,
+  cooldown: 20,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Freeze,
   projectileAnimationKey: AnimationEffectKeys.Freeze,
@@ -41,21 +43,24 @@ export const spellBlizzard: Partial<ISpell> = {
 
     await spellArea.cast(character, target, MagicPower.Medium, {
       effectAnimationKey: AnimationEffectKeys.Freeze,
-      spellAreaGrid: SPELL_AREA_CROSS_BLAST_RADIUS,
-      customFn: async (target: ICharacter | INPC) => {
+      spellAreaGrid: SPELL_AREA_DIAMOND_BLAST_RADIUS,
+      entityEffect: entityEffectFreezing,
+      customFn: async (target: ICharacter | INPC, intensity: number) => {
         const spellCalculator = container.get(SpellCalculator);
+        const hitTarget = container.get(HitTarget);
 
-        const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
-          min: 30,
-          max: 60,
-        });
-
-        const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
-          min: 20,
-          max: 35,
-        });
+        await hitTarget.hit(character, target, true, MagicPower.Medium + intensity, true);
 
         if (target.type === "Character") {
+          const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
+            min: 30,
+            max: 60,
+          });
+
+          const debuffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
+            min: 20,
+            max: 35,
+          });
           await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
             type: CharacterBuffType.CharacterAttribute,
             trait: CharacterAttributes.Speed,
