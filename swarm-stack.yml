@@ -29,25 +29,15 @@ services:
       - traefik.http.routers.rpg-api.rule=Host(`temp-na.definya.com`)
       - traefik.http.routers.rpg-api.entrypoints=websecure
       - traefik.http.routers.rpg-api.tls.certresolver=myresolver
-      - traefik.http.services.rpg-api-service.loadbalancer.server.port=${SERVER_PORT}
+      - traefik.http.services.rpg-api-service.loadbalancer.server.port=5002
       - traefik.http.routers.rpg-api.service=rpg-api-service
-      # WebSocket specific routing
-      - traefik.http.routers.rpg-api-socket.rule=Host(`temp-na-ssh.definya.com`) && Path(`/socket.io/`)
+
+      # Websockets
+      - traefik.http.routers.rpg-api-socket.rule=Host(`temp-na.definya.com`) && Path(`/socket.io/`)
       - traefik.http.routers.rpg-api-socket.entrypoints=websecure
       - traefik.http.routers.rpg-api-socket.tls.certresolver=myresolver
-      - traefik.http.services.rpg-api-socket-service.loadbalancer.server.port=${SOCKET_PORT}
+      - traefik.http.services.rpg-api-socket-service.loadbalancer.server.port=5101
       - traefik.http.routers.rpg-api-socket.service=rpg-api-socket-service
-
-      # WebSocket specific headers
-      - traefik.http.routers.rpg-api-socket.middlewares=rpg-api-socket-headers
-      - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.X-Forwarded-For=$proxy_add_x_forwarded_for
-      - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.Upgrade=$http_upgrade
-      - traefik.http.middlewares.rpg-api-socket-headers.headers.customrequestheaders.Connection=upgrade
-
-      # add sticky session for websockets
-      - "traefik.http.services.rpg-api-service.loadbalancer.sticky=true"
-      - "traefik.http.services.rpg-api-service.loadbalancer.sticky.cookie.name=StickyCookie"
-      - "traefik.http.services.rpg-api-service.loadbalancer.sticky.cookie.secure=true"
   rpg-db:
     image: mongo
     command: mongod --port ${MONGO_PORT}
