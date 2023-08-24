@@ -96,6 +96,14 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - traefik.enable=true
+        # Dashboard router
+        - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.definya.com`)"
+        - "traefik.http.routers.traefik-dashboard.service=api@internal"
+        - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+        - "traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver"
+        - traefik.http.services.traefik-dashboard.loadbalancer.server.port=5003
     command:
       # Basic setup
       - --api
@@ -128,14 +136,6 @@ services:
     networks:
       - rpg-network
       - public
-    labels:
-      - traefik.enable=true
-      # Dashboard router
-      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.definya.com`)"
-      - "traefik.http.routers.traefik-dashboard.service=api@internal"
-      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
-      - "traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver"
-      - traefik.http.services.traefik-dashboard.loadbalancer.server.port=5003
 
 networks:
   rpg-network:
