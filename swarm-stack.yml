@@ -38,6 +38,11 @@ services:
       - traefik.http.routers.rpg-api-socket.tls.certresolver=myresolver
       - traefik.http.services.rpg-api-socket-service.loadbalancer.server.port=5101
       - traefik.http.routers.rpg-api-socket.service=rpg-api-socket-service
+
+      # add sticky session for websockets
+      - "traefik.http.services.rpg-api-service.loadbalancer.sticky=true"
+      - "traefik.http.services.rpg-api-service.loadbalancer.sticky.cookie.name=StickyCookie"
+      - "traefik.http.services.rpg-api-service.loadbalancer.sticky.cookie.secure=true"
   rpg-db:
     image: mongo
     command: mongod --port ${MONGO_PORT}
@@ -85,10 +90,15 @@ services:
 
   traefik:
     image: traefik:v2.4
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
     command:
       # Basic setup
       - --api.insecure=true
-      - "--api.dashboard=true"
+      - --api.dashboard=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
@@ -114,6 +124,18 @@ services:
       - ./letsencrypt:/letsencrypt
     networks:
       - rpg-network
+    labels:
+      - traefik.enable=true
+      # Dashboard router
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.definya.com`)"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.middlewares=authtraefik"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver"
+      - traefik.http.services.traefik-dashboard.loadbalancer.server.port=5003
+
+      # Add these lines for basic authentication
+      - "traefik.http.middlewares.authtraefik.basicauth.users=admin:$apr1$3vpk4dt2$PE7A7wbg29IwRWDHfoa0L1"
 
 networks:
   rpg-network:
