@@ -40,47 +40,6 @@ export class InMemoryHashTable {
     return this.parseObject(values);
   }
 
-  public async countBooleanEnabledValues(namespace: string, isEnabled: boolean): Promise<number> {
-    const values = await this.redisManager.client.hGetAll(namespace?.toString());
-
-    if (!values) {
-      return 0;
-    }
-
-    const parsedValues = this.parseObject(values);
-
-    // Count the occurrences where the value matches isEnabled
-    const count = Object.values(parsedValues).reduce((acc, value) => {
-      return value === isEnabled ? acc + 1 : acc;
-    }, 0);
-
-    return count;
-  }
-
-  public async batchGet(namespace: string, keys: string[]): Promise<Record<string, any>> {
-    // Ensure namespace is valid and keys array is not empty
-    if (!namespace || keys.length === 0) {
-      return {};
-    }
-
-    // Fetch multiple keys at once
-    const values = await this.redisManager.client.hmGet(namespace, keys);
-
-    if (!values || !Array.isArray(values)) {
-      return {};
-    }
-
-    // Pair the keys with their respective values
-    const keyValuePairs: Record<string, any> = {};
-    keys.forEach((key, index) => {
-      keyValuePairs[key] = values[index];
-    });
-
-    // If the values are stored as stringified JSON, parse each value.
-    // Otherwise, return the keyValuePairs directly.
-    return this.parseObject(keyValuePairs);
-  }
-
   public async has(namespace: string, key: string): Promise<boolean> {
     const result = await this.redisManager.client.hExists(namespace?.toString(), key?.toString());
 

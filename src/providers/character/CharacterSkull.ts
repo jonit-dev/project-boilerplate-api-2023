@@ -52,11 +52,11 @@ export class CharacterSkull {
     if (!skull) return "";
     switch (skull as CharacterSkullType) {
       case CharacterSkullType.WhiteSkull:
-        return "You got White Skull. Expired in 15 mins";
+        return "You got a White Skull. It expires in 15 mins.";
       case CharacterSkullType.YellowSkull:
-        return "You got Yellow Skull. Expired in 1 week";
+        return "You got a Yellow Skull. It expires in 1 week.";
       case CharacterSkullType.RedSkull:
-        return "You got Red Skull. Expired in 2 weeks";
+        return "You got a Red Skull. It expires in 2 weeks.";
       default:
         throw new Error("Skull is invalid");
     }
@@ -93,6 +93,7 @@ export class CharacterSkull {
     switch (skullType) {
       case CharacterSkullType.WhiteSkull:
         timeExpired = new Date(Date.now() + 15 * 60 * 1000);
+
         break;
       case CharacterSkullType.YellowSkull:
         timeExpired = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);

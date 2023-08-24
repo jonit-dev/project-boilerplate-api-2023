@@ -1,7 +1,6 @@
 /* eslint-disable no-void */
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { NPC_BATTLE_CYCLES } from "./NPCBattleCycle";
 
 type SetInterval = ReturnType<typeof setInterval>;
@@ -11,7 +10,7 @@ export class NPCCycle {
   public interval: SetInterval;
   public id: string;
 
-  constructor(id: string, fn: Function, intervalSpeed: number, private inMemoryHashTable: InMemoryHashTable) {
+  constructor(id: string, fn: Function, intervalSpeed: number) {
     this.id = id;
     this.interval = setInterval(async () => {
       // check if NPC has behavior enabled or is dead, if so, clear the cycle
@@ -41,9 +40,7 @@ export class NPCCycle {
     }
 
     await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
-
-    const namespace = "isBehaviorEnabled";
-    await this.inMemoryHashTable.set(namespace, this.id, false);
+    await NPC.updateOne({ _id: this.id }, { $set: { isBehaviorEnabled: false } });
   }
 
   private async shouldNPCBeCleared(): Promise<boolean> {
@@ -51,10 +48,7 @@ export class NPCCycle {
 
     if (!npc) return true;
 
-    const namespace = "isBehaviorEnabled";
-    const isBehaviorEnabled = (await this.inMemoryHashTable.get(namespace, npc._id)) || false;
-
-    if (!isBehaviorEnabled || npc.health <= 0) return true;
+    if (!npc.isBehaviorEnabled || npc.health <= 0) return true;
 
     return false;
   }

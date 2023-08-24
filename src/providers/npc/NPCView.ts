@@ -2,7 +2,6 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -22,8 +21,7 @@ export class NPCView {
   constructor(
     private playerView: CharacterView,
     private socketTransmissionZone: SocketTransmissionZone,
-    private characterView: CharacterView,
-    private inMemoryHashTable: InMemoryHashTable
+    private characterView: CharacterView
   ) {}
 
   @TrackNewRelicTransaction()
@@ -82,20 +80,9 @@ export class NPCView {
   public async getNPCsInView(character: ICharacter, options?: IGetNPCsInViewOptions): Promise<INPC[]> {
     const npcsInView = await this.playerView.getElementsInCharView(NPC, character, {
       health: { $gt: 0 },
+      isBehaviorEnabled: options?.isBehaviorEnabled ?? true,
     });
 
-    if (!npcsInView.length) {
-      return [];
-    }
-
-    const namespace = "isBehaviorEnabled";
-
-    const npcIds = npcsInView.map((npc) => npc.id);
-    const behaviorStatuses = await this.inMemoryHashTable.batchGet(namespace, npcIds);
-
-    const isBehaviorFilter = options?.isBehaviorEnabled ?? true;
-
-    // Filter NPCs based on their behavior statuses
-    return npcsInView.filter((npc) => (behaviorStatuses[npc.id] || false) === isBehaviorFilter);
+    return npcsInView;
   }
 }

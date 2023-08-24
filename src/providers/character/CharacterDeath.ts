@@ -133,7 +133,7 @@ export class CharacterDeath {
         if (!characterDeathLog.isJustify) {
           await this.characterSkull.updateSkullAfterKill(killer._id.toString());
         }
-        if (characterKiller.mode === Modes.SoftMode) {
+        if (characterKiller.mode === Modes.SoftMode && !character.hasSkull) {
           return;
         }
       }

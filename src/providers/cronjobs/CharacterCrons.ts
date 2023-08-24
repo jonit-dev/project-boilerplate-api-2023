@@ -136,30 +136,41 @@ export class CharacterCrons {
   private async cleanSkullCharacters(): Promise<void> {
     const now = new Date();
 
-    const charactersWithSkull = await Character.find({
+    const charactersWithSkull = (await Character.find({
       skullExpiredAt: { $lt: now },
       hasSkull: true,
-    });
+    }).lean()) as ICharacter[];
 
-    // Remove character's skull
+    if (charactersWithSkull.length === 0) return;
+
+    // Prepare the bulk update operation
+    const bulkOps = charactersWithSkull.map((character) => ({
+      updateOne: {
+        filter: { _id: character._id },
+        update: {
+          $set: { hasSkull: false },
+          $unset: { skullType: "", skullExpiredAt: "" },
+        },
+      },
+    }));
+
+    // Execute the bulk update
+    await Character.bulkWrite(bulkOps);
+
+    // Send socket messages
     for (const character of charactersWithSkull) {
-      character.hasSkull = false;
-      character.skullType = undefined;
-      character.skullExpiredAt = undefined;
-
       const payload: ICharacterAttributeChanged = {
         targetId: character._id,
         hasSkull: false,
       };
 
-      await character.save();
       await this.socketMessaging.sendEventToCharactersAroundCharacter(
         character,
         CharacterSocketEvents.AttributeChanged,
         payload,
         true
       );
-      this.socketMessaging.sendMessageToCharacter(character, "You are free from skull!");
+      this.socketMessaging.sendMessageToCharacter(character, "Your skull was dismissed!");
     }
   }
 }

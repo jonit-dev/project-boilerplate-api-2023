@@ -25,6 +25,7 @@ import Shared, {
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
   IUIShowMessage,
+  ItemRarities,
   ItemSocketEvents,
   UISocketEvents,
 } from "@rpg-engine/shared";
@@ -226,9 +227,15 @@ export class ItemCraftable {
    * @returns
    */
   @TrackNewRelicTransaction()
-  public async getCraftChance(character: ICharacter, baseChance: number): Promise<() => Promise<boolean>> {
+  public async getCraftChance(
+    character: ICharacter,
+    baseChance: number,
+    rarityOfTool: string
+  ): Promise<() => Promise<boolean>> {
     const skillsAverage = await this.getCraftingSkillsAverage(character);
-    return this.isCraftSuccessful.bind(null, skillsAverage - 1, baseChance);
+    const rarityChance = this.getRarityPercent(rarityOfTool);
+
+    return this.isCraftSuccessful.bind(null, skillsAverage - 1, baseChance + rarityChance ?? 0);
   }
 
   @TrackNewRelicTransaction()
@@ -560,5 +567,29 @@ export class ItemCraftable {
     ];
 
     return Math.floor(craftingSkills.reduce((total, level) => total + level, 0) / craftingSkills.length);
+  }
+
+  private getRarityPercent(itemRarity: string): number {
+    switch (itemRarity) {
+      case ItemRarities.Common: {
+        return 0;
+      }
+      case ItemRarities.Uncommon: {
+        return 5;
+      }
+
+      case ItemRarities.Rare: {
+        return 1;
+      }
+      case ItemRarities.Epic: {
+        return 15;
+      }
+      case ItemRarities.Legendary: {
+        return 25;
+      }
+      default: {
+        return 0;
+      }
+    }
   }
 }
