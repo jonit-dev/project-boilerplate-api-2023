@@ -12,7 +12,6 @@ export class CleanupBloodCrons {
 
   public schedule(): void {
     nodeCron.schedule("*/1 * * * *", async () => {
-      console.log("🕒: Cleaning up ground blood...");
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupBloodCrons", async () => {
         const fiveMinAgo = new Date();
         fiveMinAgo.setMinutes(fiveMinAgo.getMinutes() - 5);

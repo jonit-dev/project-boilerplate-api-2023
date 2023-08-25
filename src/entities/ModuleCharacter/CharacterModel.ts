@@ -272,6 +272,7 @@ characterSchema.index(
     isOnline: 1,
     isBanned: 1,
     hasSkull: 1,
+    skullExpiredAt: 1,
   },
   { background: true }
 );

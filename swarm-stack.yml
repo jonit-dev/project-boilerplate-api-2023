@@ -39,7 +39,6 @@ services:
         max-file: "3"
     environment:
       FORCE_COLOR: "true"
-      CHOKIDAR_USEPOLLING: "true"
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Definya API"
     networks:

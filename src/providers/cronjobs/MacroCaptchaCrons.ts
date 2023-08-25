@@ -111,7 +111,5 @@ export class MacroCaptchaCrons {
         }
       })
     );
-
-    console.log("SENDING ANTI-MACRO CAPTCHA TO", sentTo, "CHARACTERS");
   }
 }

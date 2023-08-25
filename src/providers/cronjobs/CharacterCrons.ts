@@ -24,7 +24,6 @@ export class CharacterCrons {
   public schedule(): void {
     // every 15 min, check how many players are online
     nodeCron.schedule("*/15 * * * *", async () => {
-      console.log("🕒: Checking online characters...");
       const onlineCharactersCount = await Character.countDocuments({
         isOnline: true,
       });
@@ -38,7 +37,6 @@ export class CharacterCrons {
     });
 
     nodeCron.schedule("* * * * *", async () => {
-      console.log("🕒: Checking inactive characters...");
       await this.newRelic.trackTransaction(
         NewRelicTransactionCategory.CronJob,
         "LogoutInactiveCharacters",
@@ -50,7 +48,6 @@ export class CharacterCrons {
 
     // check banned characters every day
     nodeCron.schedule("0 0 * * *", async () => {
-      console.log("🕒: Checking banned characters...");
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "UnbanCharacters", async () => {
         await this.unbanCharacters();
       });
@@ -58,7 +55,6 @@ export class CharacterCrons {
 
     // Check for clean skull from character
     nodeCron.schedule("* * * * *", async () => {
-      console.log("🕒: Cleaning skulls from characters...");
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupSkullCrons", async () => {
         await this.cleanSkullCharacters();
       });
@@ -66,7 +62,6 @@ export class CharacterCrons {
   }
 
   private async unbanCharacters(): Promise<void> {
-    console.log("🕒: Unbanning characters");
     const bannedCharacters = await Character.find({
       isBanned: true,
       hasPermanentBan: {
@@ -85,7 +80,6 @@ export class CharacterCrons {
   }
 
   private async logoutInactiveCharacters(): Promise<void> {
-    console.log("🕒: Logging out inactive characters...");
     const onlineCharacters = (await Character.find({
       isOnline: true,
     }).lean()) as ICharacter[];

@@ -11,7 +11,6 @@ export class CleanupBodyCrons {
 
   public schedule(): void {
     nodeCron.schedule("*/3 * * * *", async () => {
-      console.log("🕒: Cleaning up dead bodies...");
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupBodyCrons", async () => {
         const oneHourAgo = new Date();
         oneHourAgo.setHours(oneHourAgo.getHours() - 1);

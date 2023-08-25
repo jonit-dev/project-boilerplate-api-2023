@@ -12,7 +12,6 @@ export class NPCCrons {
 
   public schedule(): void {
     nodeCron.schedule("* * * * *", async () => {
-      console.log("🕒: Spawning NPCs...");
       // filter all dead npcs that have a nextSpawnTime > now
 
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "NPCSpawn", async () => {
