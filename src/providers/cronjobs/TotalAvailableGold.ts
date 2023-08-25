@@ -8,12 +8,13 @@ import {
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
-@provide(TotalAvaliableGold)
-export class TotalAvaliableGold {
+@provide(TotalAvailableGold)
+export class TotalAvailableGold {
   constructor(private newRelic: NewRelic) {}
 
   public schedule(): void {
     nodeCron.schedule("0 4 * * *", async () => {
+      console.log("🕒: Calculating total available gold...");
       let totalGold = 0;
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "TotalAvaliableGold", async () => {
         const allItems = (await Item.find({ canSell: true })
@@ -30,7 +31,7 @@ export class TotalAvaliableGold {
       this.newRelic.trackMetric(
         NewRelicMetricCategory.Count,
         NewRelicSubCategory.Items,
-        "TotalAvaliableGold",
+        "TotalAvailableGold",
         totalGold
       );
     });
