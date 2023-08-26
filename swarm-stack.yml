@@ -43,11 +43,6 @@ services:
       NEW_RELIC_APP_NAME: "Definya API"
     networks:
       - rpg-network
-    configs:
-      - source: rpg-env
-        target: .env
-    env_file:
-      - .env
 
   rpg-db:
     image: mongo
@@ -72,11 +67,6 @@ services:
           - node.role == manager
     networks:
       - rpg-network
-    configs:
-      - source: rpg-env
-        target: .env
-    env_file:
-      - .env
 
   rpg-redis:
     image: redis:latest
@@ -88,65 +78,10 @@ services:
     command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
       - rpg-network
-    configs:
-      - source: rpg-env
-        target: .env
-    env_file:
-      - .env
-
-  traefik:
-    image: traefik:v2.4
-    deploy:
-      mode: global
-      placement:
-        constraints:
-          - node.role == manager
-      labels:
-        - traefik.enable=true
-        # Dashboard router
-        - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.definya.com`)"
-        - "traefik.http.routers.traefik-dashboard.service=api@internal"
-        - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
-        - "traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver"
-        - traefik.http.services.traefik-dashboard.loadbalancer.server.port=5003
-    command:
-      # Basic setup
-      - --api.insecure=true
-      - --api.dashboard=true
-      - --providers.docker=true
-      - --providers.docker.swarmMode=true
-      - --providers.docker.exposedbydefault=false
-      - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      # Setup SSL
-      - --certificatesresolvers.myresolver.acme.httpchallenge=true
-      - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
-      - --certificatesresolvers.myresolver.acme.email=admin@definya.com
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-      # Redirect HTTP to HTTPS
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      # Logging & Debugging
-      - --accesslog=true
-      - --accesslog.filepath=./traeffik-logfile.log
-      - --log.level=DEBUG
-    ports:
-      - "80:80"
-      - "443:443"
-      - "5003:8080" # Traefik dashboard
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./letsencrypt:/letsencrypt
-    networks:
-      - rpg-network
 
 networks:
   rpg-network:
-    driver: overlay
-
-configs:
-  rpg-env:
-    file: .env
+    external: true
 
 volumes:
   rpg-db-data:
