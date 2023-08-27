@@ -17,9 +17,13 @@ services:
         - "traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver"
         - traefik.http.services.traefik-dashboard.loadbalancer.server.port=5003
         - "traefik.docker.network=public"
+
+          # Enable Basic Auth on Traefik Dashboard
+        - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$2y$$05$$zXp4YId/ud4GKWGfcurBPe33lyAfwRhTPCKdmPlSYm.hRsyeATcRC" # ! You should double the $ for this to work! Otherwise you'll get stuck on the password screen
+        - "traefik.http.routers.traefik-dashboard.middlewares=traefik-auth@docker"
     command:
       # Basic setup
-      - --api.insecure=true
+      - --api.insecure=false
       - --api.dashboard=true
       - --providers.docker=true
       - --providers.docker.swarmMode=true
