@@ -193,6 +193,7 @@ const npcSchema = createLeanSchema(
         typeof: EntityEffectBlueprint,
       })
     ),
+    raidKey: Type.string({}),
     appliedEntityEffects: Type.array().of(Type.mixed({})),
   },
   { timestamps: { createdAt: true, updatedAt: true } }

@@ -28,6 +28,7 @@ import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MathHelper } from "@providers/math/MathHelper";
+import { RaidManager } from "@providers/raid/RaidManager";
 import {
   NewRelicMetricCategory,
   NewRelicSubCategory,
@@ -50,7 +51,8 @@ export class NPCManager {
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
     private newRelic: NewRelic,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private raidManager: RaidManager
   ) {}
 
   public listenForBehaviorTrigger(): void {
@@ -108,6 +110,14 @@ export class NPCManager {
 
     if (npc) {
       await this.inMemoryHashTable.set("npc", npc._id, npc);
+    }
+
+    const isRaidNPC = npc.raidKey !== undefined;
+
+    const isRaidNPCActive = npc.raidKey && (await this.raidManager.isRaidActive(npc.raidKey!));
+
+    if (isRaidNPC && !isRaidNPCActive) {
+      return;
     }
 
     if (!npc.isBehaviorEnabled) {

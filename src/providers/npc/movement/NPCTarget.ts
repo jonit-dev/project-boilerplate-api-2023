@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { Locker } from "@providers/locks/Locker";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
@@ -19,7 +20,8 @@ export class NPCTarget {
     private movementHelper: MovementHelper,
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
-    private locker: Locker
+    private locker: Locker,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   public async clearTarget(npc: INPC): Promise<void> {
@@ -114,7 +116,10 @@ export class NPCTarget {
       throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
     }
 
-    if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE) {
+    const isRaid = npc.raidKey !== undefined;
+    const freeze = !isRaid;
+
+    if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE && freeze) {
       const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
       // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
       if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {

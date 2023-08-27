@@ -32,10 +32,8 @@ export class NPCSpawn {
   }
 
   @TrackNewRelicTransaction()
-  public async spawn(npc: INPC): Promise<void> {
-    const canSpawn = await this.canSpawn(npc);
-
-    if (!canSpawn) {
+  public async spawn(npc: INPC, isRaid?: boolean): Promise<void> {
+    if (!isRaid && !(await this.canSpawn(npc))) {
       return;
     }
 

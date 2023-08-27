@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { NPCTarget } from "../movement/NPCTarget";
@@ -9,11 +10,13 @@ describe("NPCTarget.ts", () => {
   let npcTarget: NPCTarget;
   let testNPC: INPC;
   let testCharacter: ICharacter;
+  let inMemoryHashTable: InMemoryHashTable;
 
   beforeAll(async () => {
     await unitTestHelper.initializeMapLoader();
 
     npcTarget = container.get<NPCTarget>(NPCTarget);
+    inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
   });
 
   beforeEach(async () => {
@@ -158,6 +161,40 @@ describe("NPCTarget.ts", () => {
     testNPC = (await NPC.findById(testNPC.id)) as INPC;
 
     expect(testNPC.targetCharacter).toBeUndefined();
+  });
+
+  it("should not call isNonPVPZoneAtXY if the NPC is a raid NPC", async () => {
+    testNPC.raidKey = "test-raid";
+    await testNPC.save();
+
+    testCharacter = await unitTestHelper.createMockCharacter({
+      x: FromGridX(0),
+      y: FromGridY(0),
+    });
+
+    // @ts-ignore
+    const mockIsNonPVPZoneAtXY = jest.spyOn(npcTarget.mapNonPVPZone, "isNonPVPZoneAtXY").mockReturnValue(true);
+
+    await npcTarget.tryToSetTarget(testNPC);
+
+    expect(mockIsNonPVPZoneAtXY).not.toHaveBeenCalled();
+  });
+
+  it("should call isNonPVPZoneAtXY if the NPC not a raid NPC", async () => {
+    testNPC.raidKey = undefined;
+    await testNPC.save();
+
+    testCharacter = await unitTestHelper.createMockCharacter({
+      x: FromGridX(0),
+      y: FromGridY(0),
+    });
+
+    // @ts-ignore
+    const mockIsNonPVPZoneAtXY = jest.spyOn(npcTarget.mapNonPVPZone, "isNonPVPZoneAtXY").mockReturnValue(true);
+
+    await npcTarget.tryToSetTarget(testNPC);
+
+    expect(mockIsNonPVPZoneAtXY).toHaveBeenCalled();
   });
 
   describe("Validation", () => {

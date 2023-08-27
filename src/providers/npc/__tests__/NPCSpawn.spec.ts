@@ -44,6 +44,17 @@ describe("NPCSpawn", () => {
     expect(npcView.save).not.toHaveBeenCalled();
   });
 
+  it("should not check canSpawn when the NPC is a raid", async () => {
+    // @ts-ignore
+    const canSpawnSpy = jest.spyOn(npcSpawn, "canSpawn");
+
+    // Call spawn with isRaid marked as true
+    await npcSpawn.spawn(npc, true);
+
+    // Assert that canSpawn was never called
+    expect(canSpawnSpy).not.toHaveBeenCalled();
+  });
+
   it("should reset the NPC's health and mana to their maximum values", async () => {
     npc.maxHealth = 20;
     npc.maxMana = 10;

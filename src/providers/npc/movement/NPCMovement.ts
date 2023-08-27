@@ -96,7 +96,10 @@ export class NPCMovement {
       for (const character of nearbyCharacters) {
         let clearTarget = false;
 
-        if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE) {
+        const isRaid = npc.raidKey !== undefined;
+        const freeze = !isRaid;
+
+        if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE && freeze) {
           const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
 
           /*
