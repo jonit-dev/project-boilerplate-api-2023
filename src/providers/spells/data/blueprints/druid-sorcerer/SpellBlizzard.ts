@@ -28,7 +28,7 @@ export const spellBlizzard: Partial<ISpell> = {
     "Conjures a relentless tempest of ice and snow, enveloping the designated area in a freezing whirlwind of wintry fury.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "losse ninqe lanta",
-  manaCost: 40,
+  manaCost: 70,
   minLevelRequired: 12,
   minMagicLevelRequired: 10,
   cooldown: 20,
@@ -41,7 +41,7 @@ export const spellBlizzard: Partial<ISpell> = {
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
     const spellArea = container.get(SpellArea);
 
-    await spellArea.cast(character, target, MagicPower.Medium, {
+    await spellArea.cast(character, target, MagicPower.High, {
       effectAnimationKey: AnimationEffectKeys.Freeze,
       spellAreaGrid: SPELL_AREA_DIAMOND_BLAST_RADIUS,
       entityEffect: entityEffectFreezing,
@@ -49,7 +49,7 @@ export const spellBlizzard: Partial<ISpell> = {
         const spellCalculator = container.get(SpellCalculator);
         const hitTarget = container.get(HitTarget);
 
-        await hitTarget.hit(character, target, true, MagicPower.Medium + intensity, true);
+        await hitTarget.hit(character, target, true, MagicPower.High + intensity, true);
 
         if (target.type === "Character") {
           const timeout = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {

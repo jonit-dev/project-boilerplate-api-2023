@@ -81,6 +81,8 @@ export class ServerBootstrap {
 
     await this.inMemoryHashTable.deleteAll("crafting-recipes");
 
+    await this.inMemoryHashTable.deleteAll("raids");
+
     // Firebase-admin setup, that push notification requires.
     PushNotificationHelper.initialize();
 

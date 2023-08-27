@@ -321,6 +321,55 @@ export class CharacterItemInventory {
   }
 
   /**
+   * Returns the item id as array if it finds it and quantity. Otherwise, returns empty list
+   */
+  @TrackNewRelicTransaction()
+  public async checkItemsInInventoryByKey(
+    itemKey: string,
+    character: ICharacter,
+    rarity?: string
+  ): Promise<{ slotListId: string[]; qty: number }> {
+    const inventory = (await this.characterInventory.getInventory(character)) as unknown as IItem;
+
+    const inventoryItemContainer = await ItemContainer.findById(inventory?.itemContainer);
+
+    if (!inventoryItemContainer) {
+      return {
+        slotListId: [],
+        qty: 0,
+      };
+    }
+
+    return this.checkItemsInContainerByKey(itemKey, inventoryItemContainer, rarity);
+  }
+
+  @TrackNewRelicTransaction()
+  private async checkItemsInContainerByKey(
+    itemKey: string,
+    container: IItemContainer,
+    rarity?: string
+  ): Promise<{ slotListId: string[]; qty: number }> {
+    let qty = 0;
+    const slotListId: string[] = [];
+    for (let i = 0; i < container.slotQty; i++) {
+      let slotItem = container.slots[i] as unknown as IItem;
+      if (!slotItem) continue;
+
+      if (!slotItem.key) {
+        slotItem = (await Item.findById(slotItem as any)) as unknown as IItem;
+      }
+      if (isSameKey(slotItem.key, itemKey) && (rarity === undefined || slotItem.rarity === rarity)) {
+        qty += slotItem.stackQty ?? 0;
+      }
+    }
+
+    return {
+      slotListId,
+      qty,
+    };
+  }
+
+  /**
    * Returns the (slot index + 1) if it finds it. Otherwise, returns undefined
    */
   @TrackNewRelicTransaction()

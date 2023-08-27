@@ -1,4 +1,6 @@
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { NPCMovement } from "../NPCMovement";
@@ -6,14 +8,24 @@ import { NPCMovement } from "../NPCMovement";
 describe("NPCMovement.ts", () => {
   let npcMovement: NPCMovement;
   let testNPC: INPC;
+  let testCharacter: ICharacter;
+  let inMemoryHashTable: InMemoryHashTable;
 
   beforeAll(async () => {
     npcMovement = container.get<NPCMovement>(NPCMovement);
     await unitTestHelper.initializeMapLoader();
+    inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
   });
 
   beforeEach(async () => {
     testNPC = await unitTestHelper.createMockNPC({
+      x: FromGridX(5),
+      y: FromGridY(4),
+      initialX: FromGridX(5),
+      initialY: FromGridY(4),
+    });
+
+    testCharacter = await unitTestHelper.createMockCharacter({
       x: FromGridX(5),
       y: FromGridY(4),
       initialX: FromGridX(5),
@@ -59,5 +71,31 @@ describe("NPCMovement.ts", () => {
     expect(testNPC.x).toBe(FromGridX(6));
     expect(testNPC.y).toBe(FromGridY(4));
     expect(testNPC.direction).toBe("right");
+  });
+
+  it("should not freeze the NPC if it's a raidNPC", async () => {
+    testNPC.raidKey = "testRaidKey";
+    await testNPC.save();
+
+    // @ts-ignore
+    const mockIsNonPVPZoneAtXY = jest.spyOn(npcMovement.mapNonPVPZone, "isNonPVPZoneAtXY").mockReturnValue(true);
+
+    const moved = await npcMovement.moveNPC(testNPC, testNPC.x, testNPC.y, FromGridX(6), FromGridY(4), "right");
+
+    expect(mockIsNonPVPZoneAtXY).not.toHaveBeenCalled();
+    expect(moved).toBe(true);
+  });
+
+  it("should freeze the NPC it's not a raidNPC", async () => {
+    testNPC.raidKey = undefined;
+    await testNPC.save();
+
+    // @ts-ignore
+    const mockIsNonPVPZoneAtXY = jest.spyOn(npcMovement.mapNonPVPZone, "isNonPVPZoneAtXY").mockReturnValue(true);
+
+    const moved = await npcMovement.moveNPC(testNPC, testNPC.x, testNPC.y, FromGridX(6), FromGridY(4), "right");
+
+    expect(mockIsNonPVPZoneAtXY).toHaveBeenCalled();
+    expect(moved).toBe(true);
   });
 });

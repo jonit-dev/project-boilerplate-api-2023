@@ -71,21 +71,25 @@ export class UseWithItemToTile {
     } = options;
 
     let resourceKey = "";
-
     if (requiredResource) {
-      let hasRequiredItem: string | undefined;
+      let hasRequiredItem: {
+        slotListId: string[];
+        qty: number;
+      } = {
+        slotListId: [],
+        qty: 0,
+      };
       if (typeof requiredResource.key === "string") {
-        hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(requiredResource.key, character);
+        hasRequiredItem = await this.characterItemInventory.checkItemsInInventoryByKey(requiredResource.key, character);
         resourceKey = requiredResource.key;
       } else {
         // requiredResource is an array
         // check if have AT LEAST one
         for (const k of requiredResource.key) {
-          hasRequiredItem = await this.characterItemInventory.checkItemInInventoryByKey(k, character);
-          if (hasRequiredItem) {
+          hasRequiredItem = await this.characterItemInventory.checkItemsInInventoryByKey(k, character);
+          if (hasRequiredItem.qty > 0) {
             // check if have required qty
-            const item = (await Item.findById(hasRequiredItem).lean()) as IItem;
-            if (requiredResource.decrementQty && (item?.stackQty || 0) >= requiredResource.decrementQty) {
+            if (requiredResource.decrementQty && hasRequiredItem.qty >= requiredResource.decrementQty) {
               resourceKey = k;
               break;
             }
@@ -93,7 +97,7 @@ export class UseWithItemToTile {
         }
       }
 
-      if (!hasRequiredItem) {
+      if (hasRequiredItem.qty === 0) {
         this.socketMessaging.sendErrorMessageToCharacter(character, requiredResource.errorMessage);
         return;
       }
