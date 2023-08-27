@@ -129,7 +129,6 @@ export class BattleCharacterAttack {
   public async attackTarget(character: ICharacter, target: ICharacter | INPC): Promise<boolean> {
     try {
       const canAttack = await this.battleCharacterAttackValidation.canAttack(character, target);
-
       if (!canAttack) {
         return false;
       }
@@ -139,7 +138,6 @@ export class BattleCharacterAttack {
       }
 
       const checkRangeAndAttack = await this.battleAttackTarget.checkRangeAndAttack(character, target);
-
       if (checkRangeAndAttack) {
         // check for skull
         if (

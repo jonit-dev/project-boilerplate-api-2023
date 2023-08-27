@@ -32,8 +32,10 @@ describe("MovementHelper.ts", () => {
   });
 
   it("should properly detect an empty tile near a NPC", async () => {
-    const npc = await unitTestHelper.createMockNPC();
-
+    const npc = await unitTestHelper.createMockNPC({
+      x: 144,
+      y: 128,
+    });
     const hasSolidNPC = await movementHelper.isSolid(npc.scene, ToGridX(npc.x) + 16, ToGridY(npc.y), npc.layer);
 
     expect(hasSolidNPC).toBeFalsy();

@@ -104,10 +104,13 @@ export class NPCExperience {
 
       if (record!.partyId) {
         const party = await this.partyManagement.getPartyByCharacterId(characterAndSkills.character._id);
+
         if (!party) {
           continue;
         }
+
         const partyBenefit = party.benefits?.find((benefits) => benefits.benefit === CharacterPartyBenefits.Experience);
+
         baseExp += partyBenefit ? (baseExp * partyBenefit.value) / 100 : 0;
         expRecipients = [...party.members.map((member) => member._id), party.leader._id];
       } else {
@@ -119,12 +122,15 @@ export class NPCExperience {
         continue;
       }
 
-      const expPerRecipient = Number((baseExp / charactersInRange.length).toFixed(2));
+      const expPerRecipient = Number((baseExp / charactersInRange.length ?? 1).toFixed(2));
+
       for (const characterInRange of charactersInRange) {
         const recipientCharacterAndSkills = await this.validateCharacterAndSkills(characterInRange);
+
         if (!recipientCharacterAndSkills) {
           continue;
         }
+
         await this.updateSkillsAndSendEvents(
           recipientCharacterAndSkills.character,
           recipientCharacterAndSkills.skills,
@@ -291,9 +297,10 @@ export class NPCExperience {
     let levelUp = false;
     let previousLevel = 0;
 
-    const characterMode: Modes = Object.values(Modes).find((mode) => mode === character.mode) ?? Modes.SoftMode;
+    // const characterMode: Modes = Object.values(Modes)
+    //   .find((mode) => mode === character.mode) ?? Modes.SoftMode;
 
-    skills.experience += exp * MODE_EXP_MULTIPLIER[characterMode];
+    skills.experience += exp;
     skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
 
     while (skills.xpToNextLevel <= 0) {
@@ -304,7 +311,9 @@ export class NPCExperience {
       skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
       levelUp = true;
     }
+
     await this.skillFunctions.updateSkills(skills, character);
+
     if (levelUp) {
       await this.skillLvUpStatsIncrease.increaseMaxManaMaxHealth(character._id);
       await this.sendExpLevelUpEvents({ level: skills.level, previousLevel, exp }, character, target);
@@ -320,6 +329,7 @@ export class NPCExperience {
         1
       );
     }
+
     await this.warnCharactersAroundAboutExpGains(character, exp);
   }
 }

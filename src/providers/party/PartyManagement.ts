@@ -284,7 +284,6 @@ export default class PartyManagement {
 
   private async removeMemberFromParty(leader: ICharacter, target: ICharacter): Promise<void> {
     const party = await this.getPartyByCharacterId(leader._id);
-
     if (!party) {
       throw new Error("Party not found");
     }

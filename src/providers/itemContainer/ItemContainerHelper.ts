@@ -5,6 +5,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { IItemContainer, ItemContainerType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { isNumber } from "lodash";
 
 @provide(ItemContainerHelper)
 export class ItemContainerHelper {
@@ -18,12 +19,14 @@ export class ItemContainerHelper {
       if (!item) {
         throw new Error("Failed to get item type: item not found");
       }
-
       if (item.name.includes("body")) {
         return ItemContainerType.Loot;
       }
 
-      if (item.x && item.y && item.scene) {
+      // if we use item.x that will be falsy.
+      // because 0 is a "falsy" value in JavaScript.
+      // better use isNumber() fn.
+      if (isNumber(item.x) && isNumber(item.y) && item.scene) {
         return ItemContainerType.MapContainer;
       }
 
