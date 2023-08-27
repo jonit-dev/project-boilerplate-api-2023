@@ -28,6 +28,7 @@ import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MathHelper } from "@providers/math/MathHelper";
+import { RaidManager } from "@providers/raid/RaidManager";
 import {
   NewRelicMetricCategory,
   NewRelicSubCategory,
@@ -50,13 +51,13 @@ export class NPCManager {
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
     private newRelic: NewRelic,
-    private mathHelper: MathHelper
+    private mathHelper: MathHelper,
+    private raidManager: RaidManager
   ) {}
 
   public listenForBehaviorTrigger(): void {
     process.on("message", async (data) => {
-      const namespace = "isBehaviorEnabled";
-      const totalActiveNPCs = await this.inMemoryHashTable.countBooleanEnabledValues(namespace, true);
+      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
       // if we still have room for more NPCs, start the behavior loop, if not, just repass the signal to another pm2 instance
       if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
@@ -78,8 +79,7 @@ export class NPCManager {
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
     const nearbyNPCs = await this.npcView.getNPCsInView(character, { isBehaviorEnabled: false });
 
-    const namespace = "isBehaviorEnabled";
-    let totalActiveNPCs = await this.inMemoryHashTable.countBooleanEnabledValues(namespace, true);
+    let totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
     this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "Active", totalActiveNPCs);
 
@@ -112,10 +112,15 @@ export class NPCManager {
       await this.inMemoryHashTable.set("npc", npc._id, npc);
     }
 
-    const namespace = "isBehaviorEnabled";
-    const isBehaviorEnabled = (await this.inMemoryHashTable.get(namespace, npc._id)) || false;
+    const isRaidNPC = npc.raidKey !== undefined;
 
-    if (!isBehaviorEnabled) {
+    const isRaidNPCActive = npc.raidKey && (await this.raidManager.isRaidActive(npc.raidKey!));
+
+    if (isRaidNPC && !isRaidNPCActive) {
+      return;
+    }
+
+    if (!npc.isBehaviorEnabled) {
       const npcSkills = await Skill.find({ owner: npc._id }).cacheQuery({
         cacheKey: `npc-${npc.id}-skills`,
       });
@@ -136,8 +141,7 @@ export class NPCManager {
                 const n = random(0, 100);
 
                 if (n <= 5) {
-                  const newNpc = (await NPC.findById(npc._id)) as INPC;
-                  await this.npcFreezer.tryToFreezeNPC(newNpc);
+                  this.npcFreezer.tryToFreezeNPC(npc);
                 }
 
                 npc = await NPC.findById(npc._id).lean({
@@ -147,10 +151,7 @@ export class NPCManager {
 
                 npc.skills = npcSkills;
 
-                const namespace = "isBehaviorEnabled";
-                const isBehaviorEnabled = (await this.inMemoryHashTable.get(namespace, npc.id)) || false;
-
-                if (!isBehaviorEnabled) {
+                if (!npc.isBehaviorEnabled) {
                   await this.npcFreezer.freezeNPC(npc);
                   return;
                 }
@@ -167,21 +168,18 @@ export class NPCManager {
             console.log(err);
           }
         },
-        (1600 + random(0, 200)) / (npc.speed * 1.6) / NPC_CYCLE_INTERVAL_RATIO,
-        this.inMemoryHashTable
+        (1600 + random(0, 200)) / (npc.speed * 1.6) / NPC_CYCLE_INTERVAL_RATIO
       );
     }
     await this.setNPCBehavior(npc, true);
   }
 
   public async disableNPCBehaviors(): Promise<void> {
-    const namespace = "isBehaviorEnabled";
-    await this.inMemoryHashTable.deleteAll(namespace);
+    await NPC.updateMany({}, { $set: { isBehaviorEnabled: false } }).lean();
   }
 
   public async setNPCBehavior(npc: INPC, value: boolean): Promise<void> {
-    const namespace = "isBehaviorEnabled";
-    await this.inMemoryHashTable.set(namespace, npc._id, value);
+    await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } }).lean();
   }
 
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {

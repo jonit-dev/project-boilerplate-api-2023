@@ -17,7 +17,12 @@ export class NPCLoader {
     const npcSeedData = new Map<string, INPCSeedData>();
 
     for (const [mapName, mapData] of MapLoader.maps.entries()) {
-      const NPCs = this.mapObjectsLoader.getObjectLayerData("NPCs", mapData);
+      let NPCs = this.mapObjectsLoader.getObjectLayerData("NPCs", mapData);
+      const raidNPCs = this.mapObjectsLoader.getObjectLayerData("RaidNPCs", mapData);
+
+      if (raidNPCs) {
+        NPCs = NPCs?.concat(raidNPCs);
+      }
 
       if (!NPCs) {
         continue;

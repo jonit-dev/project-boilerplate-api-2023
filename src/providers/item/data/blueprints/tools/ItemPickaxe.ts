@@ -9,7 +9,7 @@ import {
   UseWithItemToTile,
 } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { IToolItemBlueprint, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
+import { IToolItemBlueprint, ItemRarities, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -39,6 +39,7 @@ export const itemPickaxe: IToolItemBlueprint = {
     skillIncrease: SkillIncrease
   ) => {
     const useWithItemToTile = container.get<UseWithItemToTile>(UseWithItemToTile);
+    const rarityOfTool = originItem.rarity ?? ItemRarities.Common;
 
     const baseUseWithItemToTileOptions: IUseWithItemToTileOptions = {
       targetTile,
@@ -59,7 +60,7 @@ export const itemPickaxe: IToolItemBlueprint = {
         {
           key: RangedWeaponsBlueprint.Stone,
           qty: [3, 5],
-          chance: await itemCraftable.getCraftChance(character, 30),
+          chance: await itemCraftable.getCraftChance(character, 30, rarityOfTool),
         },
       ],
     };
@@ -75,7 +76,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.IronOre,
               qty: [5, 7],
-              chance: await itemCraftable.getCraftChance(character, 20),
+              chance: await itemCraftable.getCraftChance(character, 20, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -88,7 +89,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.CopperOre,
               qty: [3, 4],
-              chance: await itemCraftable.getCraftChance(character, 15),
+              chance: await itemCraftable.getCraftChance(character, 15, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -102,7 +103,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.SilverOre,
               qty: [2, 3],
-              chance: await itemCraftable.getCraftChance(character, 10),
+              chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -115,7 +116,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.GoldenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 7),
+              chance: await itemCraftable.getCraftChance(character, 7, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -128,7 +129,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.GreenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 4),
+              chance: await itemCraftable.getCraftChance(character, 4, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -141,7 +142,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.ObsidiumOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 3),
+              chance: await itemCraftable.getCraftChance(character, 3, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -154,7 +155,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.CorruptionOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 2),
+              chance: await itemCraftable.getCraftChance(character, 2, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };

@@ -1,7 +1,9 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { NPCSpawn } from "@providers/npc/NPCSpawn";
+import { NPCRaidActivator } from "@providers/raid/NPCRaidActivator";
+import { NPCRaidSpawn } from "@providers/raid/NPCRaidSpawn";
+
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 
@@ -9,42 +11,44 @@ import nodeCron from "node-cron";
 
 @provide(NPCCrons)
 export class NPCCrons {
-  constructor(private npcSpawn: NPCSpawn, private newRelic: NewRelic, private inMemoryHashTable: InMemoryHashTable) {}
+  constructor(
+    private npcSpawn: NPCSpawn,
+    private newRelic: NewRelic,
+    private npcRaidSpawn: NPCRaidSpawn,
+    private npcRaidActivator: NPCRaidActivator
+  ) {}
 
   public schedule(): void {
     nodeCron.schedule("* * * * *", async () => {
       // filter all dead npcs that have a nextSpawnTime > now
 
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "NPCSpawn", async () => {
-        const potentialDeadNPCs = (await NPC.find({
+        const deadNPCs = (await NPC.find({
           health: 0,
+          isBehaviorEnabled: false,
           nextSpawnTime: {
             $exists: true,
             $lte: new Date(),
           },
         }).lean()) as INPC[];
 
-        const deadNPCs: INPC[] = [];
-        const namespace = "isBehaviorEnabled";
+        const deadRaidNPCs = await this.npcRaidSpawn.fetchDeadNPCsFromActiveRaids();
 
-        // Fetch behaviors for all NPCs at once
-        const behaviors = await this.inMemoryHashTable.batchGet(
-          namespace,
-          potentialDeadNPCs.map((npc) => npc._id.toString())
-        );
-
-        for (const potentialDeadNPC of potentialDeadNPCs) {
-          const isBehaviorEnabled = behaviors[potentialDeadNPC._id] || false;
-
-          if (!isBehaviorEnabled) {
-            deadNPCs.push(potentialDeadNPC);
-          }
-        }
+        deadNPCs.push(...deadRaidNPCs);
 
         for (const deadNPC of deadNPCs) {
-          await this.npcSpawn.spawn(deadNPC);
+          await this.npcSpawn.spawn(deadNPC, !!deadNPC.raidKey);
         }
       });
+    });
+
+    nodeCron.schedule("* * * * *", async () => {
+      await this.npcRaidActivator.shutdownRaids();
+    });
+
+    // Run every hour
+    nodeCron.schedule("0 * * * *", async () => {
+      await this.npcRaidActivator.activateRaids();
     });
   }
 }

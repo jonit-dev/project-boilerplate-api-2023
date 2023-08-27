@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { container, inMemoryHashTable, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { FromGridX, FromGridY } from "@rpg-engine/shared";
 import { NPCView } from "../NPCView";
 import { NPCWarn } from "../NPCWarn";
@@ -25,12 +25,10 @@ describe("NPCView.ts", () => {
         y: FromGridY(0),
         health: 100,
         scene: "example",
+        isBehaviorEnabled: true,
       },
       { hasSkills: true }
     );
-
-    const namespace = "isBehaviorEnabled";
-    await inMemoryHashTable.set(namespace, testNPC.id, true);
   });
 
   it("should include characters that are inside the NPC socket transmission zone", async () => {
