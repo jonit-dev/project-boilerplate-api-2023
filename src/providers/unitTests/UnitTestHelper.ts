@@ -142,6 +142,14 @@ export class UnitTestHelper {
       await npcSkills.save();
     }
 
+    if (extraProps && "x" in extraProps && "y" in extraProps) {
+      testNPC.x = extraProps.x as number;
+      testNPC.y = extraProps.y as number;
+    } else {
+      testNPC.x = 0;
+      testNPC.y = 0;
+    }
+
     await testNPC.save();
 
     return testNPC;
@@ -352,6 +360,14 @@ export class UnitTestHelper {
       }
       await equipment.save();
       testCharacter.equipment = equipment._id;
+    }
+
+    if (extraProps && "x" in extraProps && "y" in extraProps) {
+      testCharacter.x = extraProps.x as number;
+      testCharacter.y = extraProps.y as number;
+    } else {
+      testCharacter.x = 0;
+      testCharacter.y = 0;
     }
 
     await testCharacter.save();

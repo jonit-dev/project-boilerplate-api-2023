@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -155,13 +155,27 @@ describe("ItemContainerOpen.ts", () => {
       // @ts-ignore
       jest.spyOn(itemContainerOpen.socketMessaging, "sendEventToUser" as any);
 
-      const item = await unitTestHelper.createMockItemContainer(testCharacter);
+      const updateChar = (await Character.findByIdAndUpdate(
+        testCharacter._id,
+        {
+          x: 999,
+          y: 999,
+        },
+        { new: true }
+      ).lean()) as ICharacter;
 
-      testCharacter.x = ToGridX(999);
-      testCharacter.y = ToGridX(999);
-      await testCharacter.save();
+      const item = await unitTestHelper.createMockItemContainer(updateChar);
 
-      await itemContainerOpen.openContainer({ itemId: item._id }, testCharacter);
+      const roolbackCharPosition = (await Character.findByIdAndUpdate(
+        testCharacter._id,
+        {
+          x: 0,
+          y: 0,
+        },
+        { new: true }
+      )) as ICharacter;
+
+      await itemContainerOpen.openContainer({ itemId: item._id }, roolbackCharPosition);
 
       // @ts-ignore
       expect(itemContainerOpen.socketMessaging.sendEventToUser).toHaveBeenCalledWith(

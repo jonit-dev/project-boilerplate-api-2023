@@ -84,7 +84,7 @@ export class SocketAuth {
         }
 
         if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
-          console.log("⬇️ (RECEIVED): ", character.name, character.channelId!, event);
+          // console.log("⬇️ (RECEIVED): ", character.name, character.channelId!, event);
         }
 
         if (EXHAUSTABLE_EVENTS.includes(event)) {

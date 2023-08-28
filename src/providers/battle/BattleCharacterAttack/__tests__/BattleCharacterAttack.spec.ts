@@ -20,13 +20,23 @@ describe("BattleCharacterAttack.spec.ts", () => {
   });
 
   beforeEach(async () => {
-    testNPC = await unitTestHelper.createMockNPC();
-    testNPC.health = 100;
-    await testNPC.save();
+    testNPC = await unitTestHelper.createMockNPC(
+      {
+        health: 200,
+        x: 3,
+        y: 3,
+      },
+      { hasSkills: true }
+    );
 
-    testCharacter = await unitTestHelper.createMockCharacter();
-    testCharacter.health = 100;
-    (await Character.findByIdAndUpdate(testCharacter._id, testCharacter).lean()) as ICharacter;
+    testCharacter = await unitTestHelper.createMockCharacter(
+      {
+        health: 100,
+        x: 0,
+        y: 0,
+      },
+      { hasSkills: true }
+    );
   });
 
   afterEach(() => {
@@ -53,7 +63,6 @@ describe("BattleCharacterAttack.spec.ts", () => {
 
   it("should return true if attackTarget succeeds", async () => {
     const attackTarget = await battleCharacterAttack.attackTarget(testCharacter, testNPC);
-
     expect(attackTarget).toBeTruthy();
   });
 

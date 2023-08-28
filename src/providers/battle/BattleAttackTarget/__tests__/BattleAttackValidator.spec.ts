@@ -39,6 +39,8 @@ describe("battleAttackValidator.spec.ts", () => {
     });
     testNPC = await unitTestHelper.createMockNPC(
       {
+        x: 0,
+        y: 1,
         maxRangeAttack: 10,
       },
       { hasSkills: true }
@@ -57,6 +59,7 @@ describe("battleAttackValidator.spec.ts", () => {
 
   it("should validate an NPC's ranged attack", async () => {
     const target = await unitTestHelper.createMockCharacter();
+
     const result = await battleAttackValidator.validateAttack(testNPC, target);
 
     expect(result).toBeDefined();
