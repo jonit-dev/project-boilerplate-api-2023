@@ -1,12 +1,13 @@
 import { SpellsBlueprint } from "@rpg-engine/shared";
+import { spellArrowStorm } from "./SpellArrowstorm";
 import { spellBoltCreation } from "./SpellBoltCreation";
+import { spellCrimsonArrowCreation } from "./SpellCrimsonArrowCreation";
 import { spellEagleEyes } from "./SpellEagleEyes";
+import { spellEmeraldArrowCreation } from "./SpellEmeraldArrowCreation";
 import { spellFireBoltCreation } from "./SpellFireBoltCreation";
+import { spellFrostArrowCreation } from "./SpellFrostArrowCreation";
 import { spellPoisonArrowCreation } from "./SpellPoisonArrowCreation";
 import { spellQuickFire } from "./SpellQuickFire";
-import { spellFrostArrowCreation } from "./SpellFrostArrowCreation";
-import { spellCrimsonArrowCreation } from "./SpellCrimsonArrowCreation";
-import { spellEmeraldArrowCreation } from "./SpellEmeraldArrowCreation";
 
 export const hunterSpellsIndex = {
   [SpellsBlueprint.BoltCreationSpell]: spellBoltCreation,
@@ -17,4 +18,5 @@ export const hunterSpellsIndex = {
   [SpellsBlueprint.FrostArrowCreation]: spellFrostArrowCreation,
   [SpellsBlueprint.CrimsonArrowCreation]: spellCrimsonArrowCreation,
   [SpellsBlueprint.EmeraldArrowCreation]: spellEmeraldArrowCreation,
+  [SpellsBlueprint.Arrowstorm]: spellArrowStorm,
 };
