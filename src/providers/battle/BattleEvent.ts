@@ -40,7 +40,7 @@ export class BattleEvent {
   public async calculateEvent(attacker: BattleParticipant, target: BattleParticipant): Promise<BattleEventType> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
-    console.log(target.skills);
+
     const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
     const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
 
