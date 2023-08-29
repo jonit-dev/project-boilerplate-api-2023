@@ -26,10 +26,10 @@ export const spellVineGrasp: Partial<ISpell> = {
     "Summons the inherent power of nature, quickly manifesting a surge of entwining, thorny vines from the ground that shoot towards the enemy like a bolt.",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "gwedh lingalad",
-  manaCost: 80,
-  minLevelRequired: 12,
-  minMagicLevelRequired: 15,
-  cooldown: 120,
+  manaCost: 60,
+  minLevelRequired: 10,
+  minMagicLevelRequired: 13,
+  cooldown: 20,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.HitPoison,
@@ -41,7 +41,7 @@ export const spellVineGrasp: Partial<ISpell> = {
     const hitTarget = container.get(HitTarget);
     const spellCalculator = container.get(SpellCalculator);
 
-    await hitTarget.hit(character, target, true, MagicPower.Medium, true);
+    await hitTarget.hit(character, target, true, MagicPower.UltraHigh, true);
 
     await entityEffectUse.applyEntityEffects(target, character, entityEffectVineGrasp);
 

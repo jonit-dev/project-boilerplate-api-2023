@@ -5,6 +5,7 @@ import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
   BasicAttribute,
+  CharacterAttributes,
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
@@ -36,32 +37,45 @@ export const spellShapeshift: Partial<ISpell> = {
       max: 30,
     });
 
-    const buffPercentage = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
-      min: 5,
-      max: 15,
+    const buffPercentageOfHealth = await spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
+      min: 50,
+      max: 100,
     });
 
+    const buffPercentageOfResistance = await spellCalculator.calculateBasedOnSkillLevel(
+      character,
+      BasicAttribute.Magic,
+      {
+        min: 5,
+        max: 50,
+      }
+    );
+
     await characterBuffActivator.enableTemporaryBuff(character, {
-      type: CharacterBuffType.Skill,
-      trait: BasicAttribute.Strength,
-      buffPercentage: buffPercentage,
+      type: CharacterBuffType.CharacterAttribute,
+      trait: CharacterAttributes.MaxHealth,
+      buffPercentage: buffPercentageOfHealth,
       durationSeconds: timeoutInSecs,
       durationType: CharacterBuffDurationType.Temporary,
       options: {
         messages: {
           activation:
-            "You feel stronger as a bear. Your strength and resistance are increased by " + buffPercentage + "%.",
+            "You feel stronger as a bear. Your Max Health and Resistance are increased by " +
+            buffPercentageOfHealth +
+            "%. and " +
+            buffPercentageOfResistance +
+            "%.",
           deactivation: "You feel weaker again.",
         },
       },
       isStackable: false,
-      originateFrom: SpellsBlueprint.DruidShapeshift + "-" + BasicAttribute.Strength,
+      originateFrom: SpellsBlueprint.DruidShapeshift + "-" + CharacterAttributes.MaxHealth,
     });
 
     await characterBuffActivator.enableTemporaryBuff(character, {
       type: CharacterBuffType.Skill,
       trait: BasicAttribute.Resistance,
-      buffPercentage: buffPercentage,
+      buffPercentage: buffPercentageOfResistance,
       durationSeconds: timeoutInSecs,
       durationType: CharacterBuffDurationType.Temporary,
       isStackable: false,
