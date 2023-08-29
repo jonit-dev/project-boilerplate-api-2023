@@ -55,7 +55,7 @@ const characterPartySchema = createLeanSchema(
   }
 );
 
-characterPartySchema.index({ leader: 1, members: 1 }, { background: true });
+// characterPartySchema.index({ leader: 1, members: 1 }, { background: true });
 
 characterPartySchema.virtual("size").get(function (this: ICharacterParty) {
   return this.members ? this.members.length + 1 : 0;
