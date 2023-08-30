@@ -30,7 +30,7 @@ export const spellNaturesRevenge: Partial<ISpell> = {
   manaCost: 100,
   minLevelRequired: 14,
   minMagicLevelRequired: 15,
-  cooldown: 180,
+  cooldown: 60,
   castingAnimationKey: AnimationEffectKeys.SkillLevelUp,
   targetHitAnimationKey: AnimationEffectKeys.Rooted,
   projectileAnimationKey: AnimationEffectKeys.HitPoison,
