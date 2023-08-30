@@ -76,11 +76,6 @@ export default class PartyManagement {
       return;
     }
 
-    this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-      message: "The party is already full",
-      type: "info",
-    });
-
     this.socketMessaging.sendEventToUser(target?.channelId!, PartySocketEvents.PartyInvite, {
       leaderId: leader._id,
       leaderName: leader.name,
