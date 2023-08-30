@@ -56,7 +56,6 @@ export const helmetsBlueprintIndex = {
   [HelmetsBlueprint.WizardHat]: itemWizardHat,
   [HelmetsBlueprint.AmethystHelmet]: itemAmethystHelmet,
   [HelmetsBlueprint.BloodfireHelmet]: itemBloodfireHelmet,
-  [HelmetsBlueprint.BrassHelmet]: itemBrassHelmet,
   [HelmetsBlueprint.CrownHelmet]: itemCrownHelmet,
   [HelmetsBlueprint.GlacialCrown]: itemGlacialCrown,
   [HelmetsBlueprint.GuardianHelmet]: itemGuardianHelmet,
