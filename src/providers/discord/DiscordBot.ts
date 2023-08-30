@@ -25,7 +25,6 @@ export class DiscordBot {
 
   private initialize(): void {
     this.client.once("ready", () => {
-      console.log(`Logged in as ${this.client.user?.tag}!`);
       this.isReady = true;
     });
 
