@@ -1,5 +1,3 @@
-# Deploys to production when a commit is pushed to the production branch.
-
 name: Deploy to Production
 on:
   push:
@@ -12,14 +10,21 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: contains(secrets.AUTHORIZED_USERS, github.actor)
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: 16.10.0
+          node-version: 16.20.0
           cache: "yarn"
+
+      - name: Run tests
+        env:
+          NODE_OPTIONS: "--max-old-space-size=20480"
+        run: |
+          yarn env:switch:dev
+          yarn test:ci
 
       - name: Setup production credentials
         run: |
@@ -30,6 +35,7 @@ jobs:
         run: |
           yarn install
           yarn tsc && yarn lint
+          # Build the Docker image on Github cloud
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t definya/definya-team:api-latest .
           docker push definya/definya-team:api-latest
@@ -39,21 +45,21 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_KEY }}
+          key: ${{ secrets.VPS_KEY }} #! SSH private key
           passphrase: ${{ secrets.VPS_PASSPHRASE }}
           script: |
+            # Update Docker image on the VPS
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull definya/definya-team:api-latest
 
+            # Fix to avoid npm not found (applyboy/ssh-action bug)
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            cd ~/definya/api
 
+            # Update repository code
+            cd ~/definya/api
             git checkout release
             git pull origin release
 
             bash ~/definya/api/environment/api-refresh-containers.sh
-
-            cd ~/definya/api/nginx-proxy
-            docker-compose restart

@@ -26,7 +26,6 @@ GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 cd ~/definya/api
 
 echo "🐳 Building and pushing Docker image..."
-yarn lint
 docker build -t definya/definya-team:api-latest .
 docker push definya/definya-team:api-latest
 
