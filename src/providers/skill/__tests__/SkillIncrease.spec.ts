@@ -337,21 +337,25 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
 
   it("should increase character's 'first' skill level and skill points. Should increase experience and level up to level 5", async () => {
     const spToAdd = spToLvl2 * 5 + 5;
-    const teste = (await Character.findByIdAndUpdate(
+    const attacker = (await Character.findByIdAndUpdate(
       { _id: testCharacter._id },
-      { class: CharacterClass.Druid },
+      {
+        x: 0,
+        y: 1,
+        class: CharacterClass.Druid,
+      },
       { new: true }
     )) as ICharacter;
     testNPC.health = 100;
 
     for (let i = 0; i < spToAdd; i++) {
-      await skillIncrease.increaseSkillsOnBattle(teste, testNPC, 2);
+      await skillIncrease.increaseSkillsOnBattle(attacker, testNPC, 2);
     }
 
     // @ts-ignore
     await skillIncrease.npcExperience.releaseXP(testNPC);
 
-    const updatedSkills = (await Skill.findById(teste.skills).lean()) as ISkill;
+    const updatedSkills = (await Skill.findById(attacker.skills).lean()) as ISkill;
 
     expect(updatedSkills.first.level).toBe(initialLevel + 1);
     expect(updatedSkills.first.skillPoints).toBe(spToAdd * SP_INCREASE_RATIO + 35);
@@ -369,7 +373,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
     // faking timers is creating issue with mongo calls
     await wait(5.2);
     expect(spellLearnMock).toHaveBeenCalledTimes(1);
-    expect(spellLearnMock).toHaveBeenCalledWith(teste._id, true);
+    expect(spellLearnMock).toHaveBeenCalledWith(attacker._id, true);
 
     // Check that other skills remained unchanged
     expect(updatedSkills.axe.level).toBe(initialSkills.axe.level);

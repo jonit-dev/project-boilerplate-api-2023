@@ -15,6 +15,7 @@ import { ViewNetwork } from "@providers/view/network/ViewNetwork";
 import { provide } from "inversify-binding-decorators";
 import { SocketChannel } from "./SocketsTypes";
 import { MarketplaceNetwork } from "@providers/marketplace/network/MarketplaceNetwork";
+import { PartyNetwork } from "@providers/party/network/PartyNetwork";
 
 @provide(SocketEventsBinder)
 export class SocketEventsBinder {
@@ -33,7 +34,8 @@ export class SocketEventsBinder {
     private depotNetwork: DepotNetwork,
     private spellNetwork: SpellNetwork,
     private macroNetwork: MacroNetwork,
-    private marketplaceNetwork: MarketplaceNetwork
+    private marketplaceNetwork: MarketplaceNetwork,
+    private partyNetwork: PartyNetwork
   ) {}
 
   public bindEvents(channel: SocketChannel): void {
@@ -52,5 +54,6 @@ export class SocketEventsBinder {
     this.spellNetwork.onAddEventListeners(channel);
     this.macroNetwork.onAddEventListeners(channel);
     this.marketplaceNetwork.onAddEventListeners(channel);
+    this.partyNetwork.onAddEventListeners(channel);
   }
 }

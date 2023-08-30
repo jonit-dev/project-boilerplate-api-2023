@@ -20,6 +20,8 @@ import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { HeapMonitor } from "./HeapMonitor";
 import { PM2Helper } from "./PM2Helper";
+import PartyManagement from "@providers/party/PartyManagement";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 
 @provide(ServerBootstrap)
 export class ServerBootstrap {
@@ -38,6 +40,7 @@ export class ServerBootstrap {
     private heapMonitor: HeapMonitor,
     private npcFreezer: NPCFreezer,
     private locker: Locker,
+    private partyManagement: PartyManagement,
     private inMemoryHashTable: InMemoryHashTable,
     private hitTarget: HitTarget
   ) {}
@@ -72,6 +75,7 @@ export class ServerBootstrap {
     await this.characterConnection.resetCharacterAttributes();
     await this.characterFoodConsumption.clearAllFoodConsumption();
     await this.characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
+    await this.partyManagement.clearAllParties();
 
     await this.spellSilence.removeAllSilence();
 
@@ -95,6 +99,8 @@ export class ServerBootstrap {
     await this.locker.clear();
 
     await this.hitTarget.clearAllQueueJobs();
+
+    new DiscordBot();
   }
 
   private async clearAllQueues(): Promise<void> {

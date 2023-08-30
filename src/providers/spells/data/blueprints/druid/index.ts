@@ -5,6 +5,7 @@ import { spellMassHealing } from "./SpellMassHealing";
 import { spellShapeshift } from "./SpellShapeshift";
 import { spellSilence } from "./SpellSilence";
 import { spellVineGrasp } from "./SpellVineGrasp";
+import { spellNaturesRevenge } from "./SpellNaturesRevenge";
 
 export const druidSpellsIndex = {
   [SpellsBlueprint.HealRuneCreationSpell]: spellHealRuneCreation,
@@ -13,4 +14,5 @@ export const druidSpellsIndex = {
   [SpellsBlueprint.EntanglingRoots]: spellEntanglingRoots,
   [SpellsBlueprint.VineGrasp]: spellVineGrasp,
   [SpellsBlueprint.MassHealing]: spellMassHealing,
+  [SpellsBlueprint.NaturesRevenge]: spellNaturesRevenge,
 };

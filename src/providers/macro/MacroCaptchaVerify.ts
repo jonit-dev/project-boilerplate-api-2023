@@ -30,9 +30,9 @@ export class MacroCaptchaVerify {
       return false;
     }
 
-    if (code.toLowerCase() === fetchedCharacter?.captchaVerifyCode.toLowerCase())
+    if (code.toLowerCase() === fetchedCharacter?.captchaVerifyCode.toLowerCase()) {
       await this.handleSuccessVerify(fetchedCharacter);
-    else if (fetchedCharacter?.captchaTriesLeft === 1) await this.handleVerifyBan(fetchedCharacter);
+    } else if (fetchedCharacter?.captchaTriesLeft === 1) await this.handleVerifyBan(fetchedCharacter);
     else if (fetchedCharacter?.captchaTriesLeft) await this.handleDecreaseCaptchaTries(fetchedCharacter);
 
     return true;
@@ -45,7 +45,7 @@ export class MacroCaptchaVerify {
 
   private async handleVerifyBan(character: ICharacter) {
     await this.removeCaptchaFromCharacter(character);
-    await this.characterBan.increasePenaltyAndBan(character);
+    await this.characterBan.increasePenaltyAndBan(character, "macro");
   }
 
   private async handleDecreaseCaptchaTries(character: ICharacter) {

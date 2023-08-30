@@ -86,8 +86,8 @@ describe("ItemDrop.ts", () => {
       {
         itemId: testItem.id,
         scene: testCharacter.scene,
-        x: testCharacter.x,
-        y: testCharacter.y,
+        x: extraProps?.x ?? testCharacter.x,
+        y: extraProps?.y ?? testCharacter.y,
         toPosition: { x: testCharacter.x, y: testCharacter.y, scene: testCharacter.scene },
         fromContainerId,
         source: "inventory",
@@ -157,11 +157,21 @@ describe("ItemDrop.ts", () => {
   });
 
   it("should have item in character view, after its successfully dropped", async () => {
-    const itemDropped = await dropItem(inventoryItemContainerId);
+    const itemDropped = await dropItem(inventoryItemContainerId, {
+      x: 1,
+      y: 1,
+    });
 
     expect(itemDropped).toBeTruthy();
 
-    const updatedChar = await Character.findOne({ _id: testCharacter.id });
+    const updatedChar = await Character.findOneAndUpdate(
+      { _id: testCharacter.id },
+      {
+        x: 0,
+        y: 0,
+      },
+      { new: true }
+    );
 
     if (!updatedChar) throw new Error("Failed to find character after drop!");
 

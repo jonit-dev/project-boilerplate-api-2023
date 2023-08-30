@@ -1,4 +1,5 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { NPCSpawn } from "@providers/npc/NPCSpawn";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { Time } from "@providers/time/Time";
@@ -14,7 +15,8 @@ export class NPCRaidActivator {
     private npcSpawn: NPCSpawn,
     private raid: RaidManager,
     private raidManager: RaidManager,
-    private time: Time
+    private time: Time,
+    private discordBot: DiscordBot
   ) {}
 
   public async activateRaids(): Promise<void> {
@@ -33,6 +35,9 @@ export class NPCRaidActivator {
       }
 
       console.log("Activating raid:", selectedRaid.key);
+
+      const messageDiscord = `**Raid ${selectedRaid.name} is starting** ${selectedRaid.startingMessage}`;
+      await this.discordBot.sendMessage(messageDiscord, "raids");
 
       this.broadcastRaidWarning(selectedRaid);
 

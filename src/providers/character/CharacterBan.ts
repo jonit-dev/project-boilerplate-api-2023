@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { CharacterSocketEvents } from "@rpg-engine/shared";
@@ -9,7 +10,7 @@ import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterBan)
 export class CharacterBan {
-  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic) {}
+  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic, private discordBot: DiscordBot) {}
 
   @TrackNewRelicTransaction()
   public async addPenalty(character: ICharacter): Promise<void> {
@@ -36,7 +37,14 @@ export class CharacterBan {
   }
 
   @TrackNewRelicTransaction()
-  public async increasePenaltyAndBan(character: ICharacter): Promise<void> {
+  public async increasePenaltyAndBan(character: ICharacter, cause?: "macro"): Promise<void> {
+    if (cause === "macro") {
+      await this.discordBot.sendMessage(
+        `Character ${character.name} has been banned for not answering the anti-macro properly.`,
+        "bans"
+      );
+    }
+
     character.penalty = Math.floor(character.penalty / 10) * 10 + 10;
 
     if (character.penalty % 10 === 0) {

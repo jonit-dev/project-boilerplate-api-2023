@@ -17,7 +17,7 @@ describe("ItemContainerHelper", () => {
   });
 
   beforeEach(async () => {
-    testCharacter = await unitTestHelper.createMockCharacter(null, { hasEquipment: true, hasInventory: true });
+    testCharacter = await unitTestHelper.createMockCharacter({}, { hasEquipment: true, hasInventory: true });
     inventory = await testCharacter.inventory;
   });
 

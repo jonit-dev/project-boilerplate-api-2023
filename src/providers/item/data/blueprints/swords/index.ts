@@ -53,7 +53,6 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.IceSword]: itemIceSword,
   [SwordsBlueprint.CorruptionSword]: itemCorruptionSword,
   [SwordsBlueprint.DamascusSword]: itemDamascusSword,
-  [SwordsBlueprint.DoubleEdgedSword]: itemDoubleEdgedSword,
   [SwordsBlueprint.EldensSword]: itemEldensSword,
   [SwordsBlueprint.EnchantedSword]: itemEnchantedSword,
   [SwordsBlueprint.GoldenSword]: itemGoldenSword,
