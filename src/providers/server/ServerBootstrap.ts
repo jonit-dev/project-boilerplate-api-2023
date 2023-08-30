@@ -12,16 +12,16 @@ import { Seeder } from "@providers/seeds/Seeder";
 import { HitTarget } from "@providers/battle/HitTarget";
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { blueprintManager } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
+import PartyManagement from "@providers/party/PartyManagement";
 import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
 import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { HeapMonitor } from "./HeapMonitor";
 import { PM2Helper } from "./PM2Helper";
-import PartyManagement from "@providers/party/PartyManagement";
-import { DiscordBot } from "@providers/discord/DiscordBot";
 
 @provide(ServerBootstrap)
 export class ServerBootstrap {
@@ -42,7 +42,8 @@ export class ServerBootstrap {
     private locker: Locker,
     private partyManagement: PartyManagement,
     private inMemoryHashTable: InMemoryHashTable,
-    private hitTarget: HitTarget
+    private hitTarget: HitTarget,
+    private discordBot: DiscordBot
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -65,6 +66,8 @@ export class ServerBootstrap {
 
     //! TODO: Load balance NPCs on PM2 instances
     this.npcManager.listenForBehaviorTrigger();
+
+    this.discordBot.initialize();
   }
 
   private async execOneTimeOperations(): Promise<void> {
@@ -99,8 +102,6 @@ export class ServerBootstrap {
     await this.locker.clear();
 
     await this.hitTarget.clearAllQueueJobs();
-
-    new DiscordBot();
   }
 
   private async clearAllQueues(): Promise<void> {
