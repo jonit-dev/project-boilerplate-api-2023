@@ -20,6 +20,7 @@ export const appEnv = {
 
     IS_UNIT_TEST: process.env.JEST_WORKER_ID !== undefined,
     DEBUG_MODE: process.env.DEBUG_MODE === "true",
+    DISCORD_TOKEN: process.env.DISCORD_BOT_TOKEN,
   },
   analytics: {
     mixpanelToken: process.env.MIXPANEL_TOKEN,

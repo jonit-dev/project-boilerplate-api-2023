@@ -11,6 +11,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { EquipmentSlotTypes, EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { blueprintManager, entityEffectUse, equipmentSlots } from "@providers/inversify/container";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
@@ -79,7 +80,8 @@ export class CharacterDeath {
     private newRelic: NewRelic,
     private time: Time,
     private equipmentSlots: EquipmentSlots,
-    private characterSkull: CharacterSkull
+    private characterSkull: CharacterSkull,
+    private discordBot: DiscordBot
   ) {}
 
   @TrackNewRelicTransaction()
@@ -96,6 +98,10 @@ export class CharacterDeath {
 
       if (killer) {
         await this.clearAttackerTarget(killer);
+      }
+
+      if (killer?.type === EntityType.Character) {
+        await this.sendDiscordPVPMessage(killer as ICharacter, character);
       }
 
       const characterDeathData: IBattleDeath = {
@@ -216,6 +222,46 @@ export class CharacterDeath {
     );
 
     await this.locker.unlock(`character-death-${character.id}`);
+  }
+
+  private async sendDiscordPVPMessage(killer: ICharacter, target: ICharacter): Promise<void> {
+    const wasPVPDeath = killer.type === EntityType.Character && target.type === EntityType.Character;
+
+    if (wasPVPDeath) {
+      const messages = [
+        `Looks like ${killer} sent ${target} back to the drawing board!`,
+        `${killer} just made mincemeat out of ${target}.`,
+        `And down goes ${target}! ${killer} stands triumphant.`,
+        `${killer} just rewrote ${target}'s life code. #GameOver`,
+        `Epic showdown! ${killer} reigns and ${target} feels the pain.`,
+        `${killer} just sent ${target} to the respawn point.`,
+        `Looks like ${killer} just banished ${target} to the shadow realm.`,
+        `${killer} unleashed havoc, and now ${target} is no more.`,
+        `It's a critical hit! ${killer} obliterates ${target}.`,
+        `${killer} has claimed victory, while ${target} bites the dust.`,
+        `Curtains for ${target}! ${killer} takes the spotlight.`,
+        `${killer} slays ${target}, offering them a one-way ticket to the afterlife.`,
+        `A devastating blow by ${killer} leaves ${target} in ruins.`,
+        `${killer} has reduced ${target} to mere pixels.`,
+        `RIP ${target}. ${killer} adds another notch to their belt.`,
+        `${killer} has nullified ${target}'s existence. Back to square one.`,
+        `${killer} shows no mercy, wiping ${target} off the map.`,
+        `Game over for ${target}! ${killer} claims another trophy.`,
+        `It's a knockout! ${killer} leaves ${target} in the dust.`,
+        `${killer} delivers the final blow, sending ${target} back to the lobby.`,
+        `Victory is sweet for ${killer}, but it's game over for ${target}.`,
+        `${killer} has spoken, and ${target} fades into oblivion.`,
+        `${killer} has just made ${target} a ghost of their former self.`,
+        `It's a finishing move! ${killer} eliminates ${target} from play.`,
+        `${killer} makes quick work of ${target}, ending their journey.`,
+        `In a flash of brilliance, ${killer} dismantles ${target}.`,
+      ];
+
+      const randomIndex = Math.floor(Math.random() * messages.length);
+      const selectedMessage = messages[randomIndex];
+
+      await this.discordBot.sendMessage(`**PVP Death:** ${selectedMessage}`, "pvp-and-wars");
+    }
   }
 
   private async clearCache(character: ICharacter): Promise<void> {

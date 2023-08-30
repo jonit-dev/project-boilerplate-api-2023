@@ -21,6 +21,7 @@ import { provide } from "inversify-binding-decorators";
 import { HeapMonitor } from "./HeapMonitor";
 import { PM2Helper } from "./PM2Helper";
 import PartyManagement from "@providers/party/PartyManagement";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 
 @provide(ServerBootstrap)
 export class ServerBootstrap {
@@ -98,6 +99,8 @@ export class ServerBootstrap {
     await this.locker.clear();
 
     await this.hitTarget.clearAllQueueJobs();
+
+    new DiscordBot();
   }
 
   private async clearAllQueues(): Promise<void> {

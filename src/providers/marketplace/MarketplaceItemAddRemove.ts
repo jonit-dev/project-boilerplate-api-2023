@@ -7,6 +7,7 @@ import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, IItemContainer, ItemSocketEvents } from "@rpg-engine/shared";
@@ -24,8 +25,8 @@ export class MarketplaceItemAddRemove {
     private marketplaceValidation: MarketplaceValidation,
     private characterWeight: CharacterWeight,
     private marketplaceGetItems: MarketplaceGetItems,
-
-    private itemOwnership: ItemOwnership
+    private itemOwnership: ItemOwnership,
+    private discordBot: DiscordBot
   ) {}
 
   @TrackNewRelicTransaction()
@@ -78,6 +79,11 @@ export class MarketplaceItemAddRemove {
     await this.marketplaceGetItems.getItems(character, npcId, {
       owner: character._id.toString(),
     });
+
+    await this.discordBot.sendMessage(
+      `**${character.name}** has added **${item.name}** to the marketplace for **${marketplaceItem.price}** gold.`,
+      "trade"
+    );
 
     return true;
   }
