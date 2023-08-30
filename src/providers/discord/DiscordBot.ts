@@ -16,6 +16,8 @@ export class DiscordBot {
         return;
       }
 
+      console.log("🤖 Initializing Discord bot...");
+
       if (this.token && this.client) {
         return;
       }
@@ -40,6 +42,8 @@ export class DiscordBot {
 
   public async sendMessage(message: string, channelName: DiscordChannelName): Promise<void> {
     try {
+      console.log("🤖 Discord bot - Sending message: ", message, `Channel: ${channelName}`);
+
       if (!this.isReady) {
         return;
       }
