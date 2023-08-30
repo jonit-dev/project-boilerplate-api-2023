@@ -396,14 +396,26 @@ export class CharacterDeath {
   ): Promise<void> {
     let isDeadBodyLootable = false;
 
+    let multi = 1;
+    if (character.hasSkull && character.skullType) {
+      // if has yellow, 30% more. If has red => all loss
+      switch (character.skullType) {
+        case CharacterSkullType.YellowSkull:
+          multi = 0.7;
+          break;
+        case CharacterSkullType.RedSkull:
+          forceDropAll = true;
+          break;
+      }
+    }
+
     for (const slot of DROPPABLE_EQUIPMENT) {
       try {
         const itemId = equipment[slot];
 
         if (!itemId) continue;
-
-        const n = _.random(0, 100);
-
+      
+        const n = _.random(0, 100) * multi;
         if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
           const item = await this.clearItem(character, itemId);
 
@@ -490,7 +502,7 @@ export class CharacterDeath {
     forceDropAll: boolean = false
   ): Promise<void> {
     if (character.mode === Modes.PermadeathMode) {
-      await this.dropCharacterItemsOnBody(character, characterBody, forceDropAll);
+      await this.dropCharacterItemsOnBody(character, characterBody, character.equipment, forceDropAll);
       return;
     }
 
