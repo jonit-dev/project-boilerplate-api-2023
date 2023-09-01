@@ -11,6 +11,7 @@ import {
   StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
+import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../../abstractions/BaseNeutralNPC";
@@ -18,7 +19,7 @@ import { generateMoveTowardsMovement } from "../../../abstractions/BaseNeutralNP
 export const npcEloraTheQueen: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Elora, the Queen",
-  key: "elora-the-queen",
+  key: HostileNPCsBlueprint.EloraTheQueen,
   textureKey: "green-druid",
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Ranged,

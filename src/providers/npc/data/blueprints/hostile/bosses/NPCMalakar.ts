@@ -19,7 +19,7 @@ import { generateMoveTowardsMovement } from "../../../abstractions/BaseNeutralNP
 export const npcMalakarLichKing: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Malakar, the Lich King",
-  key: "malakar-lich-king",
+  key: HostileNPCsBlueprint.MalakarLichKing,
   textureKey: HostileNPCsBlueprint.Litch,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Ranged,

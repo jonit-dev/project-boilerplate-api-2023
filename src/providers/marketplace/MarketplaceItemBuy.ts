@@ -54,7 +54,7 @@ export class MarketplaceItemBuy {
     const itemBought = marketplaceItem.item as IItem;
 
     await this.discordBot.sendMessage(
-      `**${character.name}** bought **${itemBought?.name}** for **${marketplaceItem.price}** gold.`,
+      `**${character.name}** BOUGHT **${itemBought?.name}** for **${marketplaceItem.price}** gold.`,
       "marketplaceBotNotifications"
     );
 
