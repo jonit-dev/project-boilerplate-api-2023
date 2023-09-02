@@ -43,6 +43,7 @@ jobs:
 
       - name: Setup production credentials
         run: |
+          yarn env:switch:prod
           echo "${{ secrets.API_ENV }}" > .env
 
       - name: Prepare, build and push Docker image
@@ -73,9 +74,12 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-
             # Update repository code
-            cd ~/definya/api
+            cd ~/definya/api  
+
+            # Clean untracked files if any
+            git clean -fd 
+
             git checkout release
             git pull origin release
 
