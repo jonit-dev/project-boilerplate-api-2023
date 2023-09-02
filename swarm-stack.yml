@@ -15,14 +15,14 @@ services:
       labels:
         # Basic setup for API
         - traefik.enable=true
-        - traefik.http.routers.rpg-api.rule=Host(`temp-na.definya.com`)
+        - traefik.http.routers.rpg-api.rule=Host(`na.definya.com`)
         - traefik.http.routers.rpg-api.entrypoints=websecure
         - traefik.http.routers.rpg-api.tls.certresolver=myresolver
         - traefik.http.services.rpg-api-service.loadbalancer.server.port=5002
         - traefik.http.routers.rpg-api.service=rpg-api-service
 
         # Websockets
-        - traefik.http.routers.rpg-api-socket.rule=Host(`temp-na.definya.com`) && Path(`/socket.io/`)
+        - traefik.http.routers.rpg-api-socket.rule=Host(`na.definya.com`) && Path(`/socket.io/`)
         - traefik.http.routers.rpg-api-socket.entrypoints=websecure
         - traefik.http.routers.rpg-api-socket.tls.certresolver=myresolver
         - traefik.http.services.rpg-api-socket-service.loadbalancer.server.port=5101
@@ -60,7 +60,7 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.rpg-client.rule=Host(`temp-play.definya.com`)"
+        - "traefik.http.routers.rpg-client.rule=Host(`play.definya.com`)"
         - "traefik.http.routers.rpg-client.entrypoints=websecure"
         - "traefik.http.routers.rpg-client.tls.certresolver=myresolver"
         - "traefik.http.services.rpg-client.loadbalancer.server.port=8080"
