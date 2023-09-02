@@ -27,6 +27,7 @@ ENV NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=true \
 NEW_RELIC_LOG=stdout
 
 RUN npm install -g pm2
-
+ 
+ 
 # This will run our npm run dev command under package.json
 CMD ["yarn","start:prod"]

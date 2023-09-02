@@ -1,0 +1,118 @@
+version: "3.7"
+
+services:
+  rpg-api:
+    image: definya/definya-team:api-latest
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5002"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      labels:
+        # Basic setup for API
+        - traefik.enable=true
+        - traefik.http.routers.rpg-api.rule=Host(`temp-na.definya.com`)
+        - traefik.http.routers.rpg-api.entrypoints=websecure
+        - traefik.http.routers.rpg-api.tls.certresolver=myresolver
+        - traefik.http.services.rpg-api-service.loadbalancer.server.port=5002
+        - traefik.http.routers.rpg-api.service=rpg-api-service
+
+        # Websockets
+        - traefik.http.routers.rpg-api-socket.rule=Host(`temp-na.definya.com`) && Path(`/socket.io/`)
+        - traefik.http.routers.rpg-api-socket.entrypoints=websecure
+        - traefik.http.routers.rpg-api-socket.tls.certresolver=myresolver
+        - traefik.http.services.rpg-api-socket-service.loadbalancer.server.port=5101
+        - traefik.http.routers.rpg-api-socket.service=rpg-api-socket-service
+
+        # Add sticky session for websockets
+        - "traefik.http.services.rpg-api-socket-service.loadbalancer.sticky=true"
+        - "traefik.http.services.rpg-api-socket-service.loadbalancer.sticky.cookie.name=StickyCookie"
+        - "traefik.http.services.rpg-api-socket-service.loadbalancer.sticky.cookie.secure=true"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      FORCE_COLOR: "true"
+      NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
+      NEW_RELIC_APP_NAME: "Definya API"
+    networks:
+      - rpg-network
+
+  rpg-client:
+    image: definya/definya-team:client-latest
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080"]
+      interval: 120s
+      timeout: 10s
+      retries: 3
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.rpg-client.rule=Host(`temp-play.definya.com`)"
+        - "traefik.http.routers.rpg-client.entrypoints=websecure"
+        - "traefik.http.routers.rpg-client.tls.certresolver=myresolver"
+        - "traefik.http.services.rpg-client.loadbalancer.server.port=8080"
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - rpg-network
+
+  rpg-db:
+    image: mongo
+    command: mongod --port ${MONGO_PORT}
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - rpg-db-data:/data/db
+      - ./docker_scripts/:/docker-entrypoint-initdb.d
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    deploy: # db should be only on the manager node
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      - rpg-network
+
+  rpg-redis:
+    image: redis:latest
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - rpg-redis-data:/data
+      - ./config/redis.conf:/redis.conf
+    command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
+    networks:
+      - rpg-network
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  rpg-network:
+    external: true
+
+volumes:
+  rpg-db-data:
+  rpg-redis-data:

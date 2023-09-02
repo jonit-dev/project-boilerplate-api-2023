@@ -9,8 +9,8 @@ import {
   mapLoader,
   newRelic,
   redisManager,
-  serverHelper,
   serverBootstrap,
+  serverHelper,
   socketAdapter,
 } from "@providers/inversify/container";
 import { errorHandlerMiddleware } from "@providers/middlewares/ErrorHandlerMiddleware";

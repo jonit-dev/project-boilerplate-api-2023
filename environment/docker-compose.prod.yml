@@ -4,7 +4,7 @@ services:
   rpg-api:
     container_name: rpg-api
     restart: always
-    build: .
+    image: definya/definya-team:api-latest
     logging:
       options:
         max-size: "10m"
@@ -30,7 +30,6 @@ services:
       LETSENCRYPT_HOST: ${API_SUBDOMAIN}
       LETSENCRYPT_EMAIL: ${ADMIN_EMAIL}
       VIRTUAL_PORT: ${SERVER_PORT}
-      CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Definya API"
 
