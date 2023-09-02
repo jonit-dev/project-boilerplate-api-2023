@@ -8,8 +8,8 @@ import {
 import { provide } from "inversify-binding-decorators";
 import nodeCron from "node-cron";
 
-@provide(TotalAvaliableGold)
-export class TotalAvaliableGold {
+@provide(TotalAvailableGold)
+export class TotalAvailableGold {
   constructor(private newRelic: NewRelic) {}
 
   public schedule(): void {
@@ -30,7 +30,7 @@ export class TotalAvaliableGold {
       this.newRelic.trackMetric(
         NewRelicMetricCategory.Count,
         NewRelicSubCategory.Items,
-        "TotalAvaliableGold",
+        "TotalAvailableGold",
         totalGold
       );
     });

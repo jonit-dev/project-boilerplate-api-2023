@@ -1,46 +1,88 @@
-# Deploys to production when a commit is pushed to the production branch.
-
 name: Deploy to Production
 on:
   push:
     branches:
-      - production
+      - release
+
+  # Allows you to run this workflow manually from the Actions tab.
+  workflow_dispatch:
 
 jobs:
+  pre-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.set_output.outputs.should_run }}
+    steps:
+      - name: Check if actor is authorized
+        id: set_output
+        run: |
+          if [[ ",${{ secrets.AUTHORIZED_USERS }}," == *",${{ github.actor }},"* ]]; then
+            echo "Actor is authorized"
+            echo "should_run=true" >> $GITHUB_ENV
+          else
+            echo "Actor is not authorized"
+            echo "should_run=false" >> $GITHUB_ENV
+          fi
+
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.20.0
+          cache: "yarn"
 
-      - name: List files in the working directory
-        run: ls -la
-
-      - name: Login to Docker
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and Push Docker Image
+      - name: Run tests
+        env:
+          NODE_OPTIONS: "--max-old-space-size=20480"
         run: |
+          yarn env:switch:dev
+          yarn test:ci
+
+      - name: Setup production credentials
+        run: |
+          yarn env:switch:prod
+          echo "${{ secrets.API_ENV }}" > .env
+
+      - name: Prepare, build and push Docker image
+        run: |
+
+          # Prepare: install dependencies, build and lint
+          yarn tsc && yarn lint
+          yarn install
+
+          # Build the Docker image on Github cloud
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           docker build -t definya/definya-team:api-latest .
           docker push definya/definya-team:api-latest
 
-      - name: Deploy to VPS
+      - name: SSH into VPS and update containers
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_KEY }}
+          key: ${{ secrets.VPS_KEY }} #! SSH private key
+          passphrase: ${{ secrets.VPS_PASSPHRASE }}
           script: |
-            docker pull definya/definya-team:api-latest:latest
-            docker run -d definya/definya-team:api-latest:latest
-      - name: Restart nginx-proxy on VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} 'docker-compose -f ./nginx-proxy/docker-compose.yml restart nginx-proxy'
+            # Update Docker image on the VPS
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            docker pull definya/definya-team:api-latest
 
-env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  VPS_HOST: ${{ secrets.VPS_HOST }}
-  VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
-  VPS_KEY: ${{ secrets.VPS_KEY }}
-  VPS_USER: ${{ secrets.VPS_USER }}
+            # Fix to avoid npm not found (applyboy/ssh-action bug)
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # Update repository code
+            cd ~/definya/api  
+
+            # Clean untracked files if any
+            git clean -fd 
+
+            git checkout release
+            git pull origin release
+
+            bash ~/definya/api/environment/api-refresh-containers.sh
+
+            docker container prune -f

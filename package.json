@@ -15,7 +15,7 @@
     "build": "tsc -p .",
     "update:shared-deps": "yarn add @rpg-engine/shared",
     "lint": "eslint --fix ./src/**/*.ts",
-    "start:prod": "yarn install && yarn build && pm2 start pm2.json --node-args='--max-old-space-size=8192' --no-daemon",
+    "start:prod": "./environment/start-prod.sh",
     "format": "yarn prettier -w ./src/** --loglevel silent",
     "check-formatting": "prettier --check 'src/**/*.ts'",
     "bootstrap": "git pull origin master && yarn install && yarn configure",
@@ -25,7 +25,8 @@
     "configure:first-time": "./environment/first-time-setup.sh",
     "configure": "./environment/configure.sh",
     "db:export": "./environment/db-export.sh",
-    "db:import": "echo 'Please import by running bash ./environment/db-import.sh'",
+    "db:export:swarm": "./environment/db-export-swarm.sh",
+    "db:import:swarm": "echo 'Please import by running bash ./environment/db-import-swarm.sh",
     "db:download": "./environment/db-download.sh",
     "cache:clear": "sudo rm -rf ./src/providers/data/cache/**"
   },
