@@ -81,8 +81,8 @@ export class MarketplaceItemAddRemove {
     });
 
     await this.discordBot.sendMessage(
-      `**${character.name}** has added **${item.name}** to the marketplace for **${marketplaceItem.price}** gold.`,
-      "trade"
+      `**${character.name}** IS SELLING **${item.name}** on the marketplace for **${marketplaceItem.price}** gold.`,
+      "marketplaceBotNotifications"
     );
 
     return true;

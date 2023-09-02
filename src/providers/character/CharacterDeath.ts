@@ -229,32 +229,32 @@ export class CharacterDeath {
 
     if (wasPVPDeath) {
       const messages = [
-        `Looks like ${killer} sent ${target} back to the drawing board!`,
-        `${killer} just made mincemeat out of ${target}.`,
-        `And down goes ${target}! ${killer} stands triumphant.`,
-        `${killer} just rewrote ${target}'s life code. #GameOver`,
-        `Epic showdown! ${killer} reigns and ${target} feels the pain.`,
-        `${killer} just sent ${target} to the respawn point.`,
-        `Looks like ${killer} just banished ${target} to the shadow realm.`,
-        `${killer} unleashed havoc, and now ${target} is no more.`,
-        `It's a critical hit! ${killer} obliterates ${target}.`,
-        `${killer} has claimed victory, while ${target} bites the dust.`,
-        `Curtains for ${target}! ${killer} takes the spotlight.`,
-        `${killer} slays ${target}, offering them a one-way ticket to the afterlife.`,
-        `A devastating blow by ${killer} leaves ${target} in ruins.`,
-        `${killer} has reduced ${target} to mere pixels.`,
-        `RIP ${target}. ${killer} adds another notch to their belt.`,
-        `${killer} has nullified ${target}'s existence. Back to square one.`,
-        `${killer} shows no mercy, wiping ${target} off the map.`,
-        `Game over for ${target}! ${killer} claims another trophy.`,
-        `It's a knockout! ${killer} leaves ${target} in the dust.`,
-        `${killer} delivers the final blow, sending ${target} back to the lobby.`,
-        `Victory is sweet for ${killer}, but it's game over for ${target}.`,
-        `${killer} has spoken, and ${target} fades into oblivion.`,
-        `${killer} has just made ${target} a ghost of their former self.`,
-        `It's a finishing move! ${killer} eliminates ${target} from play.`,
-        `${killer} makes quick work of ${target}, ending their journey.`,
-        `In a flash of brilliance, ${killer} dismantles ${target}.`,
+        `Looks like ${killer.name} sent ${target.name} back to the drawing board!`,
+        `${killer.name} just made mincemeat out of ${target.name}.`,
+        `And down goes ${target.name}! ${killer.name} stands triumphant.`,
+        `${killer.name} just rewrote ${target.name}'s life code. #GameOver`,
+        `Epic showdown! ${killer.name} reigns and ${target.name} feels the pain.`,
+        `${killer.name} just sent ${target.name} to the respawn point.`,
+        `Looks like ${killer.name} just banished ${target.name} to the shadow realm.`,
+        `${killer.name} unleashed havoc, and now ${target.name} is no more.`,
+        `It's a critical hit! ${killer.name} obliterates ${target.name}.`,
+        `${killer.name} has claimed victory, while ${target.name} bites the dust.`,
+        `Curtains for ${target.name}! ${killer.name} takes the spotlight.`,
+        `${killer.name} slays ${target.name}, offering them a one-way ticket to the afterlife.`,
+        `A devastating blow by ${killer.name} leaves ${target.name} in ruins.`,
+        `${killer.name} has reduced ${target.name} to mere pixels.`,
+        `RIP ${target.name}. ${killer.name} adds another notch to their belt.`,
+        `${killer.name} has nullified ${target.name}'s existence. Back to square one.`,
+        `${killer.name} shows no mercy, wiping ${target.name} off the map.`,
+        `Game over for ${target.name}! ${killer.name} claims another trophy.`,
+        `It's a knockout! ${killer.name} leaves ${target.name} in the dust.`,
+        `${killer.name} delivers the final blow, sending ${target.name} back to the lobby.`,
+        `Victory is sweet for ${killer.name}, but it's game over for ${target.name}.`,
+        `${killer.name} has spoken, and ${target.name} fades into oblivion.`,
+        `${killer.name} has just made ${target.name} a ghost of their former self.`,
+        `It's a finishing move! ${killer.name} eliminates ${target.name} from play.`,
+        `${killer.name} makes quick work of ${target.name}, ending their journey.`,
+        `In a flash of brilliance, ${killer.name} dismantles ${target.name}.`,
       ];
 
       const randomIndex = Math.floor(Math.random() * messages.length);
@@ -460,7 +460,7 @@ export class CharacterDeath {
         const itemId = equipment[slot];
 
         if (!itemId) continue;
-      
+
         const n = _.random(0, 100) * multi;
         if (forceDropAll || n <= DROP_EQUIPMENT_CHANCE) {
           const item = await this.clearItem(character, itemId);

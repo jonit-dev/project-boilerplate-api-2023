@@ -1,10 +1,17 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CalculateEffectDamage } from "@providers/entityEffects/CalculateEffectDamage";
-import { container } from "@providers/inversify/container";
+import { characterBuffActivator, container } from "@providers/inversify/container";
 import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
-import { AnimationEffectKeys, MagicPower } from "@rpg-engine/shared";
-import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
+import {
+  AnimationEffectKeys,
+  CharacterAttributes,
+  CharacterBuffDurationType,
+  CharacterBuffType,
+  MagicPower,
+  SpellsBlueprint,
+} from "@rpg-engine/shared";
+import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { EntityEffectBlueprint } from "../types/entityEffectBlueprintTypes";
 import { IEntityEffect } from "./entityEffect";
 
@@ -23,6 +30,24 @@ export const entityEffectVineGrasp: IEntityEffect = {
     });
 
     itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
+
+    if (attacker.type === EntityType.NPC && target.type === EntityType.Character) {
+      await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {
+        type: CharacterBuffType.CharacterAttribute,
+        trait: CharacterAttributes.Speed,
+        buffPercentage: -15,
+        durationSeconds: 15,
+        durationType: CharacterBuffDurationType.Temporary,
+        options: {
+          messages: {
+            activation: `Your speed is reduced! (-${15}%)`,
+            deactivation: "Your speed is back to normal!",
+          },
+        },
+        isStackable: false,
+        originateFrom: SpellsBlueprint.VineGrasp,
+      });
+    }
 
     return effectDamage;
   },

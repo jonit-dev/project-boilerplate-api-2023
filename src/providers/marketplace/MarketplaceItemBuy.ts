@@ -1,7 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { MarketplaceItem } from "@entities/ModuleMarketplace/MarketplaceItemModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterTradingMarketplaceBuy } from "@providers/character/CharacterTradingMarketplaceBuy";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { MarketplaceSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -12,7 +14,8 @@ export class MarketplaceItemBuy {
   constructor(
     private socketMessaging: SocketMessaging,
     private marketplaceValidation: MarketplaceValidation,
-    private characterTradingMarketplaceBuy: CharacterTradingMarketplaceBuy
+    private characterTradingMarketplaceBuy: CharacterTradingMarketplaceBuy,
+    private discordBot: DiscordBot
   ) {}
 
   @TrackNewRelicTransaction()
@@ -47,6 +50,13 @@ export class MarketplaceItemBuy {
     }
 
     this.socketMessaging.sendEventToUser(character.channelId!, MarketplaceSocketEvents.RefreshItems);
+
+    const itemBought = marketplaceItem.item as IItem;
+
+    await this.discordBot.sendMessage(
+      `**${character.name}** BOUGHT **${itemBought?.name}** for **${marketplaceItem.price}** gold.`,
+      "marketplaceBotNotifications"
+    );
 
     return true;
   }

@@ -9,6 +9,7 @@ import { npcCaveSpider } from "./NPCCaveSpider";
 import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcCentipede } from "./NPCCentipede";
 import { npcDarkKnight } from "./NPCDarkKnight";
+import { npcDarkWraith } from "./NPCDarkWraith";
 import { npcDragonKnight } from "./NPCDragonKnight";
 import { npcDragonServant } from "./NPCDragonServant";
 import { npcDwarf } from "./NPCDwarf";
@@ -27,6 +28,7 @@ import { npcGhoul } from "./NPCGhoul";
 import { npcGiantBat } from "./NPCGiantBat";
 import { npcGiantSpider } from "./NPCGiantSpider";
 import { npcGoblin } from "./NPCGoblin";
+import { npcHighElf } from "./NPCHighElf";
 import { npcIceFox } from "./NPCIceFox";
 import { npcIceThing } from "./NPCIceThing";
 import { npcIceTroll } from "./NPCIceTroll";
@@ -118,6 +120,7 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.Spiderling]: npcSpiderling,
   [HostileNPCsBlueprint.StoneGolem]: npcStoneGolem,
   [HostileNPCsBlueprint.Elf]: npcElf,
+  [HostileNPCsBlueprint.HighElf]: npcHighElf,
   [HostileNPCsBlueprint.GiantSpider]: npcGiantSpider,
   [HostileNPCsBlueprint.BlackEagle]: npcBlackEagle,
   [HostileNPCsBlueprint.DwarfArcher]: npcDwarfArcher,
@@ -125,6 +128,7 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.DwarfMage]: npcDwarfMage,
   [HostileNPCsBlueprint.Kobold]: npcKobold,
   [HostileNPCsBlueprint.Wraith]: npcWraith,
+  [HostileNPCsBlueprint.DarkWraith]: npcDarkWraith,
   [HostileNPCsBlueprint.DragonKnight]: npcDragonKnight,
   [HostileNPCsBlueprint.IceThing]: npcIceThing,
   [HostileNPCsBlueprint.DarkKnight]: npcDarkKnight,

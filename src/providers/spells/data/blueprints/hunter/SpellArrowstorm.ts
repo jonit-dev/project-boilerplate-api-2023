@@ -6,6 +6,7 @@ import { entityEffectBleeding } from "@providers/entityEffects/data/blueprints/e
 import { container } from "@providers/inversify/container";
 import {
   AnimationEffectKeys,
+  CharacterClass,
   ISpell,
   MagicPower,
   RangeTypes,
@@ -27,6 +28,7 @@ export const spellArrowStorm: Partial<ISpell> = {
   targetHitAnimationKey: AnimationEffectKeys.Hit,
   projectileAnimationKey: AnimationEffectKeys.Arrow,
   maxDistanceGrid: RangeTypes.High,
+  characterClass: [CharacterClass.Hunter],
 
   usableEffect: async (character: ICharacter, target: ICharacter | INPC) => {
     const spellArea = container.get(SpellArea);

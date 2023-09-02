@@ -127,7 +127,7 @@ export class ItemContainerOpen {
     if (parentItem.x && parentItem.y) {
       // this range check is only valid if the container is on the map!
 
-      const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, parentItem.x, parentItem.y, 1);
+      const isUnderRange = this.movementHelper.isUnderRange(character.x, character.y, parentItem.x, parentItem.y, 3);
 
       if (!isUnderRange) {
         this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {

@@ -104,6 +104,8 @@ export enum HostileNPCsBlueprint {
   Yeti = "yeti", // Boss
   Asterion = "asterion", // Boss
   Gorgok = "gorgok", // Boss
+  EloraTheQueen = "elora-the-queen", // Super Boss
+  MalakarLichKing = "malakar-lich-king", // Super Boss
   IceTroll = "ice-troll",
   Scorpion = "scorpion",
   BlackSpider = "black-spider",
@@ -123,6 +125,7 @@ export enum HostileNPCsBlueprint {
   Spiderling = "spiderling",
   StoneGolem = "stone-golem",
   Elf = "elf",
+  HighElf = "high-elf",
   GiantSpider = "giant-spider",
   DwarfArcher = "dwarf-archer",
   DwarfGuardian = "dwarf-guardian",
@@ -130,6 +133,7 @@ export enum HostileNPCsBlueprint {
   Kobold = "kobold",
   DragonServant = "dragon-servant",
   Wraith = "wraith",
+  DarkWraith = "dark-wraith",
   DragonKnight = "dragon-knight",
   IceThing = "ice-thing",
   BlueDragon = "blue-dragon-01",
