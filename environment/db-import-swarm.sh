@@ -26,6 +26,14 @@ TASK_ID=$(docker service ps -q --filter 'desired-state=running' swarm-stack_rpg-
 # Find the Container ID Associated with the Task ID
 CONTAINER_ID=$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $TASK_ID)
 
+# Validation
+[ -z "$USERNAME" ] && echo "MONGO_INITDB_ROOT_USERNAME is empty. Check your .env file." && exit
+[ -z "$PASSWORD" ] && echo "MONGO_INITDB_ROOT_PASSWORD is empty. Check your .env file." && exit
+[ -z "$PORT" ] && echo "MONGO_PORT is empty. Check your .env file." && exit
+[ -z "$CONTAINER_ID" ] && echo "Could not find the MongoDB container ID. Check if the service is running." && exit
+
+
+
 # Unzip the database data
 cd "$BACKUPS_FOLDER"
 unzip "$DB_DUMP_ZIP" -d "./"
@@ -34,8 +42,14 @@ unzip "$DB_DUMP_ZIP" -d "./"
 docker cp "$DB_DUMP_FOLDER" "$CONTAINER_ID:/"
 
 # Import the data to the container
-docker exec "$CONTAINER_ID" mongorestore --port $PORT -u $USERNAME -p $PASSWORD "$DB_DUMP_FOLDER/$DB_CONTAINER" --drop
+docker exec "$CONTAINER_ID" mongorestore --port $PORT -u $USERNAME -p $PASSWORD "/db-dump/$DB_CONTAINER" --drop
 
 # Cleanup
 echo "Finished, deleting db-dump folder..."
-rm -r "$DB_DUMP_FOLDER"
+
+if [ $? -eq 0 ]; then
+  echo "Import successful. Deleting db-dump folder..."
+  rm -r "$DB_DUMP_FOLDER"
+else
+  echo "Import failed. Keeping db-dump folder for debugging."
+fi
