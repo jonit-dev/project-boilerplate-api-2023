@@ -86,7 +86,3 @@ const server = app.listen(port, async () => {
 });
 
 serverHelper.gracefullyShutdown(server);
-
-process.on("SIGINT", () => {
-  console.log("RECEIVED FUCKING SIGINT DAMN SIGNAL");
-});
