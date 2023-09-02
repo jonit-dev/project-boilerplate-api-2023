@@ -6,6 +6,7 @@ import { Time } from "@providers/time/Time";
 import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
+import random from "lodash/random";
 import { IRaid, RaidManager } from "./RaidManager";
 
 @provide(NPCRaidActivator)
@@ -124,7 +125,7 @@ export class NPCRaidActivator {
     const raids = await this.raid.queryRaids({ status: false });
 
     const eligibleRaids = raids.filter((raid) => {
-      const randomValue = Math.random() * 100; // Get a random number between 0 and 100
+      const randomValue = random(0, 100); // Get a random number between 1 and 100
 
       return randomValue <= raid.triggeringChance; // Check if the random number is less than or equal to the raid's triggering chance
     });
