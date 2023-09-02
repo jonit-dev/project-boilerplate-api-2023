@@ -8,11 +8,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  pre-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.set_output.outputs.should_run }}
+    steps:
+      - name: Check if actor is authorized
+        id: set_output
+        run: |
+          if [[ ",${{ secrets.AUTHORIZED_USERS }}," == *",${{ github.actor }},"* ]]; then
+            echo "Actor is authorized"
+            echo "should_run=true" >> $GITHUB_ENV
+          else
+            echo "Actor is not authorized"
+            echo "should_run=false" >> $GITHUB_ENV
+          fi
+
   deploy:
     runs-on: ubuntu-latest
-    env:
-      AUTHORIZED_USERS: ${{ secrets.AUTHORIZED_USERS }}
-    if: contains(env.AUTHORIZED_USERS, github.actor)
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
