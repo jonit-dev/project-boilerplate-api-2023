@@ -33,6 +33,7 @@ CONTAINER_ID=$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}'
 [ -z "$CONTAINER_ID" ] && echo "Could not find the MongoDB container ID. Check if the service is running." && exit
 
 
+echo "⚙️ Importing database to container $CONTAINER_ID on port $PORT with user $USERNAME..."
 
 # Unzip the database data
 cd "$BACKUPS_FOLDER"
@@ -45,11 +46,11 @@ docker cp "$DB_DUMP_FOLDER" "$CONTAINER_ID:/"
 docker exec "$CONTAINER_ID" mongorestore --port $PORT -u $USERNAME -p $PASSWORD "/db-dump/$DB_CONTAINER" --drop
 
 # Cleanup
-echo "Finished, deleting db-dump folder..."
+echo "⚙️ Finished, deleting db-dump folder..."
 
 if [ $? -eq 0 ]; then
-  echo "Import successful. Deleting db-dump folder..."
+  echo "✅ Import successful. Deleting db-dump folder..."
   rm -r "$DB_DUMP_FOLDER"
 else
-  echo "Import failed. Keeping db-dump folder for debugging."
+  echo "❌ Import failed. Keeping db-dump folder for debugging."
 fi
