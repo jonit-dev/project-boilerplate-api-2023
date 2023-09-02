@@ -45,7 +45,7 @@ docker cp "$DB_DUMP_FOLDER" "$CONTAINER_ID:/"
 # Import the data to the container
 docker exec "$CONTAINER_ID" mongorestore --port $PORT -u $USERNAME -p $PASSWORD "/db-dump/$DB_CONTAINER" --drop
 
-# Cleanup
+# Cleanup...
 echo "⚙️ Finished, deleting db-dump folder..."
 
 if [ $? -eq 0 ]; then
