@@ -26,21 +26,19 @@ echo "Deploying project..."
 git --work-tree=$DEPLOY_DIR --git-dir=$REPO_DIR checkout -f $BRANCH
 
 
-echo "🐳Building docker image..."
-docker build -t definya/definya-team:api-latest .
-docker push definya/definya-team:api-latest
-
-# Update repository code
+# Build React and Docker image
 cd ~/definya/client
 
-# Clean untracked files if any
-git clean -fd 
+echo "🐳 Building React..."
+npm run build
 
-# Checkout the release branch and pull the latest changes
-git checkout release
-git pull origin release
+echo "🐳Building Docker image..."
+docker build -t definya/definya-team:client-latest .
+docker push definya/definya-team:client-latest
 
 # Update the service to restart containers and force image update
 echo "🐳Restarting swarm service..."
 
 docker service update --force swarm-stack_rpg-client
+
+docker container prune -f

@@ -15,4 +15,8 @@ echo "🐳Restarting swarm service..."
 
 docker service update --force --with-registry-auth $SERVICE_NAME
 
-echo "Deployment complete."
+echo "🐳 Deployment complete."
+
+
+echo "🐳 Cleaning up..."
+docker container prune -f
