@@ -71,7 +71,7 @@ services:
       - rpg-network
 
   rpg-db:
-    image: mongo
+    image: mongo:7.0.0
     command: mongod --port ${MONGO_PORT}
     logging:
       options:
@@ -95,7 +95,7 @@ services:
       - rpg-network
 
   rpg-redis:
-    image: redis:latest
+    image: redis:7.2.0
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
