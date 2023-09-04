@@ -131,10 +131,6 @@ export class HitTarget {
 
       const damage = this.battleEvent.getCriticalHitDamageIfSucceed(baseDamage);
 
-      const generateBloodChance = random(1, 100);
-
-      damage > 0 && generateBloodChance <= 10 && void this.battleEffects.generateBloodOnGround(target);
-
       const damageRelatedPromises: any[] = [];
 
       if (damage > 0) {
@@ -218,6 +214,10 @@ export class HitTarget {
             damageRelatedPromises.push(this.applyEntityEffectsIfApplicable(attacker as INPC, target));
           }
         }
+
+        const generateBloodChance = random(1, 100);
+
+        generateBloodChance <= 10 && void this.battleEffects.generateBloodOnGround(target);
       }
 
       await Promise.all([...damageRelatedPromises]);

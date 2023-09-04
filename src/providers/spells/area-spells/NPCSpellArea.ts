@@ -25,7 +25,7 @@ export class NPCSpellArea {
       >;
 
       if (!npcBlueprint) {
-        throw new Error(`NPC blueprint ${attacker.baseKey} not found!`);
+        return false;
       }
 
       const areaSpells = npcBlueprint?.areaSpells as ISpellAreaNPC[];
