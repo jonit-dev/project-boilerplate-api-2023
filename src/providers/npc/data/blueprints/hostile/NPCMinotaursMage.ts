@@ -61,11 +61,7 @@ export const npcMinotaurMage = {
       chance: 20,
       quantityRange: [1, 5],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 5,
-      quantityRange: [1, 5],
-    },
+
     {
       itemBlueprintKey: StaffsBlueprint.MoonsStaff,
       chance: 5,

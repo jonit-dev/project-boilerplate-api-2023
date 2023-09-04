@@ -76,10 +76,5 @@ export const npcElderGolem: Partial<INPC> = {
       chance: 30,
       quantityRange: [5, 20],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 10,
-      quantityRange: [1, 5],
-    },
   ],
 };

@@ -12,6 +12,7 @@ import {
   AnimationEffectKeys,
   AnimationSocketEvents,
   CharacterSocketEvents,
+  CraftingSkill,
   ICraftItemPayload,
   ItemRarities,
   ItemSocketEvents,
@@ -379,7 +380,7 @@ describe("ItemCraftable.ts", () => {
     expect(container.slots[1]).toBe(null);
 
     expect(craftChanceMock).toBeCalledTimes(1);
-    expect(craftChanceMock).toBeCalledWith(1, 50);
+    expect(craftChanceMock).toBeCalledWith(10, 50);
 
     expect(sendEventToUser).toHaveBeenCalledTimes(4);
 
@@ -410,11 +411,13 @@ describe("ItemCraftable.ts", () => {
       await skills.save();
     }
 
-    const skillsAverage = await (ItemCraftable.prototype as any).getCraftingSkillsAverage(testCharacter);
+    // @ts-ignore
+    const skillsAverage = await craftableItem.getSkillLevel(testCharacter, CraftingSkill.Lumberjacking);
 
     const results: boolean[] = [];
     for (let i = 0; i < 100; i++) {
-      const result: boolean = (ItemCraftable.prototype as any).isCraftSuccessful(skillsAverage, 50);
+      // @ts-ignore
+      const result: boolean = craftableItem.isCraftSuccessful(skillsAverage, 50);
       results.push(result);
     }
 
@@ -423,8 +426,8 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("should return crafting skills average", async () => {
-    // @ts-expect-error
-    const avgSkills = await craftableItem.getCraftingSkillsAverage(testCharacter);
+    // @ts-ignore
+    const avgSkills = await craftableItem.getSkillLevel(testCharacter, CraftingSkill.Lumberjacking);
     expect(typeof avgSkills).toBe("number");
   });
 

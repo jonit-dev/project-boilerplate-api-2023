@@ -9,7 +9,15 @@ import {
   UseWithItemToTile,
 } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { IToolItemBlueprint, ItemRarities, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
+import {
+  CraftingSkill,
+  IToolItemBlueprint,
+  ItemRarities,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+} from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -60,7 +68,7 @@ export const itemPickaxe: IToolItemBlueprint = {
         {
           key: RangedWeaponsBlueprint.Stone,
           qty: [3, 5],
-          chance: await itemCraftable.getCraftChance(character, 30, rarityOfTool),
+          chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 15, rarityOfTool),
         },
       ],
     };
@@ -76,7 +84,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.IronOre,
               qty: [5, 7],
-              chance: await itemCraftable.getCraftChance(character, 20, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 20, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -89,7 +97,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.CopperOre,
               qty: [3, 4],
-              chance: await itemCraftable.getCraftChance(character, 15, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 15, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -103,7 +111,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.SilverOre,
               qty: [2, 3],
-              chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 7, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -116,7 +124,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.GoldenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 7, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 5, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -129,7 +137,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.GreenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 4, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 3, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -142,7 +150,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.ObsidiumOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 3, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 2, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -155,7 +163,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.CorruptionOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, 2, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 2, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };

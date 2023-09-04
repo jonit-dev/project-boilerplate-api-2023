@@ -5,7 +5,15 @@ import { ItemCraftable } from "@providers/item/ItemCraftable";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemToTile";
 import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
-import { IToolItemBlueprint, ItemRarities, ItemSlotType, ItemSubType, ItemType, RangeTypes } from "@rpg-engine/shared";
+import {
+  CraftingSkill,
+  IToolItemBlueprint,
+  ItemRarities,
+  ItemSlotType,
+  ItemSubType,
+  ItemType,
+  RangeTypes,
+} from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { CraftingResourcesBlueprint, ToolsBlueprint } from "../../types/itemsBlueprintTypes";
 
@@ -48,22 +56,22 @@ export const itemCarpentersAxe: IToolItemBlueprint = {
           {
             key: CraftingResourcesBlueprint.GreaterWoodenLog,
             qty: [3, 4],
-            chance: await itemCraftable.getCraftChance(character, 30, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Lumberjacking, 5, rarityOfTool),
           },
           {
             key: CraftingResourcesBlueprint.WoodenSticks,
             qty: [2, 3],
-            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Lumberjacking, 10, rarityOfTool),
           },
           {
             key: CraftingResourcesBlueprint.SmallWoodenStick,
             qty: [2, 3],
-            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Lumberjacking, 10, rarityOfTool),
           },
           {
             key: CraftingResourcesBlueprint.ElvenWood,
             qty: [1, 2],
-            chance: await itemCraftable.getCraftChance(character, 5, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Lumberjacking, 5, rarityOfTool),
           },
         ],
       },

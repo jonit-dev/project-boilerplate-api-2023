@@ -34,7 +34,8 @@ import { throttle } from "lodash";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
 
-import { CRAFTING_DIFFICULTY_RATIO } from "@providers/constants/CraftingConstants";
+import { CRAFTING_BASE_CHANCE_IMPACT, CRAFTING_DIFFICULTY_RATIO } from "@providers/constants/CraftingConstants";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemCraftable)
@@ -49,7 +50,8 @@ export class ItemCraftable {
     private animationEffect: AnimationEffect,
     private skillIncrease: SkillIncrease,
     private characterInventory: CharacterInventory,
-    private inMemoryHashTable: InMemoryHashTable
+    private inMemoryHashTable: InMemoryHashTable,
+    private traitGetter: TraitGetter
   ) {}
 
   @TrackNewRelicTransaction()
@@ -229,13 +231,14 @@ export class ItemCraftable {
   @TrackNewRelicTransaction()
   public async getCraftChance(
     character: ICharacter,
+    baseSkill: CraftingSkill,
     baseChance: number,
     rarityOfTool: string
   ): Promise<() => Promise<boolean>> {
-    const skillsAverage = await this.getCraftingSkillsAverage(character);
+    const skillLevel = await this.getSkillLevel(character, baseSkill);
     const rarityChance = this.getRarityPercent(rarityOfTool);
 
-    return this.isCraftSuccessful.bind(null, skillsAverage - 1, baseChance + rarityChance ?? 0);
+    return this.isCraftSuccessful.bind(null, skillLevel, baseChance + rarityChance ?? 0);
   }
 
   @TrackNewRelicTransaction()
@@ -255,8 +258,10 @@ export class ItemCraftable {
     }
 
     if (proceed) {
-      const skillsAverage = await this.getCraftingSkillsAverage(character);
-      proceed = this.isCraftSuccessful(skillsAverage - 1, 50);
+      const skillName = recipe.minCraftingRequirements[0];
+
+      const skillLevel = await this.getSkillLevel(character, skillName as CraftingSkill);
+      proceed = this.isCraftSuccessful(skillLevel, 50);
     }
 
     if (proceed) {
@@ -544,14 +549,24 @@ export class ItemCraftable {
     Higher CRAFTING_DIFFICULTY_RATIO: Less impact of skillsAverage on successChance, making crafting more difficult.
     Lower CRAFTING_DIFFICULTY_RATIO: Greater impact of skillsAverage on successChance, making crafting easier.
   */
-  private isCraftSuccessful(skillsAverage: number, baseChance: number): boolean {
-    const bonusScale = 1 + (baseChance - 1) / 40;
-    const successChance = baseChance + (skillsAverage / CRAFTING_DIFFICULTY_RATIO) * bonusScale;
+
+  private isCraftSuccessful(skillLevel: number, baseChance: number): boolean {
+    baseChance = baseChance * CRAFTING_BASE_CHANCE_IMPACT;
+
+    // Quadratic formula for impact
+    const quadraticImpact = Math.pow(skillLevel, 0.7) / CRAFTING_DIFFICULTY_RATIO;
+
+    const adjustedBaseChance = baseChance + quadraticImpact;
+
+    // Cap successChance at 100
+    const successChance = Math.min(100, adjustedBaseChance);
+
     const roll = random(0, 100);
+
     return roll <= successChance;
   }
 
-  private async getCraftingSkillsAverage(character: ICharacter): Promise<number> {
+  private async getSkillLevel(character: ICharacter, skillName: CraftingSkill): Promise<number> {
     const skills = (await Skill.findOne({ owner: character._id })
       .lean()
       .cacheQuery({
@@ -562,15 +577,9 @@ export class ItemCraftable {
       return 0;
     }
 
-    const craftingSkills: number[] = [
-      skills.mining.level,
-      skills.lumberjacking.level,
-      skills.cooking.level,
-      skills.alchemy.level,
-      skills.blacksmithing.level,
-    ];
+    const skillLevel = (await this.traitGetter.getSkillLevelWithBuffs(skills, skillName)) ?? skills[skillName].level;
 
-    return Math.floor(craftingSkills.reduce((total, level) => total + level, 0) / craftingSkills.length);
+    return skillLevel;
   }
 
   private getRarityPercent(itemRarity: string): number {

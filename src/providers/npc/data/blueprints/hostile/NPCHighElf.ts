@@ -60,11 +60,6 @@ export const npcHighElf: Partial<INPC> = {
     },
 
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
-      chance: 60,
-      quantityRange: [2, 6],
-    },
-    {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 25,
       quantityRange: [1, 2],
