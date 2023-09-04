@@ -36,6 +36,7 @@ import {
   formControllerContainer,
   useCasesControllers,
   userControllerContainer,
+  blueprintControllerContainer,
 } from "./ControllersInversify";
 
 const container = new Container();
@@ -46,7 +47,8 @@ container.load(
   dbTasksControllerContainer,
   abTestsControllerContainer,
   formControllerContainer,
-  useCasesControllers
+  useCasesControllers,
+  blueprintControllerContainer
 );
 
 export const database = container.get<Database>(Database);
@@ -100,5 +102,7 @@ export const containerSlotsCaching = container.get<ContainerSlotsCaching>(Contai
 export const hashGenerator = container.get<HashGenerator>(HashGenerator);
 
 export const locker = container.get<Locker>(Locker);
+
+export const blueprint = container.get<BlueprintManager>(BlueprintManager);
 
 export { container };

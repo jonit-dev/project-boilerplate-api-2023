@@ -27,7 +27,7 @@ export class BattleAttackValidator {
   ): Promise<IRangedAttackParams | undefined> {
     let rangedAttackParams: Partial<IRangedAttackParams> | undefined;
 
-    if (attacker.type === "NPC") {
+    if (attacker.type === EntityType.NPC) {
       const npc = attacker as INPC;
       if (!npc.maxRangeAttack) {
         throw new Error("NPC attempted ranged attack without specifying maxRangeAttack field");
@@ -40,7 +40,7 @@ export class BattleAttackValidator {
     }
 
     if (!this.isAttackInRange(attacker, target, rangedAttackParams.maxRange!)) {
-      if (attacker.type === "Character") {
+      if (attacker.type === EntityType.Character) {
         this.sendNotInRangeEvent(attacker as ICharacter, target);
       }
       return;
@@ -48,7 +48,7 @@ export class BattleAttackValidator {
 
     const solidInTrajectory = await this.battleRangedAttack.isSolidInRangedTrajectory(attacker, target);
     if (solidInTrajectory) {
-      if (attacker.type === "Character") {
+      if (attacker.type === EntityType.Character) {
         this.sendSolidInTrajectoryEvent(attacker as ICharacter, target);
       }
       return;

@@ -130,8 +130,13 @@ export class BattleEvent {
     damage: number,
     isMagicAttack: boolean
   ): Promise<number> {
-    if (target.type === "Character") {
+    if (target.type === EntityType.Character) {
       const character = target as ICharacter;
+      // added this check because was getting
+      // 'Skills owner is undefined' in the getSkillLevelWithBuffs function
+      if (!defenderSkills.owner) {
+        defenderSkills.owner = target.id;
+      }
 
       const [hasShield, defenderShieldingLevel, defenderResistanceLevel, defenderMagicResistanceLevel] =
         await Promise.all([

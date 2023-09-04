@@ -6,6 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
+import { NPCSpellArea } from "@providers/spells/area-spells/NPCSpellArea";
 import {
   BattleSocketEvents,
   GRID_WIDTH,
@@ -31,12 +32,22 @@ export class BattleAttackTarget {
     private battleRangedAttack: BattleAttackRanged,
     private characterWeapon: CharacterWeapon,
     private battleAttackValidator: BattleAttackValidator,
-    private hitTarget: HitTarget
+    private hitTarget: HitTarget,
+    private npcSpellArea: NPCSpellArea
   ) {}
 
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     if (!target.isAlive) {
       return false;
+    }
+
+    // check if the NPC has an area spell to cast.
+    // if casted successfully, then the attack is complete
+    if (attacker.type === EntityType.NPC) {
+      const castedSpell = await this.npcSpellArea.castNPCSpell(attacker as INPC, target);
+      if (castedSpell) {
+        return true;
+      }
     }
 
     const attackerType = attacker.attackType || (await this.characterWeapon.getAttackType(attacker as ICharacter));
@@ -56,7 +67,7 @@ export class BattleAttackTarget {
         const rangedAttackParams = await this.battleAttackValidator.validateAttack(attacker, target);
 
         if (rangedAttackParams) {
-          if (attacker.type === "Character") {
+          if (attacker.type === EntityType.Character) {
             const character = attacker as ICharacter;
             if (rangedAttackParams.itemSubType === ItemSubType.Magic) {
               return this.performRangedAttack(attacker, target, rangedAttackParams);
@@ -81,7 +92,7 @@ export class BattleAttackTarget {
       }
 
       case EntityAttackType.MeleeRanged: {
-        if (attacker.type === "Character") {
+        if (attacker.type === EntityType.Character) {
           throw new Error(`Character cannot have MeleeRanged hybrid attack type. Character id ${attacker.id}`);
         }
 
@@ -114,7 +125,7 @@ export class BattleAttackTarget {
     );
 
     if (!isTargetClose) {
-      if (attacker.type === "Character") {
+      if (attacker.type === EntityType.Character) {
         const character = attacker as ICharacter;
         await this.battleNetworkStopTargeting.stopTargeting(character);
 
@@ -129,7 +140,7 @@ export class BattleAttackTarget {
         );
       }
 
-      if (attacker.type === "NPC") {
+      if (attacker.type === EntityType.NPC) {
         const npc = attacker as INPC;
         await this.npcTarget.tryToClearOutOfRangeTargets(npc);
       }
@@ -148,7 +159,7 @@ export class BattleAttackTarget {
   ): Promise<boolean> {
     await this.hitTarget.hit(attacker, target, magicAttack);
     await this.battleRangedAttack.sendRangedAttackEvent(attacker, target, rangedAttackParams);
-    if (attacker.type === "Character" && rangedAttackParams.itemSubType === ItemSubType.Ranged) {
+    if (attacker.type === EntityType.Character && rangedAttackParams.itemSubType === ItemSubType.Ranged) {
       await this.battleRangedAttack.consumeAmmo(rangedAttackParams, attacker as ICharacter);
     }
     return true;
