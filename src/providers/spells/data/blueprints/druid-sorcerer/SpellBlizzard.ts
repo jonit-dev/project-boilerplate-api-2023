@@ -1,11 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { HitTarget } from "@providers/battle/HitTarget";
-import { SpellArea } from "@providers/battle/SpellArea";
 import { SPELL_AREA_DIAMOND_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { entityEffectFreezing } from "@providers/entityEffects/data/blueprints/entityEffectFreezing";
 import { characterBuffActivator, container } from "@providers/inversify/container";
 import { UsableEffectsBlueprint } from "@providers/item/data/usableEffects/types";
+import { SpellArea } from "@providers/spells/area-spells/SpellArea";
 import {
   AnimationEffectKeys,
   BasicAttribute,

@@ -1,9 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { SpellArea } from "@providers/battle/SpellArea";
+
 import { SPELL_AREA_DIAMOND_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container } from "@providers/inversify/container";
+import { SpellArea } from "@providers/spells/area-spells/SpellArea";
 import {
   AnimationEffectKeys,
   CharacterClass,

@@ -17,7 +17,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment, RangeTypes } from "@rpg-engine/shared";
+import { MagicPower, NPCAlignment, RangeTypes, SpellsBlueprint } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -178,4 +178,16 @@ export const npcDarkKnight: Partial<INPC> = {
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
+  areaSpells: [
+    {
+      spellKey: SpellsBlueprint.Arrowstorm,
+      probability: 20,
+      power: MagicPower.High,
+    },
+    {
+      spellKey: SpellsBlueprint.Blizzard,
+      probability: 20,
+      power: MagicPower.High,
+    },
+  ],
 };

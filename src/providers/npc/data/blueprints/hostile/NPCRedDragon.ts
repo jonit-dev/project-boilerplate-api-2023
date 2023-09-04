@@ -12,7 +12,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { AnimationEffectKeys, NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
+import { AnimationEffectKeys, MagicPower, NPCAlignment, NPCSubtype, SpellsBlueprint } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -111,4 +111,11 @@ export const npcRedDragon = {
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],
+  areaSpells: [
+    {
+      spellKey: SpellsBlueprint.FireStorm,
+      probability: 40,
+      power: MagicPower.Medium,
+    },
+  ],
 } as Partial<INPC>;

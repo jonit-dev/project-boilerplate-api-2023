@@ -15,7 +15,7 @@ import {
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
-import { AnimationEffectKeys, NPCAlignment, RangeTypes } from "@rpg-engine/shared";
+import { AnimationEffectKeys, MagicPower, NPCAlignment, RangeTypes, SpellsBlueprint } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -149,4 +149,16 @@ export const npcMinotaurMage = {
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],
+  areaSpells: [
+    {
+      spellKey: SpellsBlueprint.FireStorm,
+      probability: 20,
+      power: MagicPower.High,
+    },
+    {
+      spellKey: SpellsBlueprint.Blizzard,
+      probability: 20,
+      power: MagicPower.High,
+    },
+  ],
 } as Partial<INPC>;

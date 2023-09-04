@@ -17,7 +17,7 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { HitTarget } from "./HitTarget";
+import { HitTarget } from "../../battle/HitTarget";
 
 interface IAffectedTarget {
   target: ICharacter[] | INPC[];
@@ -53,7 +53,7 @@ export class SpellArea {
 
   @TrackNewRelicTransaction()
   public async cast(
-    caster: ICharacter,
+    caster: ICharacter | INPC,
     target: ICharacter | INPC,
     magicPower: MagicPower,
     options: ISpellAreaCastOptions
@@ -82,6 +82,10 @@ export class SpellArea {
       if (options?.customFn) {
         await options.customFn(targetToHit, targetIntensity);
       } else {
+        if (caster.type === EntityType.NPC && targetToHit.type === EntityType.NPC) {
+          return; // avoid NPCs hitting each other
+        }
+
         await this.hitTarget.hit(caster, targetToHit, true, magicPower + targetIntensity, true);
       }
 
@@ -90,14 +94,28 @@ export class SpellArea {
       }
     });
 
-    const animationPromises = animationCells.map(async (animationCell) => {
-      await this.animationEffect.sendAnimationEventToXYPosition(
-        caster,
-        effectAnimationKey,
-        FromGridX(animationCell.x),
-        FromGridY(animationCell.y)
-      );
-    });
+    let animationPromises: Promise<void>[] = [];
+    if (caster.type === EntityType.Character) {
+      animationPromises = animationCells.map(async (animationCell) => {
+        await this.animationEffect.sendAnimationEventToXYPosition(
+          caster as ICharacter,
+          effectAnimationKey,
+          FromGridX(animationCell.x),
+          FromGridY(animationCell.y)
+        );
+      });
+    }
+
+    if (caster.type === EntityType.NPC && target.type === EntityType.Character) {
+      animationPromises = animationCells.map(async (animationCell) => {
+        await this.animationEffect.sendAnimationEventToXYPosition(
+          target as ICharacter,
+          effectAnimationKey,
+          FromGridX(animationCell.x),
+          FromGridY(animationCell.y)
+        );
+      });
+    }
 
     await Promise.all([...hitPromises, ...animationPromises]);
   }

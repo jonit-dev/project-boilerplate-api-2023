@@ -4,7 +4,7 @@ import { SPELL_AREA_MEDIUM_BLAST_RADIUS } from "@providers/constants/SpellConsta
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { AnimationEffectKeys, FromGridX, FromGridY, MagicPower } from "@rpg-engine/shared";
-import { SpellArea } from "../SpellArea";
+import { SpellArea } from "../../spells/area-spells/SpellArea";
 
 describe("SpellArea", () => {
   let testCharacter: ICharacter;

@@ -17,7 +17,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { MagicPower, NPCAlignment, SpellsBlueprint } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
@@ -135,4 +135,16 @@ export const npcDwarfMage: Partial<INPC> = {
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],
+  areaSpells: [
+    {
+      spellKey: SpellsBlueprint.FireStorm,
+      probability: 20,
+      power: MagicPower.Medium,
+    },
+    {
+      spellKey: SpellsBlueprint.Blizzard,
+      probability: 20,
+      power: MagicPower.High,
+    },
+  ],
 };

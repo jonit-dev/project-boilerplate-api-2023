@@ -192,6 +192,7 @@ const npcSchema = createLeanSchema(
       isAlive: boolean;
       type: string;
       xpPerDamage: number;
+      baseKey: string;
     }),
     entityEffects: Type.array().of(
       Type.string({
@@ -210,6 +211,10 @@ export type INPC = ExtractDoc<typeof npcSchema>;
 
 npcSchema.virtual("isAlive").get(function (this: INPC) {
   return this.health > 0;
+});
+
+npcSchema.virtual("baseKey").get(function (this: INPC) {
+  return this.key.replace(/-\d+$/, "");
 });
 
 npcSchema.virtual("type").get(function (this: INPC) {
