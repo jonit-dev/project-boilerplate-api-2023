@@ -47,7 +47,7 @@ export class NPCCrons {
     });
 
     // Run every hour
-    nodeCron.schedule("0 * * * *", async () => {
+    nodeCron.schedule("0 */2 * * *", async () => {
       await this.npcRaidActivator.activateRaids();
     });
   }
