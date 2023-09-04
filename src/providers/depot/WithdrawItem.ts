@@ -13,6 +13,7 @@ import { IDepotContainerWithdraw, IEquipmentAndInventoryUpdatePayload, IItemCont
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(WithdrawItem)
 export class WithdrawItem {
@@ -25,7 +26,8 @@ export class WithdrawItem {
     private socketMessaging: SocketMessaging,
     private characterWeight: CharacterWeight,
     private itemOwnership: ItemOwnership,
-    private itemUpdater: ItemUpdater
+    private itemUpdater: ItemUpdater,
+    private inMemoryHashTable: InMemoryHashTable,
   ) {}
 
   @TrackNewRelicTransaction()
@@ -88,7 +90,7 @@ export class WithdrawItem {
     }
 
     await this.markNotIsInDepot(item);
-
+    await this.inMemoryHashTable.delete("container-all-items", toContainerId);
     void this.characterWeight.updateCharacterWeight(character);
 
     return itemContainer;

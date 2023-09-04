@@ -15,6 +15,7 @@ import { IDepotDepositItem, IEquipmentAndInventoryUpdatePayload, IItemContainer 
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(DepositItem)
 export class DepositItem {
@@ -27,7 +28,8 @@ export class DepositItem {
     private socketMessaging: SocketMessaging,
     private itemOwnership: ItemOwnership,
     private itemUpdater: ItemUpdater,
-    private characterItemSlots: CharacterItemSlots
+    private characterItemSlots: CharacterItemSlots,
+    private inMemoryHashTable: InMemoryHashTable,
   ) {}
 
   @TrackNewRelicTransaction()
@@ -66,6 +68,7 @@ export class DepositItem {
     // deposit from the characters container
     if (!!fromContainerId && !isItemFromMap) {
       const container = await this.depotSystem.removeFromContainer(fromContainerId, item);
+      await this.inMemoryHashTable.delete("container-all-items", fromContainerId);
 
       if (!item.owner) {
         await this.itemOwnership.addItemOwnership(item, character);
