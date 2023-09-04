@@ -152,13 +152,13 @@ export const npcMinotaurMage = {
   areaSpells: [
     {
       spellKey: SpellsBlueprint.FireStorm,
-      probability: 20,
-      power: MagicPower.High,
+      probability: 10,
+      power: MagicPower.Medium,
     },
     {
       spellKey: SpellsBlueprint.Blizzard,
-      probability: 20,
-      power: MagicPower.High,
+      probability: 10,
+      power: MagicPower.Medium,
     },
   ],
 } as Partial<INPC>;

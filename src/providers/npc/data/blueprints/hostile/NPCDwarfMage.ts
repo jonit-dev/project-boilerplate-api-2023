@@ -138,13 +138,13 @@ export const npcDwarfMage: Partial<INPC> = {
   areaSpells: [
     {
       spellKey: SpellsBlueprint.FireStorm,
-      probability: 20,
-      power: MagicPower.Medium,
+      probability: 5,
+      power: MagicPower.Low,
     },
     {
       spellKey: SpellsBlueprint.Blizzard,
-      probability: 20,
-      power: MagicPower.High,
+      probability: 5,
+      power: MagicPower.Low,
     },
   ],
 };

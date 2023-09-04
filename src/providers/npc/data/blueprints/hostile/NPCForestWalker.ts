@@ -108,7 +108,7 @@ export const npcForestWalker: Partial<INPC> = {
   areaSpells: [
     {
       spellKey: SpellsBlueprint.NaturesRevenge,
-      probability: 20,
+      probability: 5,
       power: MagicPower.Low,
     },
   ],
