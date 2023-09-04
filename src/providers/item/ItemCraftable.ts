@@ -540,9 +540,13 @@ export class ItemCraftable {
     return qty;
   }
 
+  /*
+    Higher CRAFTING_DIFFICULTY_RATIO: Less impact of skillsAverage on successChance, making crafting more difficult.
+    Lower CRAFTING_DIFFICULTY_RATIO: Greater impact of skillsAverage on successChance, making crafting easier.
+  */
   private isCraftSuccessful(skillsAverage: number, baseChance: number): boolean {
     const bonusScale = 1 + (baseChance - 1) / 40;
-    const successChance = baseChance + skillsAverage * bonusScale * CRAFTING_DIFFICULTY_RATIO;
+    const successChance = baseChance + (skillsAverage / CRAFTING_DIFFICULTY_RATIO) * bonusScale;
     const roll = random(0, 100);
     return roll <= successChance;
   }

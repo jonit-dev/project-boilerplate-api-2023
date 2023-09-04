@@ -144,13 +144,13 @@ export const npcOrcMage = {
   areaSpells: [
     {
       spellKey: SpellsBlueprint.FireStorm,
-      probability: 20,
+      probability: 5,
       power: MagicPower.Medium,
     },
     {
       spellKey: SpellsBlueprint.Blizzard,
-      probability: 20,
-      power: MagicPower.High,
+      probability: 10,
+      power: MagicPower.Medium,
     },
   ],
 } as Partial<INPC>;

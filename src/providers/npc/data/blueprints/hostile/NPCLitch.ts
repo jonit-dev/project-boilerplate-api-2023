@@ -148,7 +148,7 @@ export const npcLitch: Partial<INPC> = {
   areaSpells: [
     {
       spellKey: SpellsBlueprint.FireStorm,
-      probability: 20,
+      probability: 10,
       power: MagicPower.Medium,
     },
   ],
