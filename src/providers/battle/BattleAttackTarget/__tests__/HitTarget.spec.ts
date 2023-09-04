@@ -135,6 +135,10 @@ describe("HitTarget", () => {
   });
 
   describe("EntityEffects", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
     it("should always call applyEntity when weapon has entityEffect and entity effect chance is 100", async () => {
       fireSwordItem.entityEffectChance = 100;
       // @ts-ignore
