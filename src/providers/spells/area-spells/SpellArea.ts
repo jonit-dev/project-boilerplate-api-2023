@@ -79,13 +79,13 @@ export class SpellArea {
       const targetToHit = target.target as unknown as ICharacter | INPC;
       const targetIntensity = target.intensity;
 
+      if (caster.type === EntityType.NPC && targetToHit.type === EntityType.NPC) {
+        return; // avoid NPCs hitting each other
+      }
+
       if (options?.customFn) {
         await options.customFn(targetToHit, targetIntensity);
       } else {
-        if (caster.type === EntityType.NPC && targetToHit.type === EntityType.NPC) {
-          return; // avoid NPCs hitting each other
-        }
-
         await this.hitTarget.hit(caster, targetToHit, true, magicPower + targetIntensity, true);
       }
 
