@@ -24,6 +24,7 @@ import { SignUpController } from "@useCases/ModuleSystem/user/signup/SignUpContr
 import { UnsubscribeUsercontroller } from "@useCases/ModuleSystem/user/unsubscribe/UnsubscribeUsercontroller";
 import { UpdateUserController } from "@useCases/ModuleSystem/user/update/UpdateUserController";
 import { ContainerModule, interfaces } from "inversify";
+import { BlueprintController } from "@useCases/ModuleSystem/blueprint/BlueprintController";
 
 export const userControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
   bind<UpdateUserController>(UpdateUserController).toSelf();
@@ -40,6 +41,10 @@ export const userControllerContainer = new ContainerModule((bind: interfaces.Bin
   bind<GoogleOAuthSyncController>(GoogleOAuthSyncController).toSelf();
   bind<AppleOAuthController>(AppleOAuthController).toSelf();
   bind<PushNotificationController>(PushNotificationController).toSelf();
+});
+
+export const blueprintControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {
+  bind<BlueprintController>(BlueprintController).toSelf();
 });
 
 export const dbTasksControllerContainer = new ContainerModule((bind: interfaces.Bind, unbind: interfaces.Unbind) => {});
