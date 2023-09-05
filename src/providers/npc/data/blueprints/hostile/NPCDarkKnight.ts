@@ -85,7 +85,7 @@ export const npcDarkKnight: Partial<INPC> = {
 
     {
       itemBlueprintKey: ArmorsBlueprint.GoldenArmor,
-      chance: 0.5,
+      chance: 1,
     },
 
     {
@@ -153,7 +153,7 @@ export const npcDarkKnight: Partial<INPC> = {
     },
     {
       itemBlueprintKey: ShieldsBlueprint.CrimsonAegisShield,
-      chance: 0.5,
+      chance: 1,
     },
     {
       itemBlueprintKey: ShieldsBlueprint.FalconsShield,
