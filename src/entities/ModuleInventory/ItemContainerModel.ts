@@ -148,8 +148,7 @@ const onCheckSlotsChange = async function (itemContainer: IItemContainer): Promi
   const clearCache = async (): Promise<void> => {
     await inMemoryHashTable.delete("inventory-weight", itemContainer.owner!.toString()!);
     await inMemoryHashTable.delete("container-all-items", itemContainer._id.toString()!);
-    await inMemoryHashTable.deleteAll(`load-craftable-items:${itemContainer.owner?.toString()!}`);
-    await inMemoryHashTable.deleteAll(`load-craftable-items-sugested:${itemContainer.owner?.toString()!}`);
+    await inMemoryHashTable.delete("load-craftable-items", itemContainer.owner?.toString()!);
   };
 
   const slotsHash = await containerSlotsCaching.getSlotsHash(itemContainer._id.toString()!);
