@@ -56,76 +56,48 @@ export class ItemCraftable {
 
   @TrackNewRelicTransaction()
   public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
-    const namespace = this.getNamespaceLoadCraftItems(itemSubType, character._id);
+    const cache = await this.inMemoryHashTable.get("load-craftable-items", character._id);
 
-    const cachedItems = await this.getCachedCraftableItems(namespace, itemSubType);
-    if (cachedItems) {
-      this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, cachedItems);
+    const itemSubTypeCache = cache?.[itemSubType];
 
+    if (itemSubTypeCache) {
+      this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, itemSubTypeCache);
       return;
     }
 
-    const craftableItems = await this.generateCraftableItems(character, itemSubType);
-
-    await this.setCraftableItemsToCache(namespace, itemSubType, craftableItems);
-
-    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, craftableItems);
-  }
-
-  private async generateCraftableItems(character: ICharacter, itemSubType: string): Promise<ICraftableItem[]> {
     // Retrieve character inventory items
     const inventoryIngredients = await this.getCharacterInventoryIngredients(character);
 
-    // Retrieve character's skills
     const skills = (await Skill.findOne({ owner: character._id })
       .lean()
       .cacheQuery({
         cacheKey: `${character._id}-skills`,
       })) as ISkill;
 
-    // Determine which method to use for retrieving recipes based on the itemSubType
+    // Retrieve the list of recipes for the given item sub-type
     const recipes =
       itemSubType === "Suggested"
         ? await this.getRecipesWithAnyIngredientInInventory(character, inventoryIngredients)
         : await this.getRecipes(itemSubType);
 
-    // Map recipes to craftable items
-    const craftableItemsResults = await Promise.all(
-      recipes.map((recipe: IUseWithCraftingRecipe) => this.getCraftableItem(inventoryIngredients, recipe, skills))
-    );
-
-    // Sort craftable items based on whether they can be crafted or not
-    return craftableItemsResults.sort((a, b) => {
+    // Process each recipe to generate craftable items
+    const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryIngredients, recipe, skills));
+    const craftableItems = ((await Promise.all(craftableItemsPromises)) as ICraftableItem[]).sort((a, b) => {
+      // this what is craftable should be first
       if (a.canCraft && !b.canCraft) return -1;
       if (!a.canCraft && b.canCraft) return 1;
       return 0;
     });
-  }
 
-  private getNamespaceLoadCraftItems(itemSubType: string, characterId: string): string {
-    const namespace = itemSubType === "Suggested" ? "load-craftable-items-sugested" : "load-craftable-items";
-    return `${namespace}:${characterId}`;
-  }
+    const currentCache = await this.inMemoryHashTable.get("load-craftable-items", character._id);
 
-  private async getCachedCraftableItems(namespace: string, itemSubType: string): Promise<ICraftableItem[] | null> {
-    const hasCache = await this.inMemoryHashTable.has(namespace, itemSubType);
+    await this.inMemoryHashTable.set("load-craftable-items", character._id, {
+      ...currentCache,
+      [itemSubType]: craftableItems,
+    });
 
-    if (!hasCache) {
-      return null;
-    }
-
-    return (await this.inMemoryHashTable.get(namespace, itemSubType)) as ICraftableItem[];
-  }
-
-  private async setCraftableItemsToCache(
-    namespace: string,
-    itemSubType: string,
-    craftableItems: ICraftableItem[]
-  ): Promise<void> {
-    await this.inMemoryHashTable.set(namespace, itemSubType, craftableItems);
-    if (itemSubType === "Suggested") {
-      await this.inMemoryHashTable.expire(namespace, 120, "NX");
-    }
+    // Send the list of craftable items to the user through a socket event
+    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, craftableItems);
   }
 
   public async craftItem(itemToCraft: ICraftItemPayload, character: ICharacter): Promise<void> {
@@ -215,8 +187,7 @@ export class ItemCraftable {
       return;
     }
 
-    await this.inMemoryHashTable.deleteAll(`load-craftable-items:${character._id}`);
-    await this.inMemoryHashTable.deleteAll(`load-craftable-items-sugested:${character._id}`);
+    await this.inMemoryHashTable.delete("load-craftable-items", character._id);
 
     await this.performCrafting(recipe, character, itemToCraft.itemSubType);
   }
@@ -444,12 +415,11 @@ export class ItemCraftable {
     const availableRecipes: IUseWithCraftingRecipe[] = [];
     const recipes = this.getAllRecipes();
 
-    const items = (await blueprintManager.getAllBlueprintValues("items")) as IItem[];
+    const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
 
-    for (const item of items) {
-      if (!recipes[item.key]) continue;
-
-      if (item.subType === subType) {
+    for (const itemKey of itemKeys) {
+      const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
+      if (item.subType === subType && recipes[item.key]) {
         availableRecipes.push(recipes[item.key]);
       }
     }

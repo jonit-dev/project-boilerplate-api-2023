@@ -31,8 +31,8 @@ export class ItemPickupUpdater {
     await clearCacheForKey(`${character._id}-inventory`);
 
     await this.inMemoryHashTable.delete("inventory-weight", character._id);
+
     await this.inMemoryHashTable.delete("character-max-weights", character._id);
-    await this.inMemoryHashTable.deleteAll(`load-craftable-items-sugested:${character._id}`);
 
     // whenever a new item is added, we need to update the character weight
     await this.characterWeight.updateCharacterWeight(character);
