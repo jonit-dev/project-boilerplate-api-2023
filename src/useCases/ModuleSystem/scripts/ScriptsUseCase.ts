@@ -4,6 +4,7 @@ import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
+import { MarketplaceCleaner } from "@providers/marketplace/MarketplaceCleaner";
 import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { CharacterAttributes, FromGridX, FromGridY, ICharacter } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -11,7 +12,11 @@ import _ from "lodash";
 
 @provide(ScriptsUseCase)
 export class ScriptsUseCase {
-  constructor(private skillStatsIncrease: SkillStatsIncrease) {}
+  constructor(private skillStatsIncrease: SkillStatsIncrease, private marketplaceCleaner: MarketplaceCleaner) {}
+
+  public async marketplaceClean(): Promise<void> {
+    await this.marketplaceCleaner.clean();
+  }
 
   public async setAllBaseSpeedsToStandard(): Promise<void> {
     try {
