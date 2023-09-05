@@ -34,7 +34,11 @@ import { throttle } from "lodash";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
 
-import { CRAFTING_BASE_CHANCE_IMPACT, CRAFTING_DIFFICULTY_RATIO } from "@providers/constants/CraftingConstants";
+import {
+  CRAFTING_BASE_CHANCE_IMPACT,
+  CRAFTING_DIFFICULTY_RATIO,
+  CRAFTING_ITEMS_CHANCE,
+} from "@providers/constants/CraftingConstants";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
@@ -232,7 +236,7 @@ export class ItemCraftable {
       const skillName = recipe.minCraftingRequirements[0];
 
       const skillLevel = await this.getSkillLevel(character, skillName as CraftingSkill);
-      proceed = this.isCraftSuccessful(skillLevel, 50);
+      proceed = this.isCraftSuccessful(skillLevel, CRAFTING_ITEMS_CHANCE);
     }
 
     if (proceed) {

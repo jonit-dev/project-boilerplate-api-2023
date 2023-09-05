@@ -380,7 +380,7 @@ describe("ItemCraftable.ts", () => {
     expect(container.slots[1]).toBe(null);
 
     expect(craftChanceMock).toBeCalledTimes(1);
-    expect(craftChanceMock).toBeCalledWith(10, 50);
+    expect(craftChanceMock).toBeCalledWith(10, 75);
 
     expect(sendEventToUser).toHaveBeenCalledTimes(4);
 

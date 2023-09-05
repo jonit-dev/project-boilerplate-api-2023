@@ -68,6 +68,7 @@ jest.mock("@providers/constants/CraftingConstants", () => ({
   CRAFTING_MIN_LEVEL_RATIO: 1,
   CRAFTING_DIFFICULTY_RATIO: 1.5,
   CRAFTING_BASE_CHANCE_IMPACT: 0.5,
+  CRAFTING_ITEMS_CHANCE: 75,
 }));
 
 jest.mock("@providers/constants/ItemConstants", () => ({
