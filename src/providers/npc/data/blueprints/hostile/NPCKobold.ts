@@ -49,16 +49,7 @@ export const npcKobold: Partial<INPC> = {
       chance: 80,
       quantityRange: [1, 5],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
-      chance: 20,
-      quantityRange: [2, 6],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 30,
-      quantityRange: [1, 10],
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.RedSapphire,
       chance: 5,

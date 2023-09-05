@@ -14,6 +14,7 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { FromGridX, FromGridY, IItem } from "@rpg-engine/shared";
+import _ from "lodash";
 import { NPCDeath } from "../NPCDeath";
 
 describe("NPCDeath.ts", () => {
@@ -37,6 +38,10 @@ describe("NPCDeath.ts", () => {
     testCharacter.x = FromGridX(1);
     testCharacter.y = FromGridY(0);
     await testCharacter.save();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it("should properly warn characters around, about NPC's death", async () => {
@@ -162,7 +167,7 @@ describe("NPCDeath.ts", () => {
     await testNPC.save();
 
     // @ts-ignore
-    const SpyOnGetGoldLoot = jest.spyOn(npcDeath, "getGoldLoot");
+    const SpyOnGetGoldLoot = jest.spyOn(npcDeath.npcLoot, "getGoldLoot");
 
     await npcDeath.handleNPCDeath(testNPC);
 
@@ -185,7 +190,7 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
     // @ts-ignore
-    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath.npcLoot, "addLootToNPCBody");
 
     await npcDeath.handleNPCDeath(testNPC);
 
@@ -211,10 +216,10 @@ describe("NPCDeath.ts", () => {
     // @ts-ignore
     jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
     // @ts-ignore
-    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath.npcLoot, "addLootToNPCBody");
 
     // @ts-ignore
-    jest.spyOn(npcDeath, "getGoldLoot").mockReturnValueOnce([]);
+    jest.spyOn(npcDeath.npcLoot, "getGoldLoot").mockReturnValueOnce([]);
 
     // remove NPC loots
     testNPC.loots = [];
@@ -313,10 +318,10 @@ describe("NPCDeath.ts", () => {
     }
 
     // @ts-ignore
-    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath.npcLoot, "addLootToNPCBody");
 
     // @ts-ignore
-    await npcDeath.addLootToNPCBody(npcBody, testNPC.loots);
+    await npcDeath.npcLoot.addLootToNPCBody(npcBody, testNPC.loots);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
@@ -327,44 +332,6 @@ describe("NPCDeath.ts", () => {
     expect(bodyItemContainer!.slots[0]).toBeDefined();
     expect(bodyItemContainer!.slots[1]).toBeDefined();
     expect(bodyItemContainer!.slots[2]).toBeUndefined();
-  });
-
-  it("should call setItemRarityOnLootDrop if the loot item has attack and defense", async () => {
-    // @ts-ignore
-    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
-
-    testNPC.loots = [
-      // @ts-ignore
-      { itemBlueprintKey: SwordsBlueprint.Sword, chance: 100, quantityRange: [1, 1] },
-    ];
-
-    await testNPC.save();
-
-    // @ts-ignore
-    const spyOnSetItemRarityOnLootDrop = jest.spyOn(npcDeath.itemRarity, "setItemRarityOnLootDrop");
-
-    await npcDeath.handleNPCDeath(testNPC);
-
-    expect(spyOnSetItemRarityOnLootDrop).toHaveBeenCalled();
-  });
-
-  it("should call setItemRarityOnLootDropForFood if the loot item is food", async () => {
-    // @ts-ignore
-    jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
-
-    testNPC.loots = [
-      // @ts-ignore
-      { itemBlueprintKey: FoodsBlueprint.Apple, chance: 100, quantityRange: [1, 1] },
-    ];
-
-    await testNPC.save();
-
-    // @ts-ignore
-    const spyOnSetItemRarityOnLootDropForFood = jest.spyOn(npcDeath.itemRarity, "setItemRarityOnLootDropForFood");
-
-    await npcDeath.handleNPCDeath(testNPC);
-
-    expect(spyOnSetItemRarityOnLootDropForFood).toHaveBeenCalled();
   });
 
   it("should update NPC data after death", async () => {
@@ -417,16 +384,72 @@ describe("NPCDeath.ts", () => {
     await npcBody.save();
 
     // @ts-ignore
-    const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
+    const spyAddLootInNPCBody = jest.spyOn(npcDeath.npcLoot, "addLootToNPCBody");
 
     // @ts-ignore
-    await npcDeath.addLootToNPCBody(npcBody, testNPC.loots);
+    await npcDeath.npcLoot.addLootToNPCBody(npcBody, testNPC.loots);
 
     expect(spyAddLootInNPCBody).toHaveBeenCalled();
 
     const npcBodyUpdated = await Item.findById(npcBody.id);
 
     expect(npcBodyUpdated?.isDeadBodyLootable).toBe(true);
+  });
+
+  describe("Rarity tests", () => {
+    beforeEach(async () => {
+      testNPC = await unitTestHelper.createMockNPC(null, { hasSkills: true });
+    });
+
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("should call setItemRarityOnLootDrop if the loot item has attack and defense", async () => {
+      // @ts-ignore
+      jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+      testNPC.loots = [
+        // @ts-ignore
+        { itemBlueprintKey: SwordsBlueprint.Sword, chance: 100, quantityRange: [1, 1] },
+      ];
+
+      await testNPC.save();
+
+      // @ts-ignore
+      const spyOnSetItemRarityOnLootDrop = jest.spyOn(npcDeath.npcLoot.itemRarity, "setItemRarityOnLootDrop");
+
+      await npcDeath.handleNPCDeath(testNPC);
+
+      expect(spyOnSetItemRarityOnLootDrop).toHaveBeenCalled();
+    });
+
+    it("should call setItemRarityOnLootDropForFood if the loot item is food", async () => {
+      // @ts-ignore
+      jest.spyOn(npcDeath.npcLoot, "getGoldLoot").mockReturnValueOnce({} as any);
+
+      jest.spyOn(_, "random").mockImplementation(() => 1);
+
+      // @ts-ignore
+      jest.spyOn(npcDeath.characterView, "getCharactersAroundXYPosition").mockReturnValueOnce([]);
+
+      testNPC.loots = [
+        // @ts-ignore
+        { itemBlueprintKey: FoodsBlueprint.Apple, chance: 100, quantityRange: [1, 1] },
+      ];
+
+      await testNPC.save();
+
+      const spyOnSetItemRarityOnLootDropForFood = jest.spyOn(
+        // @ts-ignore
+        npcDeath.npcLoot.itemRarity,
+        "setItemRarityOnLootDropForFood"
+      );
+
+      await npcDeath.handleNPCDeath(testNPC);
+
+      expect(spyOnSetItemRarityOnLootDropForFood).toHaveBeenCalled();
+    });
   });
 
   //! Flaky test - temporarily suspended
@@ -463,7 +486,7 @@ describe("NPCDeath.ts", () => {
   //   const spyAddLootInNPCBody = jest.spyOn(npcDeath, "addLootToNPCBody");
 
   //   // @ts-ignore
-  //   await npcDeath.addLootToNPCBody(npcBody, testNPC.loots);
+  //   await npcDeath.npcLoot.addLootToNPCBody(npcBody, testNPC.loots);
 
   //   expect(spyAddLootInNPCBody).toHaveBeenCalled();
 

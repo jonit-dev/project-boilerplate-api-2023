@@ -46,11 +46,6 @@ export const npcWraith: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
-      chance: 20,
-      quantityRange: [2, 6],
-    },
-    {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 15,
       quantityRange: [1, 10],

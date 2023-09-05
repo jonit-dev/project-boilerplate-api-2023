@@ -76,10 +76,7 @@ export const npcDwarfArcher: Partial<INPC> = {
       itemBlueprintKey: AccessoriesBlueprint.SapphireRing,
       chance: 1,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 5,
-    },
+
     {
       itemBlueprintKey: CraftingResourcesBlueprint.SmallWoodenStick,
       chance: 20,
@@ -89,10 +86,6 @@ export const npcDwarfArcher: Partial<INPC> = {
       itemBlueprintKey: RangedWeaponsBlueprint.Shuriken,
       chance: 10,
       quantityRange: [5, 10],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
-      chance: 7,
     },
   ],
 };

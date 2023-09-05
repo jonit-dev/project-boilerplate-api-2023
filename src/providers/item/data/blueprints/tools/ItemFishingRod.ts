@@ -7,6 +7,7 @@ import { UseWithItemToTile } from "@providers/useWith/abstractions/UseWithItemTo
 import { IUseWithTargetTile } from "@providers/useWith/useWithTypes";
 import {
   AnimationEffectKeys,
+  CraftingSkill,
   EntityAttackType,
   IToolItemBlueprint,
   ItemRarities,
@@ -74,17 +75,17 @@ export const itemFishingRod: IToolItemBlueprint = {
           {
             key: FoodsBlueprint.WildSalmon,
             qty: [1, 3],
-            chance: await itemCraftable.getCraftChance(character, 2.5, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Fishing, 2.5, rarityOfTool),
           },
           {
             key: FoodsBlueprint.Tuna,
             qty: [2, 3],
-            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Fishing, 10, rarityOfTool),
           },
           {
             key: FoodsBlueprint.BrownFish,
             qty: [1, 2],
-            chance: await itemCraftable.getCraftChance(character, 10, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Fishing, 10, rarityOfTool),
           },
         ],
       },
