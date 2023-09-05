@@ -32,6 +32,11 @@ export class MarketplaceCleaner {
     for (const entry of marketplaceEntries) {
       const character = (await Character.findById(entry.owner).lean()) as ICharacter;
 
+      if (!character) {
+        await MarketplaceItem.deleteOne({ _id: entry._id });
+        continue;
+      }
+
       const characterLastActive = dayjs(character.updatedAt);
 
       // if last activity was more than 2 months ago, delete the item
