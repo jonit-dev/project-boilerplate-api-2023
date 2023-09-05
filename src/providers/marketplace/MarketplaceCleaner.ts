@@ -108,7 +108,7 @@ export class MarketplaceCleaner {
           continue;
         }
 
-        const item = (await Item.findById(entry.item).lean()) as IItem;
+        const item = (await Item.findById(entry.item)) as IItem;
         if (!item) {
           idsToDelete.push(entry._id);
           continue;
