@@ -107,14 +107,7 @@ export const npcOrcBerserker = {
       itemBlueprintKey: StaffsBlueprint.AirWand,
       chance: 10,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CopperOre,
-      chance: 7,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
-      chance: 7,
-    },
+
     {
       itemBlueprintKey: DaggersBlueprint.RomanDagger,
       chance: 7,

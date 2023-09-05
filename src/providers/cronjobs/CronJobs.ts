@@ -11,6 +11,7 @@ import { ControlTimeCrons } from "./ControlTimeCrons";
 import { DeleteChatCrons } from "./DeleteChatCrons";
 import { ItemDeleteCrons } from "./ItemDeleteCrons";
 import { MacroCaptchaCrons } from "./MacroCaptchaCrons";
+import { MarketplaceCrons } from "./MarketplaceCrons";
 import { NPCCrons } from "./NPCCrons";
 import { TotalAvailableGold } from "./TotalAvailableGold";
 
@@ -28,7 +29,8 @@ export class Cronjob {
     private cleanupBodyCrons: CleanupBodyCrons,
     private cleanupEmptyBodyCrons: CleanupEmptyBodyCrons,
     private macroCaptchaCrons: MacroCaptchaCrons,
-    private totalAvailableGold: TotalAvailableGold
+    private totalAvailableGold: TotalAvailableGold,
+    private marketplaceCrons: MarketplaceCrons
   ) {}
 
   public start(): void {
@@ -50,6 +52,7 @@ export class Cronjob {
         this.cleanupBodyCrons.schedule();
         this.cleanupEmptyBodyCrons.schedule();
         this.macroCaptchaCrons.schedule();
+        this.marketplaceCrons.schedule();
         break;
       case EnvType.Staging:
       case EnvType.Production:
@@ -66,6 +69,7 @@ export class Cronjob {
           this.cleanupEmptyBodyCrons.schedule();
           this.macroCaptchaCrons.schedule();
           this.totalAvailableGold.schedule();
+          this.marketplaceCrons.schedule();
         }
         break;
     }

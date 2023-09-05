@@ -1,3 +1,5 @@
 export const CRAFTING_MIN_LEVEL_RATIO = 1.3;
 
-export const CRAFTING_DIFFICULTY_RATIO = 1.5;
+export const CRAFTING_DIFFICULTY_RATIO = 2;
+
+export const CRAFTING_BASE_CHANCE_IMPACT = 0.5;

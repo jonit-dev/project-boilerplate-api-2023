@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
@@ -14,6 +15,7 @@ import {
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { ItemSubType } from "@rpg-engine/shared/dist/types/item.types";
 import {
   BasicAttribute,
@@ -28,8 +30,6 @@ import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
-import { NewRelic } from "@providers/analytics/NewRelic";
-import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 
 @provide(SkillIncrease)
 export class SkillIncrease {

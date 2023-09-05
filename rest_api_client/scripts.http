@@ -26,4 +26,7 @@ GET {{baseUrl}}/scripts/max-health-max-mana HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
- 
+### Scripts :: Remove marketplace junk
+GET {{baseUrl}}/scripts/clean-marketplace HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

@@ -86,11 +86,6 @@ export const npcStoneGolem: Partial<INPC> = {
     },
 
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
-      chance: 30,
-      quantityRange: [6, 8],
-    },
-    {
       itemBlueprintKey: ShieldsBlueprint.SilverShield,
       chance: 1,
     },

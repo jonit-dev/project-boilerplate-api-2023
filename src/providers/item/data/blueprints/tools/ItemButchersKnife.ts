@@ -11,6 +11,7 @@ import {
   UseWithItemToEntity,
 } from "@providers/useWith/abstractions/UseWithItemToEntity";
 import {
+  CraftingSkill,
   IToolItemBlueprint,
   ItemRarities,
   ItemSlotType,
@@ -95,7 +96,7 @@ export const itemButchersKnife: IToolItemBlueprint = {
             {
               key: FoodsBlueprint.RedMeat,
               qty: [1, 3],
-              chance: await itemCraftable.getCraftChance(character, 20, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Cooking, 20, rarityOfTool),
             },
           ],
         };
@@ -110,7 +111,7 @@ export const itemButchersKnife: IToolItemBlueprint = {
           switch (subType) {
             case NPCSubtype.Animal:
               rewards.push({
-                chance: await itemCraftable.getCraftChance(character, 30, rarityOfTool),
+                chance: await itemCraftable.getCraftChance(character, CraftingSkill.Cooking, 30, rarityOfTool),
                 key: FoodsBlueprint.RedMeat,
                 qty: [1, 3],
               });
@@ -118,12 +119,12 @@ export const itemButchersKnife: IToolItemBlueprint = {
             case NPCSubtype.Bird:
               rewards.push(
                 {
-                  chance: await itemCraftable.getCraftChance(character, 30, rarityOfTool),
+                  chance: await itemCraftable.getCraftChance(character, CraftingSkill.Cooking, 30, rarityOfTool),
                   key: CraftingResourcesBlueprint.Feather,
                   qty: [1, 3],
                 },
                 {
-                  chance: await itemCraftable.getCraftChance(character, 30, rarityOfTool),
+                  chance: await itemCraftable.getCraftChance(character, CraftingSkill.Cooking, 30, rarityOfTool),
                   key: FoodsBlueprint.ChickensMeat,
                   qty: [1, 3],
                 }

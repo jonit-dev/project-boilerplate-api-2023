@@ -5,14 +5,23 @@ import { ScriptsUseCase } from "./ScriptsUseCase";
 
 @controller("/scripts", AuthMiddleware, isAdminMiddleware)
 export class ScriptsController implements interfaces.Controller {
-  constructor(private scriptsUserCase: ScriptsUseCase) {}
+  constructor(private scriptsUseCase: ScriptsUseCase) {}
 
   @httpGet("/adjust-speed")
   public async adjustSpeed(@response() res): Promise<void> {
-    await this.scriptsUserCase.setAllBaseSpeedsToStandard();
+    await this.scriptsUseCase.setAllBaseSpeedsToStandard();
 
     return res.status(200).send({
       message: "Speed adjusted",
+    });
+  }
+
+  @httpGet("/clean-marketplace")
+  public async cleanMarketplace(@response() res): Promise<void> {
+    await this.scriptsUseCase.marketplaceClean();
+
+    return res.status(200).send({
+      message: "Marketplace cleaned!",
     });
   }
 
@@ -20,7 +29,7 @@ export class ScriptsController implements interfaces.Controller {
   public async initialCoordinates(@response() res): Promise<void> {
     // update all initial coordinates from users performatically
 
-    await this.scriptsUserCase.adjustInitialCoordinates();
+    await this.scriptsUseCase.adjustInitialCoordinates();
 
     return res.status(200).send({
       message: "Initial coordinates adjusted succesfully",
@@ -31,7 +40,7 @@ export class ScriptsController implements interfaces.Controller {
   public async maxHealthMaxMana(@response() res): Promise<void> {
     // update all initial coordinates from users performatically
 
-    await this.scriptsUserCase.adjustMaxHealthMaxMana();
+    await this.scriptsUseCase.adjustMaxHealthMaxMana();
 
     return res.status(200).send({
       message: "Max HP/Mana adjusted and buffs removed",
@@ -42,7 +51,7 @@ export class ScriptsController implements interfaces.Controller {
   public async spellFix(@response() res): Promise<void> {
     // update all initial coordinates from users performatically
 
-    await this.scriptsUserCase.spellNameFix();
+    await this.scriptsUseCase.spellNameFix();
 
     return res.status(200).send({
       message: "Eagles Eye Fixes",
@@ -53,7 +62,7 @@ export class ScriptsController implements interfaces.Controller {
   public async buggedDepots(@response() res): Promise<void> {
     // update all initial coordinates from users performatically
 
-    await this.scriptsUserCase.fixWrongDepot();
+    await this.scriptsUseCase.fixWrongDepot();
 
     return res.status(200).send({
       message: "Depot fixed",
@@ -62,7 +71,7 @@ export class ScriptsController implements interfaces.Controller {
 
   @httpGet("/fix-depot-reference")
   public async fixDepotReference(@response() res): Promise<void> {
-    await this.scriptsUserCase.fixAllDepotReferences();
+    await this.scriptsUseCase.fixAllDepotReferences();
 
     return res.status(200).send({
       message: "Depot reference fixed",

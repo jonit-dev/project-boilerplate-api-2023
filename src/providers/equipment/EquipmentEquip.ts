@@ -277,7 +277,7 @@ export class EquipmentEquip {
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
     await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
 
-    void this.characterWeight.updateCharacterWeight(character);
+    await this.characterWeight.updateCharacterWeight(character);
 
     await this.characterItemBuff.enableItemBuff(character, item);
 

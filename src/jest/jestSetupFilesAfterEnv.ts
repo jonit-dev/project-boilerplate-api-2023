@@ -59,6 +59,7 @@ jest.mock("@providers/constants/LootConstants", () => ({
   LOOT_GOLD_RESISTANCE_WEIGHT: 1.5,
   LOOT_GOLD_STRENGTH_WEIGHT: 1,
   LOOT_CRAFTING_MATERIAL_DROP_CHANCE: 1,
+  LOOT_FOOD_DROP_CHANCE: 0.5,
   LOOT_GOLD_DROP_CHANCE: 1,
   NPC_LOOT_CHANCE_MULTIPLIER: 1,
 }));
@@ -66,6 +67,7 @@ jest.mock("@providers/constants/LootConstants", () => ({
 jest.mock("@providers/constants/CraftingConstants", () => ({
   CRAFTING_MIN_LEVEL_RATIO: 1,
   CRAFTING_DIFFICULTY_RATIO: 1.5,
+  CRAFTING_BASE_CHANCE_IMPACT: 0.5,
 }));
 
 jest.mock("@providers/constants/ItemConstants", () => ({

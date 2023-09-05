@@ -121,30 +121,18 @@ export const npcDwarfMage: Partial<INPC> = {
       chance: 20,
       quantityRange: [1, 5],
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 5,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
-      chance: 7,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 5,
-    },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],
   areaSpells: [
     {
       spellKey: SpellsBlueprint.FireStorm,
-      probability: 20,
-      power: MagicPower.Medium,
+      probability: 5,
+      power: MagicPower.Low,
     },
     {
       spellKey: SpellsBlueprint.Blizzard,
-      probability: 20,
-      power: MagicPower.High,
+      probability: 5,
+      power: MagicPower.Low,
     },
   ],
 };

@@ -124,8 +124,7 @@ export class ItemDrop {
       await this.inMemoryHashTable.delete("container-all-items", itemDropData.fromContainerId);
 
       if (itemToBeDropped.type === ItemType.CraftingResource) {
-        await this.inMemoryHashTable.deleteAll(`load-craftable-items:${character._id}`);
-        await this.inMemoryHashTable.deleteAll(`load-craftable-items-sugested:${character._id}`);
+        await this.inMemoryHashTable.delete("load-craftable-items", character._id);
       }
 
       await this.inMemoryHashTable.delete("inventory-weight", character._id);

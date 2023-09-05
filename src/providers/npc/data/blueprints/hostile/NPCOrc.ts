@@ -142,14 +142,7 @@ export const npcOrc = {
       itemBlueprintKey: BootsBlueprint.FarmersBoot,
       chance: 20,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CopperOre,
-      chance: 7,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
-      chance: 7,
-    },
+
     {
       itemBlueprintKey: FoodsBlueprint.Milk,
       chance: 10,

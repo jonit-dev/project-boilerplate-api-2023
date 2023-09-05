@@ -53,16 +53,6 @@ export const npcLitch: Partial<INPC> = {
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.ObsidiumOre,
-      chance: 20,
-      quantityRange: [2, 6],
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 20,
-      quantityRange: [2, 6],
-    },
-    {
       itemBlueprintKey: CraftingResourcesBlueprint.Diamond,
       chance: 15,
       quantityRange: [1, 10],
@@ -148,7 +138,7 @@ export const npcLitch: Partial<INPC> = {
   areaSpells: [
     {
       spellKey: SpellsBlueprint.FireStorm,
-      probability: 20,
+      probability: 10,
       power: MagicPower.Medium,
     },
   ],

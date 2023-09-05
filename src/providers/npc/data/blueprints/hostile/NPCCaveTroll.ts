@@ -104,11 +104,6 @@ export const npcCaveTroll = {
       itemBlueprintKey: ShieldsBlueprint.SpikedShield,
       chance: 20,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GreenOre,
-      chance: 20,
-      quantityRange: [1, 5],
-    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;
