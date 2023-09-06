@@ -9,11 +9,13 @@ import {
   IItemUpdate,
   IItemUpdateAll,
   IViewDestroyElementPayload,
+  IViewElement,
   ItemSocketEvents,
   ItemSubType,
   ItemType,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
+import * as Bluebird from "bluebird";
 import { provide } from "inversify-binding-decorators";
 import { ItemCoordinates } from "./ItemCoordinates";
 
@@ -90,11 +92,9 @@ export class ItemView {
   public async warnCharacterAboutItemsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     const itemsNearby = await this.getItemsInCharacterView(character);
 
-    const itemsOnCharViewPromises = itemsNearby.map((item) =>
-      this.characterView.getElementOnView(character, item._id, "items")
-    );
-
-    const itemsOnCharView = await Promise.all(itemsOnCharViewPromises);
+    const [itemsOnCharView] = await Bluebird.all([
+      Bluebird.map(itemsNearby, (item) => this.characterView.getElementOnView(character, item._id, "items")),
+    ]);
 
     const itemsToUpdate: IItemUpdate[] = [];
     const addToViewPromises: Promise<void>[] = [];
@@ -103,55 +103,57 @@ export class ItemView {
       const item = itemsNearby[i];
       const itemOnCharView = itemsOnCharView[i];
 
-      if (!options?.always) {
-        if (
-          itemOnCharView &&
-          this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene", "isDeadBodyLootable"])
-        ) {
-          continue;
-        }
-      }
+      const shouldSkip =
+        !options?.always &&
+        itemOnCharView &&
+        this.objectHelper.doesObjectAttrMatches(itemOnCharView, item, ["id", "x", "y", "scene", "isDeadBodyLootable"]);
 
-      if (item.x === undefined || item.y === undefined || !item.scene || !item.layer) {
+      const isInvalidItem = item.x === undefined || item.y === undefined || !item.scene || !item.layer;
+
+      if (shouldSkip || isInvalidItem) {
         continue;
       }
 
-      itemsToUpdate.push({
-        id: item.id,
-        texturePath: item.texturePath,
-        textureAtlas: item.textureAtlas,
-        type: item.type as ItemType,
-        subType: item.subType as ItemSubType,
-        name: item.name,
-        x: item.x,
-        y: item.y,
-        layer: item.layer,
-        stackQty: item.stackQty || 0,
-        isDeadBodyLootable: item.isDeadBodyLootable,
-      });
+      itemsToUpdate.push(this.prepareItemToUpdate(item));
 
       addToViewPromises.push(
-        this.characterView.addToCharacterView(
-          character._id,
-          {
-            id: item.id,
-            x: item.x,
-            y: item.y,
-            scene: item.scene,
-            isDeadBodyLootable: item.isDeadBodyLootable,
-          },
-          "items"
-        )
+        this.characterView.addToCharacterView(character._id, this.prepareAddToView(item), "items")
       );
     }
 
-    await Promise.all(addToViewPromises);
+    await Bluebird.all(addToViewPromises);
 
-    if (itemsToUpdate.length === 0) return;
+    if (itemsToUpdate.length > 0) {
+      this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {
+        items: itemsToUpdate,
+      });
+    }
+  }
 
-    this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {
-      items: itemsToUpdate,
-    });
+  private prepareItemToUpdate(item: IItem): IItemUpdate {
+    return {
+      id: item.id,
+      texturePath: item.texturePath,
+      textureAtlas: item.textureAtlas,
+      type: item.type as ItemType,
+      subType: item.subType as ItemSubType,
+      name: item.name,
+      x: item.x!,
+      y: item.y!,
+      layer: item.layer!,
+      stackQty: item.stackQty || 0,
+      isDeadBodyLootable: item.isDeadBodyLootable,
+    };
+  }
+
+  private prepareAddToView(item: IItem): IViewElement {
+    return {
+      id: item.id,
+      x: item.x!,
+      y: item.y!,
+      scene: item.scene!,
+      isDeadBodyLootable: item.isDeadBodyLootable,
+    };
   }
 
   @TrackNewRelicTransaction()
