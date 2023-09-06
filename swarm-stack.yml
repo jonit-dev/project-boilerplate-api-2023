@@ -121,7 +121,7 @@ services:
     image: newrelic/nri-docker:latest
     environment:
       NRIA_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
-      NRIA_DISPLAY_NAME: "Definya API"
+      NRIA_DISPLAY_NAME: "Definya API Docker"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/host/proc:ro
