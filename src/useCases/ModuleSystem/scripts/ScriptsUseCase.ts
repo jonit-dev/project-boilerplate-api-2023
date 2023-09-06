@@ -4,6 +4,7 @@ import { Depot } from "@entities/ModuleDepot/DepotModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
+import { ItemReportGenerator } from "@providers/item/ItemReportGenerator";
 import { MarketplaceCleaner } from "@providers/marketplace/MarketplaceCleaner";
 import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { CharacterAttributes, FromGridX, FromGridY, ICharacter } from "@rpg-engine/shared";
@@ -12,7 +13,15 @@ import _ from "lodash";
 
 @provide(ScriptsUseCase)
 export class ScriptsUseCase {
-  constructor(private skillStatsIncrease: SkillStatsIncrease, private marketplaceCleaner: MarketplaceCleaner) {}
+  constructor(
+    private skillStatsIncrease: SkillStatsIncrease,
+    private marketplaceCleaner: MarketplaceCleaner,
+    private itemReportGenerator: ItemReportGenerator
+  ) {}
+
+  public async generateReportItems(): Promise<void> {
+    await this.itemReportGenerator.exec();
+  }
 
   public async marketplaceClean(): Promise<void> {
     await this.marketplaceCleaner.clean();

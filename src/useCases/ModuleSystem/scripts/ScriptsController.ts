@@ -7,6 +7,15 @@ import { ScriptsUseCase } from "./ScriptsUseCase";
 export class ScriptsController implements interfaces.Controller {
   constructor(private scriptsUseCase: ScriptsUseCase) {}
 
+  @httpGet("/reports/items")
+  public async generateReportItems(@response() res): Promise<void> {
+    await this.scriptsUseCase.generateReportItems();
+
+    return res.status(200).send({
+      message: "Report generated!",
+    });
+  }
+
   @httpGet("/adjust-speed")
   public async adjustSpeed(@response() res): Promise<void> {
     await this.scriptsUseCase.setAllBaseSpeedsToStandard();
