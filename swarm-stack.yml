@@ -9,9 +9,15 @@ services:
       timeout: 10s
       retries: 3
     deploy:
-      replicas: 2
+      replicas: 4
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker #! Only runs in worker node to preserve the DB on the manager node
+      resources:
+        limits:
+          cpus: "0.8" # Limits CPU usage to 80%
       labels:
         # Basic setup for API
         - traefik.enable=true
