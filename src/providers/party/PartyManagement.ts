@@ -6,6 +6,7 @@ import { CharacterBuffActivator } from "@providers/character/characterBuff/Chara
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BasicAttribute,
+  CharacterAttributes,
   CharacterBuffDurationType,
   CharacterBuffType,
   CharacterClass,
@@ -14,6 +15,8 @@ import {
   CharacterPartyDropBonus,
   CharacterPartyEXPBonus,
   CharacterPartySkillBonus,
+  CombatSkill,
+  CraftingSkill,
   ICharacterBuff,
   ICharacterPartyShared,
   ICharacterPermanentBuff,
@@ -23,54 +26,28 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
+
+type BuffSkillTypes = BasicAttribute | CombatSkill | CraftingSkill | CharacterAttributes;
 
 @provide(PartyManagement)
 export default class PartyManagement {
   constructor(private socketMessaging: SocketMessaging, private characterBuffActivator: CharacterBuffActivator) {}
 
-  public async partyInfoRead(member: ICharacter): Promise<void> {
-    const party = (await this.getPartyByCharacterId(member._id)) as ICharacterParty;
-    const partyInfoData: ICharacterPartyShared = (party as unknown as ICharacterPartyShared) ?? null;
-    this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
-      member?.channelId!,
-      PartySocketEvents.PartyInfoOpen,
-      partyInfoData
-    );
-  }
-
-  // #TODO REMOVE
-  public async inviteOrCreateParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
-    if (!character) {
-      throw new Error("Character not found");
-    }
-
-    if (!target) {
-      this.socketMessaging.sendErrorMessageToCharacter(leader, "Target not found");
-      return;
-    }
-
-    const isInParty = await this.checkIfIsInParty(leader);
-    isInParty ? await this.inviteToParty(leader, target, character) : await this.createParty(character, target);
-  }
-
-  public async inviteToParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
-    if (!leader || !target) {
-      throw new Error("Leader or target not found");
-    }
-
-    const isTargetInParty = await this.checkIfIsInParty(target);
+  // PARTY MANAGEMENT
+  public async inviteToParty(leader: ICharacter, target: ICharacter): Promise<void> {
+    const isTargetInParty = await this.getPartyByCharacterId(target._id);
     if (isTargetInParty) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: `${target.name} already is in a party`,
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
+        message: `${target.name} already is in a party!`,
         type: "info",
       });
       return;
     }
 
-    if (!(await this.haveFreeSlots(leader))) {
+    if (!(await this.checkIfPartyHaveFreeSlots(leader))) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-        message: "The party is already full",
+        message: "The party is already full!",
         type: "info",
       });
       return;
@@ -80,58 +57,75 @@ export default class PartyManagement {
       leaderId: leader._id,
       leaderName: leader.name,
     });
+
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
+      message: `Send invite to ${target.name}!`,
+      type: "info",
+    });
   }
 
-  public async acepptInvite(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
-    const isPartyExist = await this.checkIfIsInParty(leader);
+  public async acceptInvite(leader: ICharacter, target: ICharacter): Promise<ICharacterParty | undefined> {
+    const isPartyExist = await this.getPartyByCharacterId(leader._id);
 
-    isPartyExist ? await this.addMemberToParty(leader, target, character) : await this.createParty(leader, target);
+    const party: ICharacterParty | undefined = isPartyExist
+      ? await this.addMemberToParty(leader, target)
+      : await this.createParty(leader, target);
+
+    if (!party) {
+      throw new Error("Error accept invite Party!");
+    }
+
+    return party;
   }
 
-  private async addMemberToParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
-    const targetIsInParty = await this.checkIfIsInParty(target);
+  private async addMemberToParty(leader: ICharacter, target: ICharacter): Promise<ICharacterParty | undefined> {
+    const targetIsInParty = await this.getPartyByCharacterId(target._id);
     if (targetIsInParty) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-        message: `${target.name} already is in a party`,
+        message: `${target.name} already is in a party!`,
         type: "info",
       });
+
       return;
     }
 
-    if (!(await this.haveFreeSlots(leader))) {
+    if (!(await this.checkIfPartyHaveFreeSlots(leader))) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
         message: "The party is already full",
         type: "info",
       });
+
       return;
     }
 
     const party = (await this.getPartyByCharacterId(leader._id)) as ICharacterParty;
-    await this.removeAllBuffInParty(party);
+    let isAdding = false;
+    await this.handleAllBuffInParty(party, isAdding);
+
     party.members.push({
       _id: target._id,
       class: target.class as CharacterClass,
       name: target.name,
     });
+
     const benefits = this.calculatePartyBenefits(party.size + 1, this.getDifferentClasses(party));
+
     const updatedParty = (await CharacterParty.findByIdAndUpdate(
       party._id,
       {
-        // leader: {
-        //   _id: leader._id,
-        //   class: leader.class as CharacterClass,
-        //   name: leader.name,
-        // },
         members: party.members,
         benefits,
       },
       { new: true }
     )) as ICharacterParty;
 
-    await this.applyAllBuffInParty(updatedParty);
+    isAdding = true;
+    await this.handleAllBuffInParty(updatedParty, isAdding);
 
-    const partyInfoData = updatedParty as unknown as ICharacterPartyShared;
-    void this.sendMessageToPartyMembers(`${target.name} joined the party`, partyInfoData, true);
+    const message = `${target.name} joined the party!`;
+    await this.sendMessageToAllMembers(message, updatedParty);
+
+    return updatedParty;
   }
 
   private async createParty(
@@ -139,19 +133,17 @@ export default class PartyManagement {
     target: ICharacter,
     maxSize?: number
   ): Promise<ICharacterParty | undefined> {
-    const targetIsInParty = await this.checkIfIsInParty(target);
+    const targetIsInParty = await this.getPartyByCharacterId(target._id);
     if (targetIsInParty) {
       this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-        message: `${target.name} already is in a party`,
+        message: `${target.name} already is in a party!`,
         type: "info",
       });
+
       return;
     }
 
-    let finalMaxSize = 5;
-    if (typeof maxSize !== "undefined") {
-      finalMaxSize = maxSize < 2 ? 2 : maxSize > 5 ? 5 : maxSize;
-    }
+    const finalMaxSize = typeof maxSize !== "undefined" ? Math.min(Math.max(maxSize, 2), 5) : 5;
 
     const benefits = this.calculatePartyBenefits(2, leader.class !== target.class ? 2 : 1);
 
@@ -176,47 +168,57 @@ export default class PartyManagement {
       const party = await CharacterParty.create(createParty);
 
       if (party) {
-        await this.applyAllBuffInParty(party);
-        const partyInfoData = party as unknown as ICharacterPartyShared;
-        void this.sendMessageToPartyMembers(`${target.name} joined the party`, partyInfoData, true);
+        const isAdding = true;
+        await this.handleAllBuffInParty(party, isAdding);
+        const message = `${target.name} joined the party!`;
+        await this.sendMessageToAllMembers(message, party);
+
+        return party;
       }
-      return party;
+
+      return;
     } catch (error) {
       console.error(error);
     }
   }
 
-  public async transferLeadership(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
-    const inSameParty = await this.checkIfSameParty(leader, target);
+  public async transferLeadership(partyId: string, target: ICharacter, eventCaller: ICharacter): Promise<boolean> {
+    const party = (await CharacterParty.findById(partyId).lean().select("_id leader members")) as ICharacterParty;
 
-    if (!inSameParty) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
+    if (!party) {
+      return false;
+    }
+
+    const isLeader = this.checkIfIsLeader(party, eventCaller);
+
+    if (!isLeader) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(eventCaller.channelId!, UISocketEvents.ShowMessage, {
+        message: "You are not the party leader!",
+        type: "info",
+      });
+
+      return false;
+    }
+
+    const inSameParty = this.areBothInSameParty(party, eventCaller, target);
+    const isTargetSameParty = this.checkIfInParty(party, target);
+
+    if (!isTargetSameParty || !inSameParty) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(eventCaller.channelId!, UISocketEvents.ShowMessage, {
         message: `${target.name} is not in your party!`,
         type: "info",
       });
-      return;
-    }
 
-    const checkIfIsLeader = await this.checkIfIsLeader(character._id, leader._id);
-    if (!checkIfIsLeader) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
-        message: "You are not the party leader",
-        type: "info",
-      });
-      return;
-    }
-
-    const party = (await CharacterParty.findOne({ "leader._id": leader._id }).lean()) as ICharacterParty;
-    if (!party) {
-      throw new Error("Party not found");
+      return false;
     }
 
     const members = party.members.filter((member) => member._id.toString() !== target._id.toString());
+
     party.members = members;
     party.members.push({
-      _id: leader._id,
-      class: leader.class as CharacterClass,
-      name: leader.name,
+      _id: party.leader._id,
+      class: party.leader.class as CharacterClass,
+      name: party.leader.name,
     });
 
     party.leader = {
@@ -227,109 +229,105 @@ export default class PartyManagement {
 
     const updatedParty = (await CharacterParty.findByIdAndUpdate(party._id, party, { new: true })) as ICharacterParty;
 
-    const partyInfoData = updatedParty as unknown as ICharacterPartyShared;
-    void this.sendMessageToPartyMembers("", partyInfoData, true);
+    const message = `Leadership has been transferred to ${target.name}!`;
+    await this.sendMessageToAllMembers(message, updatedParty);
+
+    await this.partyPayloadSend(updatedParty);
+
+    return true;
   }
 
-  public async leaveParty(leader: ICharacter, target: ICharacter, character: ICharacter): Promise<void> {
-    const isLeader = await this.checkIfIsLeader(character._id, leader._id);
-    const isSameAsTarget = target._id.toString() === character._id.toString();
+  public async leaveParty(partyId: string, targetOfEvent: ICharacter, eventCaller: ICharacter): Promise<boolean> {
+    const party = (await CharacterParty.findById(partyId).lean().select("_id leader members")) as ICharacterParty;
 
-    const isTargetInTheParty = await this.checkIfIsInParty(target);
+    const isLeader = this.checkIfIsLeader(party, eventCaller);
+    const isSameAsTarget = this.checkIfIsSameTarget(targetOfEvent._id, eventCaller._id);
+    const isTargetInParty = this.checkIfInParty(party, targetOfEvent);
 
-    if (!isTargetInTheParty) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-        message: `${target.name} is not in your party!`,
-        type: "info",
-      });
-      return;
-    }
+    let infoMessage = "";
 
     if (isLeader && isSameAsTarget) {
-      const party = await this.getPartyByCharacterId(target._id);
-      if (party && party.members!.length !== 0) {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You must transfer the leadership of the party before leaving!",
-          type: "info",
-        });
-        return;
-      }
-    } else {
-      if (!isSameAsTarget && !isLeader) {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: "You can't remove other members from the party",
-          type: "info",
-        });
-        return;
-      }
-      if (isLeader && !(await this.checkIfSameParty(character, target))) {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-          message: `The ${target.name} is not in the party`,
-          type: "info",
-        });
-        return;
-      }
+      infoMessage = "You must transfer the leadership of the party before leaving!";
+    } else if (!isTargetInParty) {
+      infoMessage = `${targetOfEvent.name} is not in your party!`;
+    } else if (!isLeader && !isSameAsTarget) {
+      infoMessage = "You can't remove other members from the party!";
     }
 
-    await this.removeMemberFromParty(leader, target);
-    if (isSameAsTarget) {
-      await this.partyInfoRead(character);
+    if (infoMessage) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(eventCaller.channelId!, UISocketEvents.ShowMessage, {
+        message: infoMessage,
+        type: "info",
+      });
+
+      return false;
     }
+    return await this.removeMemberFromParty(party, targetOfEvent);
   }
 
-  private async removeMemberFromParty(leader: ICharacter, target: ICharacter): Promise<void> {
-    const party = await this.getPartyByCharacterId(leader._id);
+  private async removeMemberFromParty(party: ICharacterParty, eventCaller: ICharacter): Promise<boolean> {
     if (!party) {
-      throw new Error("Party not found");
+      return false;
     }
 
-    await this.removeAllBuffInParty(party);
+    let isAdding = false;
+    await this.handleAllBuffInParty(party, isAdding);
 
-    const members = party.members.filter((member) => member._id.toString() !== target._id.toString());
-    party.members = members;
+    party.members = party.members.filter((member) => member._id.toString() !== eventCaller._id.toString());
 
-    const benefits = this.calculatePartyBenefits(party.size - 1, this.getDifferentClasses(party));
-    party.benefits = benefits;
+    const partySize = party.size || party.members.length + 1;
+    party.benefits = this.calculatePartyBenefits(partySize, this.getDifferentClasses(party));
 
     if (party.members.length === 0) {
-      const leaderData = (await Character.findById(leader._id).lean()) as ICharacter;
-      await this.deleteParty(leaderData);
-      await this.partyInfoRead(target);
+      await this.deleteParty(eventCaller._id);
+      const message = "Party Deleted!";
+      await this.sendMessageToAllMembers(message, party);
 
-      return;
+      await this.partyPayloadSend(null, [eventCaller._id, party.leader._id]);
+
+      return true;
     }
 
     const updatedParty = (await CharacterParty.findByIdAndUpdate(party._id, party, { new: true })) as ICharacterParty;
-    await this.applyAllBuffInParty(updatedParty);
 
-    await this.partyInfoRead(leader);
-    await this.partyInfoRead(target);
+    isAdding = true;
+    await this.handleAllBuffInParty(updatedParty, isAdding);
 
-    const partyInfoData = (await this.getPartyByCharacterId(leader._id)) as unknown as ICharacterPartyShared;
-    void this.sendMessageToPartyMembers(`${target.name} left the party`, partyInfoData, true);
+    const message = `${eventCaller.name} left the party!`;
+    await this.sendMessageToAllMembers(message, updatedParty);
+
+    await this.partyPayloadSend(updatedParty);
+    await this.partyPayloadSend(null, [eventCaller._id]);
+
+    return true;
   }
 
-  private async deleteParty(leader: ICharacter): Promise<void> {
-    const isInParty = await this.checkIfIsInParty(leader);
-    if (!isInParty) {
-      this.socketMessaging.sendEventToUser<IUIShowMessage>(leader.channelId!, UISocketEvents.ShowMessage, {
+  private async deleteParty(character: ICharacter): Promise<void> {
+    const party = (await this.getPartyByCharacterId(character._id)) as ICharacterParty;
+    if (!party) {
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "You are not in a party",
         type: "info",
       });
       return;
     }
 
-    const party = (await this.getPartyByCharacterId(leader._id)) as ICharacterParty;
-    if (party && party !== null) {
-      // await this.removeAllBuffInParty(party);
-      await CharacterParty.deleteOne({ _id: party._id });
-      await this.partyInfoRead(leader);
-    }
+    await this.handleAllBuffInParty(party, false);
+    await CharacterParty.deleteOne({ _id: party._id });
+    const updatedParty = (await CharacterParty.findById(party._id)) as ICharacterParty;
+    await this.partyPayloadSend(updatedParty);
   }
 
   public async getPartyByCharacterId(characterId: string): Promise<ICharacterParty | null> {
     const party = (await CharacterParty.findOne({
-      $or: [{ "leader._id": characterId }, { "members._id": characterId }],
+      $or: [
+        {
+          "leader._id": characterId,
+        },
+        {
+          "members._id": characterId,
+        },
+      ],
     }).lean({ virtuals: true })) as ICharacterParty;
 
     return party || null;
@@ -414,225 +412,211 @@ export default class PartyManagement {
     return uniqueClasses.size;
   }
 
-  public async applyBuffSkill(characterId: string, buffPercentage: number): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
+  // CHARACTERS BUFFS
+  public async handleAllBuffInParty(teste: ICharacterParty, isAdding: boolean): Promise<void> {
+    const party = (await CharacterParty.findById(teste._id)
+      .lean()
+      .select("_id leader members size")) as ICharacterParty;
 
-    let traits = [BasicAttribute.Strength, BasicAttribute.Resistance];
-    if (character.class === CharacterClass.Druid || character.class === CharacterClass.Sorcerer) {
-      traits = [BasicAttribute.Magic, BasicAttribute.MagicResistance];
-    }
-
-    const applyBuffTasks = traits.map((trait) => this.applyCharacterBuff(character, trait, buffPercentage));
-
-    try {
-      await Promise.all(applyBuffTasks);
-    } catch (error) {
-      console.error("Error applying buff to character:", error);
-    }
-  }
-
-  private async applyCharacterBuff(character: ICharacter, trait: string, buffPercentage: number): Promise<void> {
-    const buff = {
-      type: CharacterBuffType.Skill,
-      trait,
-      buffPercentage,
-      durationType: CharacterBuffDurationType.Permanent,
-    } as ICharacterPermanentBuff;
-
-    await this.characterBuffActivator.enablePermanentBuff(character, buff, true);
-  }
-
-  public async removeBuffSkill(characterId: string, buffPercentage: number): Promise<void> {
-    const character = (await Character.findById(characterId).lean()) as ICharacter;
-
-    let traits = [BasicAttribute.Strength, BasicAttribute.Resistance];
-    if (character.class === CharacterClass.Druid || character.class === CharacterClass.Sorcerer) {
-      traits = [BasicAttribute.Magic, BasicAttribute.MagicResistance];
-    }
-
-    const removeBuffTasks = traits.map((trait) => this.removeCharacterBuff(character, trait, buffPercentage));
-
-    try {
-      await Promise.all(removeBuffTasks);
-    } catch (error) {
-      console.error("Error removing buff from character:", error);
-    }
-  }
-
-  private async removeCharacterBuff(character: ICharacter, trait: string, buffPercentage: number): Promise<void> {
-    const buff = (await CharacterBuff.findOne({
-      owner: character._id,
-      trait,
-      buffPercentage,
-      durationType: CharacterBuffDurationType.Permanent,
-    })) as ICharacterBuff;
-
-    if (!buff) {
-      throw new Error("Remove Buff not found");
-    }
-
-    await this.characterBuffActivator.disableBuff(character, buff._id!, CharacterBuffType.Skill, true);
-  }
-
-  public async removeAllBuffInParty(party: ICharacterParty): Promise<void> {
     const differentClasses = this.getDifferentClasses(party);
-    const numberOfMembers = party.size ?? party.members.length + 1;
+    const { leader, members, size } = party;
 
+    const numberOfMembers = size || members.length + 1;
     const benefits = this.calculatePartyBenefits(numberOfMembers, differentClasses);
 
     const skillBenefit = benefits.find((benefit) => benefit.benefit === CharacterPartyBenefits.Skill);
 
     if (!skillBenefit) {
-      throw new Error("Skill benefit not found");
+      return;
     }
-
-    const { leader, members } = party;
-
-    if (!leader._id) {
-      throw new Error("Leader id not found");
-    }
-
-    const removeBuffTasks = [
-      this.removeBuffSkill(leader._id as string, skillBenefit.value),
-      ...members.map((member) =>
-        member._id ? this.removeBuffSkill(member._id as string, skillBenefit.value) : Promise.resolve()
-      ),
-    ];
 
     try {
-      await Promise.all(removeBuffTasks);
-    } catch (error) {
-      console.error("Error removing buff from party:", error);
-    }
-  }
-
-  public async applyAllBuffInParty(party: ICharacterParty): Promise<void> {
-    const differentClasses = this.getDifferentClasses(party);
-    const numberOfMembers = party.size ?? party.members.length + 1;
-
-    const benefits = this.calculatePartyBenefits(numberOfMembers, differentClasses);
-
-    const skillBenefit = benefits.find((benefit) => benefit.benefit === CharacterPartyBenefits.Skill);
-
-    if (!skillBenefit) {
-      throw new Error("Skill benefit not found");
-    }
-
-    const { leader, members } = party;
-
-    if (!leader || !members) {
-      throw new Error("Party leader or members not defined");
-    }
-
-    const buffTasks = [
-      this.applyBuffSkill(leader._id as string, skillBenefit.value),
-      ...members.map((member) => (member._id ? this.applyBuffSkill(member._id as string, skillBenefit.value) : null)),
-    ].filter(Boolean);
-
-    try {
-      await Promise.all(buffTasks);
-    } catch (error) {
-      console.error("Error applying buff to party:", error);
-    }
-  }
-
-  public async clearAllParties(): Promise<void> {
-    const allPartys = (await CharacterParty.find({}).lean()) as ICharacterParty[];
-
-    const removeTasks = allPartys.map(async (party) => {
-      try {
-        await this.removeAllBuffInParty(party);
-        await CharacterParty.findByIdAndDelete(party._id);
-      } catch (error) {
-        console.log("Error removing party buffs", error);
+      await this.handleCharacterBuffSkill(leader._id.toString(), skillBenefit.value, isAdding);
+      for (const member of members) {
+        await this.handleCharacterBuffSkill(member._id.toString(), skillBenefit.value, isAdding);
       }
+    } catch (error) {
+      console.error(`Error ${isAdding ? "applying" : "removing"} buff from party:`, error);
+    }
+  }
+
+  private async handleCharacterBuffSkill(
+    characterId: string,
+    buffPercentage: number,
+    isAdding: boolean = true
+  ): Promise<void> {
+    try {
+      const character = (await Character.findById(characterId)
+        .lean()
+        .select("_id class channelId skills")) as ICharacter;
+
+      const traits = this.getClassTraits(character.class as CharacterClass);
+      const tasks = isAdding
+        ? [this.applyCharacterBuff(character, traits, buffPercentage)]
+        : [this.removeCharacterBuff(character, traits, buffPercentage)];
+
+      await Promise.all(tasks);
+    } catch (error) {
+      console.error(`Error ${isAdding ? "applying" : "removing"} buff to character:`, error);
+    }
+  }
+
+  private async removeCharacterBuff(character: ICharacter, traits: string[], buffPercentage: number): Promise<void> {
+    for await (const trait of traits) {
+      const buff = (await CharacterBuff.findOne({
+        owner: character._id,
+        trait,
+        buffPercentage,
+        durationType: CharacterBuffDurationType.Permanent,
+      })
+        .lean()
+        .select("_id")) as ICharacterBuff;
+
+      if (!buff) {
+        return;
+      }
+      await this.characterBuffActivator.disableBuff(character, buff._id!, CharacterBuffType.Skill, true);
+    }
+  }
+
+  private async applyCharacterBuff(character: ICharacter, traits: string[], buffPercentage: number): Promise<void> {
+    const capitalizedTraits = traits.map((trait) => {
+      if (trait === BasicAttribute.MagicResistance) {
+        return "Magic Resistance";
+      }
+
+      return _.capitalize(trait);
     });
 
-    await Promise.all(removeTasks);
-  }
+    const activationMessage = `Aura of ${capitalizedTraits.join(
+      ", "
+    )} boosts your skills by ${buffPercentage}% respectively.`;
+    const deactivationMessage = `Aura of ${capitalizedTraits.join(
+      ", "
+    )} fades, reducing your skills by ${buffPercentage}% respectively.`;
 
-  private async sendMessageToPartyMembers(
-    messageToSend: string,
-    partyInfo?: ICharacterPartyShared,
-    isToSendPartyData?: boolean | false
-  ): Promise<void> {
-    if (partyInfo && partyInfo.members) {
-      for (let i = 0; i < partyInfo.members.length; i++) {
-        const memberData = (await Character.findById(partyInfo.members[i]._id).lean()) as ICharacter;
-        if (!memberData) continue;
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(memberData.channelId!, UISocketEvents.ShowMessage, {
-          message: messageToSend,
-          type: "info",
-        });
-        if (isToSendPartyData) {
-          this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
-            memberData.channelId!,
-            PartySocketEvents.PartyInfoOpen,
-            partyInfo
-          );
-        }
-      }
+    for await (const trait of traits) {
+      const buff = {
+        type: CharacterBuffType.Skill,
+        trait,
+        buffPercentage,
+        durationType: CharacterBuffDurationType.Permanent,
+        skipAllMessages: false,
+        skipDeactivationMessage: false,
+        options: {
+          messages: {
+            activation: activationMessage,
+            deactivation: deactivationMessage,
+          },
+        },
+      } as ICharacterPermanentBuff;
 
-      // send to leader.
-      const leaderData = (await Character.findById(partyInfo.leader._id).lean()) as ICharacter;
-      if (leaderData) {
-        this.socketMessaging.sendEventToUser<IUIShowMessage>(leaderData.channelId!, UISocketEvents.ShowMessage, {
-          message: messageToSend,
-          type: "info",
-        });
-        if (isToSendPartyData) {
-          this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
-            leaderData.channelId!,
-            PartySocketEvents.PartyInfoOpen,
-            partyInfo
-          );
-        }
-      }
+      await this.characterBuffActivator.enablePermanentBuff(character, buff, true);
     }
   }
 
-  // #region Validations
-  private async checkIfIsInParty(character: ICharacter): Promise<boolean> {
-    const party = (await CharacterParty.findOne({
-      $or: [
-        { "members._id": mongoose.Types.ObjectId(character._id) },
-        { "leader._id": mongoose.Types.ObjectId(character._id) },
-      ],
-    }).lean()) as ICharacterParty;
+  // SEND MESSAGE OR DATA
+  public async partyPayloadSend(party: ICharacterParty | null, charactersId?: Types.ObjectId[]): Promise<void> {
+    const allCharactersId = new Set<Types.ObjectId>(charactersId ? [...charactersId] : []);
 
-    if (!party || party === null) {
+    let partyPayload: ICharacterPartyShared | undefined;
+
+    if (party) {
+      allCharactersId.add(party.leader._id);
+      party.members.forEach((member) => allCharactersId.add(member._id));
+      partyPayload = this.generateDataPayloadFromServer(party);
+    }
+
+    const fetchCharacter = async (id: Types.ObjectId): Promise<ICharacter> => {
+      return (await Character.findById(id.toString()).lean().select("channelId")) as ICharacter;
+    };
+
+    const sendPayloadToCharacter = async (characterId: Types.ObjectId): Promise<void> => {
+      const character = await fetchCharacter(characterId);
+      this.socketMessaging.sendEventToUser<ICharacterPartyShared>(
+        character.channelId!,
+        PartySocketEvents.PartyInfoOpen,
+        partyPayload
+      );
+    };
+
+    if (allCharactersId.size === 1 && !partyPayload) {
+      return sendPayloadToCharacter(allCharactersId.values().next().value);
+    }
+
+    await Promise.all(Array.from(allCharactersId).map(sendPayloadToCharacter));
+  }
+
+  private async sendMessageToAllMembers(message: string, party: ICharacterParty): Promise<void> {
+    if (!party.members || !party.leader) {
+      throw new Error("Empty party to send Message or Data!");
+    }
+
+    const charactersIds = new Set<Types.ObjectId>();
+    charactersIds.add(party.leader._id);
+
+    for (const member of party.members) {
+      charactersIds.add(member._id);
+    }
+
+    for (const characterId of charactersIds) {
+      const character = (await Character.findById(characterId).lean().select("channelId")) as ICharacter;
+
+      this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+        message,
+        type: "info",
+      });
+    }
+  }
+
+  // PARTY VALIDATIONS
+  private checkIfIsLeader(party: ICharacterParty, eventCaller: ICharacter): boolean {
+    if (!party) {
       return false;
     }
 
-    const isMember = party.members.some((member) => member._id.toString() === character._id.toString());
-    const isLeader = party.leader._id.toString() === character._id.toString();
+    return party.leader._id.toString() === eventCaller._id.toString();
+  }
+
+  private checkIfIsSameTarget(targetOfEventId: string, eventCallerId: string): boolean {
+    if (!targetOfEventId || !eventCallerId) {
+      return false;
+    }
+
+    return eventCallerId.toString() === targetOfEventId.toString();
+  }
+
+  private checkIfInParty(party: ICharacterParty, eventCaller: ICharacter): boolean {
+    if (!party) {
+      return false;
+    }
+
+    const isMember = party.members.some((member) => member._id.toString() === eventCaller._id.toString());
+
+    const isLeader = party.leader._id.toString() === eventCaller._id.toString();
 
     return isMember || isLeader;
   }
 
-  private async checkIfIsLeader(characterId: string, leaderId: string): Promise<boolean> {
-    const party = (await CharacterParty.findOne({ "leader._id": characterId })) as ICharacterParty;
-    if (!party || party === null) {
+  private areBothInSameParty(party: ICharacterParty, eventCaller: ICharacter, target: ICharacter): boolean {
+    if (!party) {
       return false;
     }
 
-    return true;
+    const isEventCallerInParty =
+      party.members.some((member) => member._id.toString() === eventCaller._id.toString()) ||
+      party.leader._id.toString() === eventCaller._id.toString();
+
+    const isTargetInParty =
+      party.members.some((member) => member._id.toString() === target._id.toString()) ||
+      party.leader._id.toString() === target._id.toString();
+
+    return isEventCallerInParty && isTargetInParty;
   }
 
-  private async checkIfSameParty(leader: ICharacter, target: ICharacter): Promise<boolean> {
-    const leaderParty = await this.getPartyByCharacterId(leader._id);
-    const targetParty = await this.getPartyByCharacterId(target._id);
-
-    if (!leaderParty || !targetParty) {
-      return false;
-    }
-
-    return leaderParty._id.toString() === targetParty._id.toString();
-  }
-
-  private async haveFreeSlots(leader: ICharacter): Promise<boolean> {
-    const party = (await CharacterParty.findOne({ "leader._id": leader._id })
-      .lean({ virtuals: true })
+  private async checkIfPartyHaveFreeSlots(character: ICharacter): Promise<boolean> {
+    const party = (await CharacterParty.findOne({ "leader._id": character._id })
+      .lean({ virtuals: true, defaults: true })
       .select("maxSize size members")) as ICharacterParty;
 
     if (!party) {
@@ -642,7 +626,7 @@ export default class PartyManagement {
     const maxSize = party.maxSize;
     const actualSize = party.size;
 
-    if (actualSize! >= maxSize) {
+    if (actualSize >= maxSize) {
       return false;
     }
 
@@ -653,29 +637,95 @@ export default class PartyManagement {
     target: INPC,
     charactersId: Types.ObjectId[],
     maxDistance: number
-  ): Promise<Types.ObjectId[]> {
-    const charactersInRange: Types.ObjectId[] = [];
+  ): Promise<Set<Types.ObjectId>> {
+    const charactersInRange = new Set<Types.ObjectId>();
     const maxDistanceSquared = maxDistance * maxDistance;
     const characters = (await Character.find({
       _id: { $in: charactersId },
     })
       .lean()
-      .select("_id scene x y")) as ICharacter[];
+      .select("_id scene x y isAlive isOnline")) as ICharacter[];
+
     if (!characters) {
-      return [];
+      return charactersInRange;
     }
+
     for (const character of characters) {
-      if (target.scene !== character.scene) {
+      if (
+        target.scene !== character.scene ||
+        character.isAlive === false ||
+        character.health === 0 ||
+        character.isOnline === false
+      ) {
         continue;
       }
+
       const dx = target.x - character.x;
       const dy = target.y - character.y;
       const distanceSquared = dx * dx + dy * dy;
+
       if (distanceSquared <= maxDistanceSquared) {
-        charactersInRange.push(character._id);
+        charactersInRange.add(character._id);
       }
     }
+
     return charactersInRange;
   }
-  // #endregion
+
+  // HELP FUNCTIONS
+  public generateDataPayloadFromServer(party: ICharacterParty): ICharacterPartyShared | undefined {
+    const convertedParty: ICharacterPartyShared = {
+      id: party._id ? party._id.toString() : undefined,
+      leader: {
+        _id: party.leader._id.toString(),
+        class: party.leader.class as CharacterClass,
+        name: party.leader.name,
+      },
+      members: party.members.map((member) => ({
+        _id: member._id.toString(),
+        class: member.class as CharacterClass,
+        name: member.name,
+      })),
+      maxSize: party.maxSize,
+      size: party.size,
+      benefits: party.benefits
+        ? party.benefits.map((benefit) => ({
+            benefit: benefit.benefit as CharacterPartyBenefits,
+            value: benefit.value,
+          }))
+        : undefined,
+    };
+
+    return convertedParty || undefined;
+  }
+
+  private getClassTraits(charClass: CharacterClass): BuffSkillTypes[] {
+    const classTraits: Record<CharacterClass, BuffSkillTypes[]> = {
+      None: [BasicAttribute.Strength, BasicAttribute.Resistance],
+      Warrior: [BasicAttribute.Strength, BasicAttribute.Resistance],
+      Berserker: [BasicAttribute.Strength, BasicAttribute.Resistance],
+      Druid: [BasicAttribute.Magic, BasicAttribute.Resistance],
+      Sorcerer: [BasicAttribute.Magic, BasicAttribute.MagicResistance],
+      Rogue: [BasicAttribute.Dexterity, CombatSkill.Dagger],
+      Hunter: [BasicAttribute.Dexterity, CombatSkill.Distance],
+    };
+
+    return classTraits[charClass] || [BasicAttribute.Strength, BasicAttribute.Resistance];
+  }
+
+  // SERVER BOOTSTRAP
+  public async clearAllParties(): Promise<void> {
+    const allPartys = (await CharacterParty.find({}).lean()) as ICharacterParty[];
+
+    const removeTasks = allPartys.map(async (party) => {
+      try {
+        await this.handleAllBuffInParty(party, false);
+        await CharacterParty.findByIdAndDelete(party._id);
+      } catch (error) {
+        console.log("Error removing party buffs", error);
+      }
+    });
+
+    await Promise.all(removeTasks);
+  }
 }

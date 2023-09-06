@@ -54,10 +54,6 @@ describe("Party Benefits", () => {
         hasInventory: true,
       }
     );
-
-    await characterLeader.save();
-    await firstMember.save();
-    await secondMember.save();
   });
 
   afterAll(() => {
@@ -138,18 +134,18 @@ describe("Party Benefits", () => {
   });
 
   it("should update benefits when a party member is removed", async () => {
-    // @ts-ignore
-    await partyManagement.createParty(characterLeader, firstMember);
-    // @ts-ignore
-    await partyManagement.addMemberToParty(characterLeader, secondMember, characterLeader);
-    // @ts-ignore
-    await partyManagement.leaveParty(secondMember, secondMember, secondMember);
+    await partyManagement.acceptInvite(characterLeader, firstMember);
 
-    // @ts-ignore
-    const party = await partyManagement.getPartyByCharacterId(characterLeader._id);
+    const party = await partyManagement.acceptInvite(characterLeader, secondMember);
+
+    const success = await partyManagement.leaveParty(party?._id, secondMember, secondMember);
+
+    expect(success).toBeTruthy;
+
+    const updatedParty = await partyManagement.getPartyByCharacterId(characterLeader._id);
 
     const expectedBenefits = partyManagement.calculatePartyBenefits(2, 2);
 
-    expect(party!.benefits!.map(({ benefit, value }) => ({ benefit, value }))).toEqual(expectedBenefits);
+    expect(updatedParty!.benefits!.map(({ benefit, value }) => ({ benefit, value }))).toEqual(expectedBenefits);
   });
 });

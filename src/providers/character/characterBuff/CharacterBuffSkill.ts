@@ -133,7 +133,7 @@ export class CharacterBuffSkill {
       buffs,
     });
 
-    if (!noMessage) {
+    if (noMessage) {
       this.sendCharacterActivationDeactivationMessage(character, buff, type);
     }
   }

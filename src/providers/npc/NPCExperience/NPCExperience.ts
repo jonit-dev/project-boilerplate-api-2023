@@ -118,11 +118,12 @@ export class NPCExperience {
       }
 
       const charactersInRange = await this.partyManagement.isWithinRange(target, expRecipients, 150);
-      if (charactersInRange.length === 0) {
+
+      if (charactersInRange.size === 0) {
         continue;
       }
 
-      const expPerRecipient = Number((baseExp / charactersInRange.length ?? 1).toFixed(2));
+      const expPerRecipient = Number((baseExp / charactersInRange.size ?? 1).toFixed(2));
 
       for (const characterInRange of charactersInRange) {
         const recipientCharacterAndSkills = await this.validateCharacterAndSkills(characterInRange);

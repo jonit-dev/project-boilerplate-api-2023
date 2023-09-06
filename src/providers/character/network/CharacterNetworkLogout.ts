@@ -26,6 +26,8 @@ import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
+import PartyManagement from "@providers/party/PartyManagement";
+import { ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 
 @provide(CharacterNetworkLogout)
 export class CharacterNetworkLogout {
@@ -43,7 +45,8 @@ export class CharacterNetworkLogout {
     private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
     private socketSessionControl: SocketSessionControl,
-    private skillStatsIncrease: SkillStatsIncrease
+    private skillStatsIncrease: SkillStatsIncrease,
+    private partyManagement: PartyManagement
   ) {}
 
   public onCharacterLogout(channel: SocketChannel): void {
@@ -64,6 +67,9 @@ export class CharacterNetworkLogout {
         }
 
         console.log(`🚪: Character id ${data.id} has disconnected`);
+
+        const party = (await this.partyManagement.getPartyByCharacterId(character._id)) as ICharacterParty;
+        await this.partyManagement.leaveParty(party._id, character, character);
 
         await this.temporaryRemoveWeapon(data.id);
 

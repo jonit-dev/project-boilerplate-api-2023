@@ -15,10 +15,23 @@ export class PartyNetworkTranferLeaderShip {
       PartySocketEvents.TransferLeadership,
       async (data: IPartyManagementFromClient, character: ICharacter) => {
         try {
-          const leader = (await Character.findById(character._id).lean()) as ICharacter;
+          const eventCaller = (await Character.findById(character._id).lean()) as ICharacter;
+
           const target = (await Character.findById(data.targetId).lean()) as ICharacter;
 
-          await this.partyManagement.transferLeadership(leader, target, character);
+          if (!eventCaller || !target) {
+            throw new Error("Character not found in TransferLeader party!");
+          }
+
+          if (!data.partyId) {
+            return;
+          }
+
+          const success = await this.partyManagement.transferLeadership(data.partyId, target, eventCaller);
+
+          if (!success) {
+            return;
+          }
         } catch (error) {
           console.error(error);
         }
