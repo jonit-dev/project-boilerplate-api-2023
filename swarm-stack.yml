@@ -130,7 +130,7 @@ services:
       - /etc/os-release:/etc/os-release:ro
     network_mode: host
     deploy:
-      mode: global # ensures that the agent runs on every node
+      mode: global
       resources:
         limits:
           memory: 128M
