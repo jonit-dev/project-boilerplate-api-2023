@@ -117,6 +117,24 @@ services:
         constraints:
           - node.role == manager
 
+  newrelic-infra:
+    image: newrelic/nri-docker:latest
+    environment:
+      NRIA_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
+      NRIA_DISPLAY_NAME: "Definya API"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/log:/var/log:ro
+      - /etc/os-release:/etc/os-release:ro
+    network_mode: host
+    deploy:
+      mode: global # ensures that the agent runs on every node
+      resources:
+        limits:
+          memory: 128M
+
 networks:
   rpg-network:
     external: true
