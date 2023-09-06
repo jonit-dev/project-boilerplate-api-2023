@@ -19,7 +19,7 @@ services:
         parallelism: 2
       resources:
         limits:
-          cpus: 2.5 # Limits CPU usage to 80%
+          cpus: 2.5
       labels:
         # Basic setup for API
         - traefik.enable=true
