@@ -12,20 +12,47 @@ export class PartyNetworkInviteToParty {
   public onInviteToParty(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
       channel,
-      PartySocketEvents.Invite,
-      async (data: IPartyManagementFromClient, character: ICharacter) => {
+      PartySocketEvents.PartyInvite,
+      async (data: IPartyManagementFromClient, _character: ICharacter) => {
         try {
           const leader = (await Character.findById(data.leaderId).lean()) as ICharacter;
           if (!leader) {
-            throw new Error("Error on leave party, character leader not found");
+            throw new Error("Error on invite to party, leader not found");
           }
 
           const target = (await Character.findById(data.targetId).lean()) as ICharacter;
           if (!target) {
-            throw new Error("Error on leave party, character target not found");
+            throw new Error("Error on invite to party, target not found");
           }
 
-          await this.partyManagement.inviteToParty(leader, target, character);
+          await this.partyManagement.inviteToParty(leader, target);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    );
+
+    this.socketAuth.authCharacterOn(
+      channel,
+      PartySocketEvents.AcceptInvite,
+      async (data: IPartyManagementFromClient, _character: ICharacter) => {
+        try {
+          const leader = (await Character.findById(data.leaderId).lean()) as ICharacter;
+
+          if (!leader) {
+            throw new Error("Error on joing party, character leader not found");
+          }
+
+          const target = (await Character.findById(data.targetId).lean()) as ICharacter;
+          if (!target) {
+            throw new Error("Error on joing party, character target not found");
+          }
+
+          const party = await this.partyManagement.acceptInvite(leader, target);
+
+          if (party) {
+            await this.partyManagement.partyPayloadSend(party);
+          }
         } catch (error) {
           console.error(error);
         }

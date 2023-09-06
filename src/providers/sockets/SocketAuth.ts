@@ -84,7 +84,7 @@ export class SocketAuth {
         }
 
         if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
-          // console.log("⬇️ (RECEIVED): ", character.name, character.channelId!, event);
+          console.log("⬇️ (RECEIVED): ", character.name, character.channelId!, event);
         }
 
         if (EXHAUSTABLE_EVENTS.includes(event)) {
@@ -153,8 +153,6 @@ export class SocketAuth {
             await callback(data, character, owner);
           }
         );
-
-        // console.log(`📨 Received ${event} from ${character.name}(${character._id}): ${JSON.stringify(data)}`);
       } catch (error) {
         console.error(`${character.name} => ${event}, channel ${channel} failed with error: ${error}`);
 
