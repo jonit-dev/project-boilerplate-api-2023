@@ -10,6 +10,7 @@ import {
   NPCAlignment,
   NPCSocketEvents,
 } from "@rpg-engine/shared";
+import * as Promise from "bluebird";
 import { provide } from "inversify-binding-decorators";
 import { NPCQuest } from "./NPCQuest";
 import { NPCView } from "./NPCView";
@@ -30,27 +31,31 @@ export class NPCWarn {
 
   @TrackNewRelicTransaction()
   public async warnCharacterAboutNPCsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
+    // Fetch all NPCs in view first, before entering loop
     const npcsInView = await this.npcView.getNPCsInView(character);
 
-    for (const npc of npcsInView) {
-      if (!options?.always) {
-        const npcOnCharView = await this.characterView.getElementOnView(character, npc.id, "npcs");
-
-        // if we already have a representation there, just skip!
-        if (npcOnCharView) {
-          const doesServerNPCMatchesClientNPC = this.objectHelper.doesObjectAttrMatches(npcOnCharView, npc, [
-            "id",
-            "scene",
-          ]);
-
-          if (doesServerNPCMatchesClientNPC) {
-            continue;
+    const npcWarnings = Promise.map(
+      npcsInView,
+      async (npc) => {
+        if (!options?.always) {
+          // Fetch all elements and proceed with object checks
+          const npcOnCharView = await this.characterView.getElementOnView(character, npc.id, "npcs");
+          if (npcOnCharView) {
+            const doesServerNPCMatchesClientNPC = this.objectHelper.doesObjectAttrMatches(npcOnCharView, npc, [
+              "id",
+              "scene",
+            ]);
+            if (doesServerNPCMatchesClientNPC) {
+              return; // skip
+            }
           }
         }
-      }
+        await this.warnCharacterAboutSingleNPCCreation(npc, character);
+      },
+      { concurrency: 10 }
+    );
 
-      await this.warnCharacterAboutSingleNPCCreation(npc, character);
-    }
+    await npcWarnings;
   }
 
   @TrackNewRelicTransaction()

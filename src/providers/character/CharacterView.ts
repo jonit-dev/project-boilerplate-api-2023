@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -7,7 +8,6 @@ import { GRID_HEIGHT, GRID_WIDTH, IViewElement, SOCKET_TRANSMISSION_ZONE_WIDTH }
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Model } from "mongoose";
-
 export interface ICharacterDistance {
   id: string;
   distance: number;
@@ -17,6 +17,7 @@ export interface ICharacterDistance {
 
 export type CharacterViewType = "npcs" | "items" | "characters";
 
+@TrackClassExecutionTime()
 @provide(CharacterView)
 export class CharacterView {
   constructor(
@@ -61,9 +62,8 @@ export class CharacterView {
 
   public async clearAllOutOfViewElements(characterId: string, characterX: number, characterY: number): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
-    for (const type of types) {
-      await this.clearOutOfViewElements(characterId, characterX, characterY, type);
-    }
+    const clearPromises = types.map((type) => this.clearOutOfViewElements(characterId, characterX, characterY, type));
+    await Promise.all(clearPromises);
   }
 
   @TrackNewRelicTransaction()
@@ -74,31 +74,31 @@ export class CharacterView {
     type: CharacterViewType
   ): Promise<void> {
     const hasView = await this.inMemoryHashTable.hasAll(`character-view-${type}:${characterId}`);
-
     if (!hasView) {
       return;
     }
 
     const elementsOnView = await this.inMemoryHashTable.getAll(`character-view-${type}:${characterId}`);
-
     if (!elementsOnView) {
       return;
     }
 
     const elementsIds = Object.keys(elementsOnView);
-    const elementsToRemove: string[] = [];
+    const elementsToRemove = new Set<string>();
 
     for (const elementId of elementsIds) {
       const element = elementsOnView[elementId] as unknown as IViewElement;
-
       if (this.isOutOfCharacterView(characterX, characterY, element.x, element.y)) {
-        elementsToRemove.push(elementId);
+        elementsToRemove.add(elementId);
       }
     }
 
-    for (const elementId of elementsToRemove) {
-      await this.removeFromCharacterView(characterId, elementId, type);
-    }
+    // Convert the Set back to an array for Promise.all
+    const removePromises = Array.from(elementsToRemove).map((elementId) =>
+      this.removeFromCharacterView(characterId, elementId, type)
+    );
+
+    await Promise.all(removePromises);
   }
 
   public async getElementOnView(
