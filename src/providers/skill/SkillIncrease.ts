@@ -30,6 +30,7 @@ import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -44,7 +45,8 @@ export class SkillIncrease {
     private skillMapper: SkillCraftingMapper,
     private numberFormatter: NumberFormatter,
     private npcExperience: NPCExperience,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private discordBot: DiscordBot
   ) {}
 
   /**
@@ -108,6 +110,23 @@ export class SkillIncrease {
     if (increasedWeaponSP?.skillLevelUp && attacker.channelId) {
       await this.skillFunctions.sendSkillLevelUpEvents(increasedWeaponSP, attacker, target);
     }
+
+    if (increasedStrengthSP?.skillLevelUp || increasedWeaponSP?.skillLevelUp) {
+      const skillData = increasedStrengthSP?.skillLevelUp ? increasedStrengthSP : increasedWeaponSP;
+      const isMultipleOfTen = skillData.skillLevelAfter % 10 === 0;
+
+      if (skillData && isMultipleOfTen) {
+        const message = this.discordBot.getRandomLevelUpMessage(
+          attacker.name,
+          skillData.skillLevelAfter,
+          skillData.skillName
+        );
+        const channel = "achievements";
+        const title = "Skill Level Up!";
+
+        await this.discordBot.sendMessageWithColor(message, channel, title);
+      }
+    }
   }
 
   @TrackNewRelicTransaction()
@@ -134,6 +153,15 @@ export class SkillIncrease {
     }
 
     const result = this.increaseSP(skills, ItemSubType.Shield) as IIncreaseSPResult;
+
+    const isMultipleOfTen = result.skillLevelAfter % 10 === 0;
+    if (result.skillLevelUp && isMultipleOfTen) {
+      const message = this.discordBot.getRandomLevelUpMessage(character.name, result.skillLevelAfter, result.skillName);
+      const channel = "achievements";
+      const title = "Skill Level Up!";
+
+      await this.discordBot.sendMessageWithColor(message, channel, title);
+    }
 
     await this.skillFunctions.updateSkills(skills, character);
 
@@ -188,6 +216,19 @@ export class SkillIncrease {
       }
 
       await this.skillFunctions.sendSkillLevelUpEvents(result, character);
+
+      const isMultipleOfTen = result.skillLevelAfter % 10 === 0;
+      if (isMultipleOfTen) {
+        const message = this.discordBot.getRandomLevelUpMessage(
+          character.name,
+          result.skillLevelAfter,
+          result.skillName
+        );
+        const channel = "achievements";
+        const title = "Skill Level Up!";
+
+        await this.discordBot.sendMessageWithColor(message, channel, title);
+      }
     }
 
     await this.characterBonusPenalties.applyRaceBonusPenalties(character, attribute);

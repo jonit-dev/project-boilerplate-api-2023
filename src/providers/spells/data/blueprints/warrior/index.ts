@@ -3,10 +3,12 @@ import { spellFortifyDefense } from "./SpellFortifyDefense";
 import { spellPhysicalShield } from "./SpellPhysicalShield";
 import { spellPowerStrike } from "./SpellPowerStrike";
 import { spellStunTarget } from "./SpellStunTarget";
+import { spellBleedingEdge } from "./SpellBleedingEdge";
 
 export const warriorSpellsIndex = {
   [SpellsBlueprint.SpellPhysicalShield]: spellPhysicalShield,
   [SpellsBlueprint.WarriorStunTarget]: spellStunTarget,
   [SpellsBlueprint.FortifyDefense]: spellFortifyDefense,
   [SpellsBlueprint.PowerStrike]: spellPowerStrike,
+  [SpellsBlueprint.BleedingEdge]: spellBleedingEdge,
 };

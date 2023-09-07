@@ -18,6 +18,9 @@ export const HEALTH_MANA_BASE_INCREASE_RATE = 10;
 
 export const ML_INCREASE_RATIO = 0.75;
 
+export const SPELL_CALCULATOR_DEFAULT_MIN_SKILL_MULTIPLIER = 0.5;
+export const SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER = 1.5;
+
 export const CUSTOM_SKILL_COOLDOWNS = {
   resistance: 10,
   distance: 8,

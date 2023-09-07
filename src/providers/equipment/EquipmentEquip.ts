@@ -108,7 +108,7 @@ export class EquipmentEquip {
     await this.inMemoryHashTable.delete("equipment-weight", character._id);
     await this.inMemoryHashTable.delete("equipment-slots", character._id);
 
-    void this.characterWeight.updateCharacterWeight(character);
+    await this.characterWeight.updateCharacterWeight(character);
 
     return true;
   }

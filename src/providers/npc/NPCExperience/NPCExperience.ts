@@ -8,6 +8,7 @@ import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
 import { NPC_GIANT_FORM_EXPERIENCE_MULTIPLIER } from "@providers/constants/NPCConstants";
 import { MODE_EXP_MULTIPLIER } from "@providers/constants/SkillConstants";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { spellLearn } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import PartyManagement from "@providers/party/PartyManagement";
@@ -31,6 +32,7 @@ import {
   SkillSocketEvents,
   UISocketEvents,
 } from "@rpg-engine/shared";
+import { Colors } from "discord.js";
 
 import { provide } from "inversify-binding-decorators";
 
@@ -55,7 +57,8 @@ export class NPCExperience {
     private skillLvUpStatsIncrease: SkillStatsIncrease,
     private locker: Locker,
     private partyManagement: PartyManagement,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private discordBot: DiscordBot
   ) {}
 
   /**
@@ -326,6 +329,16 @@ export class NPCExperience {
         `${character.class}-LevelUp`,
         1
       );
+
+      const isMultipleOfTen = skills.level % 10 === 0;
+
+      if (isMultipleOfTen) {
+        const message = this.discordBot.getRandomLevelUpMessage(character.name, skills.level, "Level");
+        const channel = "achievements";
+        const title = "Character Level UP!";
+        const color = Colors.DarkRed;
+        await this.discordBot.sendMessageWithColor(message, channel, title, color);
+      }
     }
 
     await this.warnCharactersAroundAboutExpGains(character, exp);

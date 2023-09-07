@@ -254,7 +254,7 @@ describe("SpellCast.ts", () => {
     testCharacter.class = CharacterClass.Druid;
     await Character.findByIdAndUpdate(testCharacter.id, testCharacter);
 
-    const newHealth = testCharacter.health + 20;
+    const newHealth = testCharacter.health + 21;
     const newMana = testCharacter.mana - spellGreaterHealing.manaCost!;
 
     const skills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;

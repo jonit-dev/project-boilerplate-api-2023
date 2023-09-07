@@ -1,15 +1,15 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import { ICraftingSkillsBonusAndPenalties, IIncreaseSPResult } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterCraftingBonusPenalties)
 export class CharacterCraftingBonusPenalties {
-  constructor(private skillFunctions: SkillFunctions) {}
+  constructor(private skillFunctions: SkillFunctions, private discordBot: DiscordBot) {}
 
   public async updateCraftingSkills(
-    character: ICharacter,
     skills: ISkill,
     skillName: string,
     bonusOrPenalties: ICraftingSkillsBonusAndPenalties
@@ -138,8 +138,21 @@ export class CharacterCraftingBonusPenalties {
     }
 
     const char = (await Character.findById(skills.owner).lean()) as ICharacter;
-
     await this.skillFunctions.updateSkills(skills, char);
+
+    const isMultipleOfTen = skillSpData.skillLevelAfter % 10 === 0;
+
+    if (skillLevelUp && isMultipleOfTen) {
+      const message = this.discordBot.getRandomLevelUpMessage(
+        char.name,
+        skillSpData.skillLevelAfter,
+        skillSpData.skillName
+      );
+      const channel = "achievements";
+      const title = "Skill Level Up!";
+
+      await this.discordBot.sendMessageWithColor(message, channel, title);
+    }
 
     return skillSpData;
   }

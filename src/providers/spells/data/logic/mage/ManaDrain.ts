@@ -1,7 +1,9 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { LinearInterpolation } from "@providers/math/LinearInterpolation";
+import { SkillsAvailable } from "@providers/skill/SkillTypes";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { BasicAttribute, CharacterTrait, EntityType } from "@rpg-engine/shared";
+import { BasicAttribute, EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { IRequiredOptions, SpellCalculator } from "../../abstractions/SpellCalculator";
 
@@ -10,7 +12,8 @@ export class ManaDrain {
   constructor(
     private socketMessaging: SocketMessaging,
     private spellCalculator: SpellCalculator,
-    private linearInterpolation: LinearInterpolation
+    private linearInterpolation: LinearInterpolation,
+    private traitGetter: TraitGetter
   ) {}
 
   public async handleManaDrain(attacker: ICharacter, target: ICharacter): Promise<boolean> {
@@ -75,13 +78,15 @@ export class ManaDrain {
 
   private async calculateManaDrained(
     character: ICharacter,
-    skillName: CharacterTrait,
+    skillName: SkillsAvailable,
     options: IRequiredOptions
   ): Promise<number> {
-    const value = await this.spellCalculator.getSkillLevel(character, skillName);
+    const skills = await this.spellCalculator.getCharacterSkill(character);
+
+    const skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, skillName);
 
     return this.linearInterpolation.calculateLinearInterpolation(
-      value,
+      skillLevel,
       options.min,
       options.max,
       options.skillAssociation

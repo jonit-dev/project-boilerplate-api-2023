@@ -73,4 +73,40 @@ describe("SpellCalculator", () => {
     expect(timeout).toBeGreaterThanOrEqual(15);
     expect(timeout).toBeLessThanOrEqual(100);
   });
+
+  it("calculates a spell damage based on skill level", async () => {
+    const skills = (await Skill.findOne({ _id: testCharacter.skills }).lean()) as ISkill;
+    skills.magic.level = 50; // Setting magic skill level to 50 for the test
+    await Skill.updateOne({ _id: testCharacter.skills }, skills);
+
+    const minMultiplier = 0.5; // Your test min multiplier
+    const maxMultiplier = 1.5; // Your test max multiplier
+
+    const expectedMinDamage = 50 * minMultiplier; // 25
+    const expectedMaxDamage = 50 * maxMultiplier; // 75
+
+    // When level is not considered
+    const damageWithoutLevel = await spellCalculator.spellDamageCalculator(testCharacter, BasicAttribute.Magic, {
+      minSkillMultiplier: minMultiplier,
+      maxSkillMultiplier: maxMultiplier,
+    });
+
+    expect(damageWithoutLevel).toBeGreaterThanOrEqual(expectedMinDamage);
+    expect(damageWithoutLevel).toBeLessThanOrEqual(expectedMaxDamage);
+
+    // When level is considered, assuming getCharacterLevel would return 10 for testCharacter
+    const damageWithLevel = await spellCalculator.spellDamageCalculator(testCharacter, BasicAttribute.Magic, {
+      minSkillMultiplier: minMultiplier,
+      maxSkillMultiplier: maxMultiplier,
+      level: true,
+      minLevelMultiplier: 0.1,
+      maxLevelMultiplier: 0.9,
+    });
+
+    const expectedMinDamageWithLevel = expectedMinDamage + 10 * 0.1; // 26
+    const expectedMaxDamageWithLevel = expectedMaxDamage + 10 * 0.9; // 84
+
+    expect(damageWithLevel).toBeGreaterThanOrEqual(expectedMinDamageWithLevel);
+    expect(damageWithLevel).toBeLessThanOrEqual(expectedMaxDamageWithLevel);
+  });
 });

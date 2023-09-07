@@ -1,7 +1,12 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import {
+  SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER,
+  SPELL_CALCULATOR_DEFAULT_MIN_SKILL_MULTIPLIER,
+} from "@providers/constants/SkillConstants";
 import { LinearInterpolation } from "@providers/math/LinearInterpolation";
-import { CharacterTrait, ISkill } from "@rpg-engine/shared";
+import { SkillsAvailable } from "@providers/skill/SkillTypes";
+import { TraitGetter } from "@providers/skill/TraitGetter";
 import { provide } from "inversify-binding-decorators";
 import { random, round } from "lodash";
 
@@ -17,16 +22,27 @@ export interface IRequiredOptions {
   skillAssociation?: "default" | "reverse"; // reverse = higher skill, lower the value. default = higher skill, higher the value
 }
 
+const DEFAULT_MIN_LEVEL_MULTIPLIER = 0.2;
+const DEFAULT_MAX_LEVEL_MULTIPLIER = 0.8;
+
+interface ISpellDamageOptions {
+  level?: boolean;
+  minLevelMultiplier?: number;
+  maxLevelMultiplier?: number;
+}
+
 @provide(SpellCalculator)
 export class SpellCalculator {
-  constructor(private linearInterpolation: LinearInterpolation) {}
+  constructor(private linearInterpolation: LinearInterpolation, private traitGetter: TraitGetter) {}
 
   public async getQuantityBasedOnSkillLevel(
     character: ICharacter,
-    skillName: CharacterTrait,
+    skillName: SkillsAvailable,
     options?: IOptions
   ): Promise<number> {
-    const skillLevel = await this.getSkillLevel(character, skillName);
+    const skills = await this.getCharacterSkill(character);
+
+    const skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, skillName);
 
     let itemsToCreate = round(random(1, skillLevel / options?.difficulty! ?? 3));
 
@@ -43,13 +59,15 @@ export class SpellCalculator {
 
   public async calculateBasedOnSkillLevel(
     character: ICharacter,
-    skillName: CharacterTrait,
+    skillName: SkillsAvailable,
     options: IRequiredOptions
   ): Promise<number> {
-    const value = await this.getSkillLevel(character, skillName);
+    const skills = await this.getCharacterSkill(character);
+
+    const skillLevel = await this.traitGetter.getSkillLevelWithBuffs(skills, skillName);
 
     const buffPercentage = await this.linearInterpolation.calculateLinearInterpolation(
-      value,
+      skillLevel,
       options.min,
       options.max,
       options.skillAssociation
@@ -62,10 +80,73 @@ export class SpellCalculator {
     return maxInterpolatedValue;
   }
 
-  public async getSkillLevel(character: ICharacter, skillName: string): Promise<number> {
-    const skills = (await Skill.findOne({ _id: character.skills }).lean()) as unknown as ISkill;
-    const skillLevel = skills[skillName].level as number;
+  public async spellDamageCalculator(
+    character: ICharacter,
+    skillName: SkillsAvailable,
+    options?: {
+      minSkillMultiplier?: number;
+      maxSkillMultiplier?: number;
+      level?: boolean;
+      minLevelMultiplier?: number;
+      maxLevelMultiplier?: number;
+    }
+  ): Promise<number> {
+    const minSkillMultiplier = options?.minSkillMultiplier || SPELL_CALCULATOR_DEFAULT_MIN_SKILL_MULTIPLIER;
+    const maxSkillMultiplier = options?.maxSkillMultiplier || SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER;
 
-    return skillLevel;
+    const skillLevel = await this.getSkillLevel(character, skillName);
+    let [minTotalValue, maxTotalValue] = this.calculateSkillDamage(skillLevel, minSkillMultiplier, maxSkillMultiplier);
+
+    if (options?.level) {
+      const [minLevelValue, maxLevelValue] = await this.calculateLevelDamage(character, options);
+      minTotalValue += minLevelValue;
+      maxTotalValue += maxLevelValue;
+    }
+
+    if (minTotalValue < 1) {
+      throw new Error("The minimum value cannot be less than 1.");
+    }
+
+    return this.generateRandomDamage(minTotalValue, maxTotalValue);
+  }
+
+  private async getSkillLevel(character: ICharacter, skillName: SkillsAvailable): Promise<number> {
+    const skills = await this.getCharacterSkill(character);
+    return await this.traitGetter.getSkillLevelWithBuffs(skills, skillName);
+  }
+
+  private calculateSkillDamage(skillLevel: number, minMultiplier: number, maxMultiplier: number): [number, number] {
+    return [skillLevel * minMultiplier, skillLevel * maxMultiplier];
+  }
+
+  private async calculateLevelDamage(character: ICharacter, options: ISpellDamageOptions): Promise<[number, number]> {
+    const level = await this.getCharacterLevel(character);
+    const minMultiplier = options.minLevelMultiplier || DEFAULT_MIN_LEVEL_MULTIPLIER;
+    const maxMultiplier = options.maxLevelMultiplier || DEFAULT_MAX_LEVEL_MULTIPLIER;
+    return [level * minMultiplier, level * maxMultiplier];
+  }
+
+  private generateRandomDamage(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  private async getCharacterLevel(character: ICharacter): Promise<number> {
+    const skills = (await Skill.findOne({ _id: character.skills }).lean()) as unknown as ISkill;
+    const characterLevel = skills.level as number;
+
+    return characterLevel;
+  }
+
+  public async getCharacterSkill(character: ICharacter): Promise<ISkill> {
+    const skills = (await Skill.findOne({ _id: character.skills })
+      .lean({
+        virtuals: true,
+        defaults: true,
+      })
+      .cacheQuery({
+        cacheKey: `${character._id}-skills`,
+      })) as unknown as ISkill;
+
+    return skills;
   }
 }

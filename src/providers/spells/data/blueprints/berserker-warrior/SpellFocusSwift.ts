@@ -1,8 +1,8 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { SpellArea } from "@providers/spells/area-spells/SpellArea";
 import { SPELL_AREA_MEDIUM_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { container } from "@providers/inversify/container";
+import { SpellArea } from "@providers/spells/area-spells/SpellArea";
 import {
   AnimationEffectKeys,
   CharacterClass,
@@ -20,7 +20,7 @@ export const spellFocusSwitft: Partial<ISpell> = {
   description: "Provoke the enemy so that they focus their attacks on you",
   castingType: SpellCastingType.RangedCasting,
   magicWords: "cuio tenna",
-  manaCost: 20,
+  manaCost: 40,
   minLevelRequired: 25,
   minMagicLevelRequired: 10,
   cooldown: 25,
