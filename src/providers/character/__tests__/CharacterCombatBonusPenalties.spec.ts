@@ -38,14 +38,14 @@ describe("Case CharacterCombatBonusPenalties", () => {
       club: 0.2,
     };
 
-    await characterCombatBonusPenalties.updateCombatSkills(testCharacter, skills, CombatSkill.Dagger, combatSkills);
+    await characterCombatBonusPenalties.updateCombatSkills(skills, CombatSkill.Dagger, combatSkills);
 
     expect(skills.dagger.skillPoints).toEqual(expect.closeTo(0.22, 2));
 
     // First Call
-    await characterCombatBonusPenalties.updateCombatSkills(testCharacter, skills, CombatSkill.Sword, combatSkills);
+    await characterCombatBonusPenalties.updateCombatSkills(skills, CombatSkill.Sword, combatSkills);
     // Second Call
-    await characterCombatBonusPenalties.updateCombatSkills(testCharacter, skills, CombatSkill.Sword, combatSkills);
+    await characterCombatBonusPenalties.updateCombatSkills(skills, CombatSkill.Sword, combatSkills);
 
     expect(skills.sword.skillPoints).toEqual(expect.closeTo(0.44, 2));
   });
