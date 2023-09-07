@@ -1,5 +1,4 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
@@ -17,7 +16,6 @@ export interface ICharacterDistance {
 
 export type CharacterViewType = "npcs" | "items" | "characters";
 
-@TrackClassExecutionTime()
 @provide(CharacterView)
 export class CharacterView {
   constructor(
