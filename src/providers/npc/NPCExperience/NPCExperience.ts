@@ -298,9 +298,6 @@ export class NPCExperience {
     let levelUp = false;
     let previousLevel = 0;
 
-    // const characterMode: Modes = Object.values(Modes)
-    //   .find((mode) => mode === character.mode) ?? Modes.SoftMode;
-
     skills.experience += exp;
     skills.xpToNextLevel = this.skillCalculator.calculateXPToNextLevel(skills.experience, skills.level + 1);
 
