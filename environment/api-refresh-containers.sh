@@ -20,3 +20,5 @@ echo "🐳 Deployment complete."
 
 echo "🐳 Cleaning up..."
 docker container prune -f
+
+docker image prune -a -f
