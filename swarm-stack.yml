@@ -15,11 +15,6 @@ services:
       placement:
         constraints:
           - node.role == worker #! Only runs in worker node to preserve the DB on the manager node
-      update_config:
-        parallelism: 2
-      resources:
-        limits:
-          cpus: 2.5
       labels:
         # Basic setup for API
         - traefik.enable=true
@@ -118,22 +113,21 @@ services:
           - node.role == manager
 
   newrelic-infra:
-    image: newrelic/nri-docker:latest
+    image: newrelic/infrastructure:latest
     environment:
       NRIA_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NRIA_DISPLAY_NAME: "Definya API Docker"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /var/log:/var/log:ro
-      - /etc/os-release:/etc/os-release:ro
+      - "/:/host:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     network_mode: host
     deploy:
       mode: global
       resources:
         limits:
           memory: 128M
+    cap_add:
+      - SYS_PTRACE
 
 networks:
   rpg-network:
