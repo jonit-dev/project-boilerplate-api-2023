@@ -47,14 +47,14 @@ export const availableRaids: IRaid[] = [
     name: "Elora's Raid on Shadowlands",
     key: "elora-raid-shadowlands",
     startingMessage: "Elora, the Druid Queen, is invading shadowlands! Dark forces are going to be smashed!",
-    triggeringChance: 0.69, // since raid checks are every hour, this makes 1 raid every 15 days
+    triggeringChance: 1, // since raid checks are every hour, this makes 1 raid every 15 days
     minDuration: 15,
   },
   {
     name: "Malakar's Raid on Ilya",
     key: "malakar-raid-ilya",
     startingMessage: "Malakar, the Lich King, is invading Ilya! Evacuate immediately!",
-    triggeringChance: 0.69, // since raid checks are every hour, this makes 1 raid every 15 days
+    triggeringChance: 1, // since raid checks are every hour, this makes 1 raid every 15 days
     minDuration: 15,
   },
 ];

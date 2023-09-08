@@ -1,8 +1,10 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
+import PartyManagement from "@providers/party/PartyManagement";
 import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketConnection } from "@providers/sockets/SocketConnection";
@@ -26,8 +28,6 @@ import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
-import PartyManagement from "@providers/party/PartyManagement";
-import { ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 
 @provide(CharacterNetworkLogout)
 export class CharacterNetworkLogout {
@@ -67,9 +67,6 @@ export class CharacterNetworkLogout {
         }
 
         console.log(`🚪: Character id ${data.id} has disconnected`);
-
-        const party = (await this.partyManagement.getPartyByCharacterId(character._id)) as ICharacterParty;
-        await this.partyManagement.leaveParty(party._id, character, character);
 
         await this.temporaryRemoveWeapon(data.id);
 
@@ -122,11 +119,21 @@ export class CharacterNetworkLogout {
 
         await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
 
+        await this.leavePartyIfExists(character);
+
         const connectedCharacters = await this.socketConnection.getConnectedCharacters();
 
         console.log("- Total characters connected:", connectedCharacters.length);
       }
     );
+  }
+
+  private async leavePartyIfExists(character: ICharacter): Promise<void> {
+    const party = (await this.partyManagement.getPartyByCharacterId(character._id)) as ICharacterParty;
+
+    if (party) {
+      await this.partyManagement.leaveParty(party._id, character, character);
+    }
   }
 
   private async temporaryRemoveWeapon(characterId: Types.ObjectId): Promise<void> {
