@@ -50,8 +50,8 @@ jobs:
         run: |
 
           # Prepare: install dependencies, build and lint
-          yarn tsc && yarn lint
           yarn install
+          yarn tsc && yarn lint
 
           # Build the Docker image on Github cloud
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
