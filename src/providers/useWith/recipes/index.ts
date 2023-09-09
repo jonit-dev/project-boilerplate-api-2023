@@ -9,6 +9,7 @@ import { recipeCraftingResources } from "./crafting-resources";
 import { recipeDaggersIndex } from "./daggers/index";
 import { recipeFoodsIndex } from "./foods/index";
 import { recipeGlovesIndex } from "./gloves";
+import { recipeHammersIndex } from "./hammers/index";
 import { recipeHelmetsIndex } from "./helmets/index";
 import { recipeLegsIndex } from "./legs/index";
 import { recipeMacesIndex } from "./maces/index";
@@ -39,4 +40,5 @@ export const recipeBlueprintsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   ...recipeContainers,
   ...recipePotionsIndex,
   ...recipeGlovesIndex,
+  ...recipeHammersIndex,
 };

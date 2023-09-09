@@ -8,6 +8,7 @@ import {
   HelmetsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment, NPCSubtype } from "@rpg-engine/shared";
@@ -84,6 +85,10 @@ export const npcSkeletonKnight = {
       itemBlueprintKey: CraftingResourcesBlueprint.Skull,
       chance: 25,
       quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.CopperveinBlade,
+      chance: 15,
     },
   ],
 } as Partial<INPC>;

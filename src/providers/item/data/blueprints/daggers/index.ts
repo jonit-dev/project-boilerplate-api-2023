@@ -22,6 +22,10 @@ import { itemRomanDagger } from "./tier4/ItemRomanDagger";
 import { itemVerdantDagger } from "./tier4/ItemVerdantDagger";
 import { itemVerdantJitte } from "./tier4/ItemVerdantJitte";
 import { itemGoldenDagger } from "./tier5/ItemGoldenDagger";
+import { itemDewDagger } from "./tier6/ItemDewDagger";
+import { itemFrostBiteDagger } from "./tier7/ItemFrostBiteDagger";
+import { itemHexBladeDagger } from "./tier8/ItemHexBladeDagger";
+import { itemSpiritBlade } from "./tier9/ItemSpiritBlade";
 
 export const daggersBlueprintIndex = {
   [DaggersBlueprint.Dagger]: itemDagger,
@@ -47,4 +51,8 @@ export const daggersBlueprintIndex = {
   [DaggersBlueprint.DamascusJitte]: itemDamascusJitte,
   [DaggersBlueprint.PhoenixDagger]: itemPhoenixDagger,
   [DaggersBlueprint.PhoenixJitte]: itemPhoenixJitte,
+  [DaggersBlueprint.DewDagger]: itemDewDagger,
+  [DaggersBlueprint.FrostBiteDagger]: itemFrostBiteDagger,
+  [DaggersBlueprint.SpiritBlade]: itemSpiritBlade,
+  [DaggersBlueprint.HexBladeDagger]: itemHexBladeDagger,
 };

@@ -12,6 +12,22 @@ import { itemElvenSword } from "./tier1/ItemElvenSword";
 import { itemIronwoodTanto } from "./tier1/ItemIronwoodTanto";
 import { itemKatana } from "./tier1/ItemKatana";
 import { itemShortSword } from "./tier1/ItemShortSword";
+import { itemDiamondSword } from "./tier10/ItemDiamondSword";
+import { itemElucidatorSword } from "./tier10/ItemElucidatorSword";
+import { itemGuardianSword } from "./tier10/ItemGuardianSword";
+import { itemRoyalGuardianSword } from "./tier10/ItemRoyalGuardianSword";
+import { itemTitaniumBroadsword } from "./tier10/ItemTitaniumBroadsword";
+import { itemVioletVenomSword } from "./tier10/ItemVioletVenomSword";
+import { itemAngelicSword } from "./tier11/ItemAngelicSword";
+import { itemHellfireEdgeSword } from "./tier11/ItemHellfireEdgeSword";
+import { itemInfernoEdgeSword } from "./tier11/ItemInfernoEdgeSword";
+import { itemMinotaurSword } from "./tier11/ItemMinotaurSword";
+import { itemNemesisSword } from "./tier11/ItemNemesisSword";
+import { itemEmeraldBroadsword } from "./tier12/ItemEmeraldBroadsword";
+import { itemGhostTalonSword } from "./tier12/ItemGhostTalonSword";
+import { itemPhoenixSword } from "./tier12/ItemPhoenixSword";
+import { itemWarlordBroadsword } from "./tier12/ItemWarlordBroadsword";
+import { itemZenBroadsword } from "./tier12/ItemZenBroadsword";
 import { itemCopperBroadsword } from "./tier2/ItemCopperBroadsword";
 import { itemDoubleEdgedSword } from "./tier2/ItemDoubleEdgedSword";
 import { itemIceSword } from "./tier2/ItemIceSword";
@@ -36,9 +52,24 @@ import { itemIceShardLongsword } from "./tier4/ItemIceShardLongsword";
 import { itemMithrilSword } from "./tier4/ItemMithrilSword";
 import { itemPoisonSword } from "./tier4/ItemPoisonSword";
 import { itemTungstenSword } from "./tier4/ItemTungstenSword";
+import { itemCopperveinBlade } from "./tier5/ItemCopperveinBlade";
 import { itemDragonsSword } from "./tier5/ItemDragonsSword";
 import { itemGoldenSword } from "./tier5/ItemGoldenSword";
 import { itemLeviathanSword } from "./tier5/ItemLeviathanSword";
+import { itemBronzeFuryBroadsword } from "./tier6/ItemBronzeFuryBroadsword";
+import { itemOceanSaberSword } from "./tier6/ItemOceanSaberSword";
+import { itemPixieCutSword } from "./tier6/ItemPixieCutSword";
+import { itemTigerSword } from "./tier6/ItemTigerSword";
+import { itemCenturionBroadsword } from "./tier7/ItemCenturionBroadsword";
+import { itemJadeBlade } from "./tier7/ItemJadeBlade";
+import { itemWindCutterSword } from "./tier7/ItemWindCutterSword";
+import { itemIronFistSword } from "./tier8/ItemIronFistSword";
+import { itemMoonshadeSword } from "./tier8/ItemMoonshadeSword";
+import { itemVenomStrikeSword } from "./tier8/ItemVenomStrikeSword";
+import { itemGorgonBlade } from "./tier9/ItemGorgonBlade";
+import { itemLightBringerSword } from "./tier9/ItemLightBringerSword";
+import { itemStellarBlade } from "./tier9/ItemStellarBlade";
+import { itemThunderStrikeSword } from "./tier9/ItemThunderStrikeSword";
 
 export const swordsBlueprintIndex = {
   [SwordsBlueprint.ShortSword]: itemShortSword,
@@ -81,4 +112,35 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.FalconsSword]: itemFalconsSword,
   [SwordsBlueprint.GlacialSword]: itemGlacialSword,
   [SwordsBlueprint.AzureMachete]: itemAzureMachete,
+  [SwordsBlueprint.AngelicSword]: itemAngelicSword,
+  [SwordsBlueprint.DiamondSword]: itemDiamondSword,
+  [SwordsBlueprint.ElucidatorSword]: itemElucidatorSword,
+  [SwordsBlueprint.RoyalGuardianSword]: itemRoyalGuardianSword,
+  [SwordsBlueprint.TigerSword]: itemTigerSword,
+  [SwordsBlueprint.LightBringerSword]: itemLightBringerSword,
+  [SwordsBlueprint.InfernoEdgeSword]: itemInfernoEdgeSword,
+  [SwordsBlueprint.WindCutterSword]: itemWindCutterSword,
+  [SwordsBlueprint.ThunderStrikeSword]: itemThunderStrikeSword,
+  [SwordsBlueprint.MoonshadeSword]: itemMoonshadeSword,
+  [SwordsBlueprint.VenomStrikeSword]: itemVenomStrikeSword,
+  [SwordsBlueprint.HellfireEdgeSword]: itemHellfireEdgeSword,
+  [SwordsBlueprint.EmeraldBroadsword]: itemEmeraldBroadsword,
+  [SwordsBlueprint.JadeBlade]: itemJadeBlade,
+  [SwordsBlueprint.BronzeFuryBroadsword]: itemBronzeFuryBroadsword,
+  [SwordsBlueprint.GorgonBlade]: itemGorgonBlade,
+  [SwordsBlueprint.CenturionBroadsword]: itemCenturionBroadsword,
+  [SwordsBlueprint.CopperveinBlade]: itemCopperveinBlade,
+  [SwordsBlueprint.MinotaurSword]: itemMinotaurSword,
+  [SwordsBlueprint.TitaniumBroadsword]: itemTitaniumBroadsword,
+  [SwordsBlueprint.WarlordBroadsword]: itemWarlordBroadsword,
+  [SwordsBlueprint.GuardianSword]: itemGuardianSword,
+  [SwordsBlueprint.ZenBroadsword]: itemZenBroadsword,
+  [SwordsBlueprint.PhoenixSword]: itemPhoenixSword,
+  [SwordsBlueprint.StellarBlade]: itemStellarBlade,
+  [SwordsBlueprint.OceanSaberSword]: itemOceanSaberSword,
+  [SwordsBlueprint.IronFistSword]: itemIronFistSword,
+  [SwordsBlueprint.GhostTalonSword]: itemGhostTalonSword,
+  [SwordsBlueprint.VioletVenomSword]: itemVioletVenomSword,
+  [SwordsBlueprint.NemesisSword]: itemNemesisSword,
+  [SwordsBlueprint.PixieCutSword]: itemPixieCutSword,
 };

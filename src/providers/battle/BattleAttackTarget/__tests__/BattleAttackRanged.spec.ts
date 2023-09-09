@@ -4,7 +4,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 
-import { itemFireStaff } from "@providers/item/data/blueprints/staffs/item3/ItemFireStaff";
+import { itemFireStaff } from "@providers/item/data/blueprints/staffs/tier3/ItemFireStaff";
 import { itemsBlueprintIndex } from "@providers/item/data/index";
 import {
   RangedWeaponsBlueprint,

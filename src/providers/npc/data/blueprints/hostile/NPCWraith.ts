@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AxesBlueprint,
   BootsBlueprint,
   ContainersBlueprint,
   CraftingResourcesBlueprint,
@@ -13,6 +14,7 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   StaffsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
@@ -98,6 +100,18 @@ export const npcWraith: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
       chance: 30,
       quantityRange: [5, 8],
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.SerpentWand,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.WindCutterSword,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.SerpentDanceAxe,
+      chance: 15,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

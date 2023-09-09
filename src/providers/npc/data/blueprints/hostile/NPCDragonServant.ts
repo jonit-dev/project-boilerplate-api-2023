@@ -9,6 +9,7 @@ import {
   HelmetsBlueprint,
   OthersBlueprint,
   ShieldsBlueprint,
+  StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -103,6 +104,14 @@ export const npcDragonServant: Partial<INPC> = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.DragonTooth,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.GuardianSword,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.ElementalStaff,
+      chance: 15,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],

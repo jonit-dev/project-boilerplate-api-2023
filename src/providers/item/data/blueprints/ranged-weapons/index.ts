@@ -3,15 +3,24 @@ import { itemArrow } from "./ammo/ItemArrow";
 import { itemBolt } from "./ammo/ItemBolt";
 import { itemCorruptionBolt } from "./ammo/ItemCorruptionBolt";
 import { itemCrimsonArrow } from "./ammo/ItemCrimsonArrow";
+import { itemCrystallineArrow } from "./ammo/ItemCrystallineArrow";
+import { itemCursedBolt } from "./ammo/ItemCursedBolt";
+import { itemEarthArrow } from "./ammo/ItemEarthArrow";
 import { itemElvenBolt } from "./ammo/ItemElvenBolt";
 import { itemEmeraldArrow } from "./ammo/ItemEmeraldArrow";
 import { itemFireBolt } from "./ammo/ItemFireBolt";
 import { itemFrostArrow } from "./ammo/ItemFrostArrow";
 import { itemGoldenArrow } from "./ammo/ItemGoldenArrow";
+import { itemGossamerBolt } from "./ammo/ItemGossamerBolt";
+import { itemHeartseekerArrow } from "./ammo/ItemHeartseekerArrow";
 import { itemIronArrow } from "./ammo/ItemIronArrow";
 import { itemPoisonArrow } from "./ammo/ItemPoisonArrow";
+import { itemSeekerArrow } from "./ammo/ItemSeekerArrow";
 import { itemShockArrow } from "./ammo/ItemShockArrow";
+import { itemSilvermoonArrow } from "./ammo/ItemSilvermoonArrow";
 import { itemStone } from "./ammo/ItemStone";
+import { itemSunflareArrow } from "./ammo/ItemSunflareArrow";
+import { itemWardenArrow } from "./ammo/ItemWardenArrow";
 import { itemWoodenArrow } from "./ammo/ItemWoodenArrow";
 import { itemBow } from "./tier0/ItemBow";
 import { itemSlingshot } from "./tier0/ItemSlingshot";
@@ -22,6 +31,9 @@ import { itemElvenBow } from "./tier1/ItemElvenBow";
 import { itemHorseBow } from "./tier1/ItemHorseBow";
 import { itemShortBow } from "./tier1/ItemShortBow";
 import { itemShuriken } from "./tier1/ItemShuriken";
+import { itemDragonWingBow } from "./tier10/ItemDragonWingBow";
+import { itemStarsHooterBow } from "./tier11/ItemStarsHooterBow";
+import { itemUmbralBow } from "./tier12/ItemUmbralBow";
 import { itemCorruptionBow } from "./tier2/ItemCorruptionBow";
 import { itemEbonyLongbow } from "./tier2/ItemEbonyLongbow";
 import { itemFrostBow } from "./tier2/ItemFrostBow";
@@ -49,6 +61,11 @@ import { itemSunstoneBow } from "./tier5/ItemSunstoneBow";
 import { itemValkyriesBow } from "./tier5/ItemValkyriesBow";
 import { itemYggdrasilBow } from "./tier5/ItemYggdrasilBow";
 import { itemZephyrusBow } from "./tier5/ItemZephyrusBow";
+import { itemIronBarkBow } from "./tier6/ItemIronBarkBow";
+import { itemWhisperWindBow } from "./tier6/ItemWhisperWindBow";
+import { itemEaglesEyeBow } from "./tier7/ItemEaglesEyeBow";
+import { itemStoneBreakerBow } from "./tier8/ItemStoneBreakerBow";
+import { itemBloodseekerBow } from "./tier9/ItemBloodseekerBow";
 
 export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.Slingshot]: itemSlingshot,
@@ -101,4 +118,21 @@ export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.RedwoodLongbow]: itemRedwoodLongbow,
   [RangedWeaponsBlueprint.ElmReflexBow]: itemElmReflexBow,
   [RangedWeaponsBlueprint.EbonyLongbow]: itemEbonyLongbow,
+  [RangedWeaponsBlueprint.EaglesEyeBow]: itemEaglesEyeBow,
+  [RangedWeaponsBlueprint.StarsHooterBow]: itemStarsHooterBow,
+  [RangedWeaponsBlueprint.BloodseekerBow]: itemBloodseekerBow,
+  [RangedWeaponsBlueprint.StoneBreakerBow]: itemStoneBreakerBow,
+  [RangedWeaponsBlueprint.DragonWingBow]: itemDragonWingBow,
+  [RangedWeaponsBlueprint.WhisperWindBow]: itemWhisperWindBow,
+  [RangedWeaponsBlueprint.IronBarkBow]: itemIronBarkBow,
+  [RangedWeaponsBlueprint.UmbralBow]: itemUmbralBow,
+  [RangedWeaponsBlueprint.HeartseekerArrow]: itemHeartseekerArrow,
+  [RangedWeaponsBlueprint.CrystallineArrow]: itemCrystallineArrow,
+  [RangedWeaponsBlueprint.SilvermoonArrow]: itemSilvermoonArrow,
+  [RangedWeaponsBlueprint.SeekerArrow]: itemSeekerArrow,
+  [RangedWeaponsBlueprint.EarthArrow]: itemEarthArrow,
+  [RangedWeaponsBlueprint.CursedBolt]: itemCursedBolt,
+  [RangedWeaponsBlueprint.GossamerBolt]: itemGossamerBolt,
+  [RangedWeaponsBlueprint.SunflareArrow]: itemSunflareArrow,
+  [RangedWeaponsBlueprint.WardenArrow]: itemWardenArrow,
 };

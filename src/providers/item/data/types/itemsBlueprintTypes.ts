@@ -39,6 +39,37 @@ export enum SwordsBlueprint {
   FalconsSword = "falcons-sword",
   GlacialSword = "glacial-sword",
   AzureMachete = "azure-machete",
+  AngelicSword = "angelic-sword",
+  DiamondSword = "diamond-sword",
+  ElucidatorSword = "elucidator-sword",
+  RoyalGuardianSword = "royal-guardian-sword",
+  TigerSword = "tiger-sword",
+  LightBringerSword = "light-bringer-sword",
+  InfernoEdgeSword = "inferno-edge-sword",
+  WindCutterSword = "wind-cutter-sword",
+  ThunderStrikeSword = "thunder-strike-sword",
+  MoonshadeSword = "moonshade-sword",
+  VenomStrikeSword = "venom-strike-sword",
+  HellfireEdgeSword = "hellfire-edge-sword",
+  EmeraldBroadsword = "emerald-broadsword",
+  JadeBlade = "jade-blade",
+  BronzeFuryBroadsword = "bronze-fury-broadsword",
+  GorgonBlade = "gorgon-blade",
+  CenturionBroadsword = "centurion-broadsword",
+  CopperveinBlade = "coppervein-blade",
+  MinotaurSword = "minotaur-sword",
+  TitaniumBroadsword = "titanium-broadsword",
+  WarlordBroadsword = "warlord-broadsword",
+  GuardianSword = "guardian-sword",
+  ZenBroadsword = "zen-broadsword",
+  PhoenixSword = "phoenix-sword",
+  StellarBlade = "stellar-blade",
+  OceanSaberSword = "ocean-saber-sword",
+  IronFistSword = "iron-fist-sword",
+  GhostTalonSword = "ghost-talon-sword",
+  VioletVenomSword = "violet-venom-sword",
+  NemesisSword = "nemesis-sword",
+  PixieCutSword = "pixie-cut-sword",
 }
 
 export enum HelmetsBlueprint {
@@ -115,6 +146,10 @@ export enum DaggersBlueprint {
   DamascusJitte = "damascus-jitte",
   PhoenixDagger = "phoenix-dagger",
   PhoenixJitte = "phoenix-jitte",
+  DewDagger = "dew-dagger",
+  FrostBiteDagger = "frost-bite-dagger",
+  SpiritBlade = "spirit-blade",
+  HexBladeDagger = "hex-blade-dagger",
 }
 
 export enum ArmorsBlueprint {
@@ -174,6 +209,19 @@ export enum AxesBlueprint {
   WhiteRavenAxe = "white-raven-axe",
   GlacialAxe = "glacial-axe",
   GlacialHatchet = "glacial-hatchet",
+  GuardianAxe = "guardian-axe",
+  GrandSanguineBattleaxe = "grand-sanguine-battleaxe",
+  GloriousAxe = "glorious-axe",
+  HydraSlayerAxe = "hydra-slayer-axe",
+  SerpentDanceAxe = "serpent-dance-axe",
+  SilentScreamAxe = "silent-scream-axe",
+  RustBreakerAxe = "rust-breaker-axe",
+  MoonBeamAxe = "moon-beam-axe",
+  HandAxe = "hand-axe",
+  PhoenixWingAxe = "phoenix-wing-axe",
+  GoldenReaverAxe = "golden-reaver-axe",
+  DaramianWaraxe = "daramian-waraxe",
+  CelestialArcAxe = "celestial-arc-axe",
 }
 
 export enum BootsBlueprint {
@@ -377,6 +425,23 @@ export enum RangedWeaponsBlueprint {
   FrostArrow = "frost-arrow",
   CrimsonArrow = "crimson-arrow",
   EmeraldArrow = "emerald-arrow",
+  EaglesEyeBow = "eagles-eye-bow",
+  StarsHooterBow = "stars-hooter-bow",
+  BloodseekerBow = "bloodseeker-bow",
+  StoneBreakerBow = "stone-breaker-bow",
+  DragonWingBow = "dragon-wing-bow",
+  WhisperWindBow = "whisper-wind-bow",
+  IronBarkBow = "iron-bark-bow",
+  UmbralBow = "umbral-bow",
+  HeartseekerArrow = "heartseeker-arrow",
+  CrystallineArrow = "crystalline-arrow",
+  SilvermoonArrow = "silvermoon-arrow",
+  SeekerArrow = "seeker-arrow",
+  EarthArrow = "earth-arrow",
+  CursedBolt = "cursed-bolt",
+  GossamerBolt = "gossamer-bolt",
+  SunflareArrow = "sunflare-arrow",
+  WardenArrow = "warden-arrow",
 }
 
 export enum GlovesBlueprint {
@@ -398,6 +463,11 @@ export enum MacesBlueprint {
   RusticFlail = "rustic-flail",
   BloodstainedCenser = "bloodstained-censer",
   SilverBulbMace = "silver-bulb-mace",
+  WitchBaneMace = "witch-bane-mace",
+  SpectralMace = "spectral-mace",
+  SkullCrusherMace = "skull-crusher-mace",
+  BronzeFistMace = "bronze-fist-mace",
+  SilverFistMace = "silver-fist-mace",
 }
 
 export enum MagicsBlueprint {
@@ -450,6 +520,20 @@ export enum StaffsBlueprint {
   AquaStaff = "aqua-staff",
   SkyBlueStaff = "sky-blue-staff",
   Emberward = "emberward",
+  GaleforceStaff = "galeforce-staff",
+  FireburstWand = "fireburst-wand",
+  VortexStaff = "vortex-staff",
+  WinterspireStaff = "winterspire-staff",
+  SpellbinderWand = "spellbinder-wand",
+  NaturesWand = "natures-wand",
+  SolarStaff = "solar-staff",
+  DoomStaff = "doom-staff",
+  GravityStaff = "gravity-staff",
+  LunarWand = "lunar-wand",
+  ElementalStaff = "elemental-staff",
+  SerpentWand = "serpent-wand",
+  EagleEyeWand = "eagle-eye-wand",
+  FrostbiteWand = "frostbite-wand",
 }
 
 export enum ShieldsBlueprint {
@@ -477,6 +561,11 @@ export enum ShieldsBlueprint {
   CrimsonAegisShield = "crimson-aegis-shield",
   DwarvenShield = "dwarven-shield",
   FalconsShield = "falcons-shield",
+  TemporalRoundShield = "temporal-round-shield",
+  IronHeartShield = "iron-heart-shield",
+  WardenOfTheWoods = "warden-of-the-woods",
+  BladeBarrier = "blade-barrier",
+  PaladinsSafeguardShield = "paladins-safeguard-shield",
 }
 
 export enum LegsBlueprint {
@@ -522,6 +611,11 @@ export enum HammersBlueprint {
   WarHammer = "war-hammer",
   RoyalHammer = "royal-hammer",
   SilverHammer = "silver-hammer",
+  MedievalCrossedHammer = "medieval-crossed-hammer",
+  SledgeHammer = "sledge-hammer",
+  ThorHammer = "thor-hammer",
+  GoldHammer = "gold-hammer",
+  DragonFistHammer = "dragon-fist-hammer",
 }
 
 export type AvailableBlueprints =

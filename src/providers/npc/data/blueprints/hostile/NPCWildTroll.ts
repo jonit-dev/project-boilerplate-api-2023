@@ -9,6 +9,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AxesBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
@@ -81,6 +82,10 @@ export const npcWildTroll = {
       itemBlueprintKey: CraftingResourcesBlueprint.PhoenixFeather,
       chance: 20,
       quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.HandAxe,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

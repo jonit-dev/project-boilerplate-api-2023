@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AxesBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
@@ -86,6 +87,14 @@ export const npcDragonKnight: Partial<INPC> = {
     {
       itemBlueprintKey: ShieldsBlueprint.SilverShield,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.DaramianWaraxe,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.GuardianSword,
+      chance: 15,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
