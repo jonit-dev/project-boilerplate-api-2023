@@ -105,8 +105,6 @@ export class ServerBootstrap {
     this.npcFreezer.init();
 
     await this.locker.clear();
-
-    await this.hitTarget.clearAllQueueJobs();
   }
 
   private async clearAllQueues(): Promise<void> {
