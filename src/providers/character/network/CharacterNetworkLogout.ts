@@ -45,6 +45,7 @@ export class CharacterNetworkLogout {
     private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
     private socketSessionControl: SocketSessionControl,
+
     private skillStatsIncrease: SkillStatsIncrease,
     private partyManagement: PartyManagement
   ) {}
@@ -100,7 +101,7 @@ export class CharacterNetworkLogout {
             textureKey: textureKeyVeil || character.textureKey,
           }
         );
-        await this.socketSessionControl.deleteSession(character);
+        await this.socketSessionControl.deleteSession(character.channelId!);
 
         await this.specialEffect.clearEffects(character);
 

@@ -34,12 +34,10 @@ import { provide } from "inversify-binding-decorators";
 import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
-import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
-
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
 import { ItemCleaner } from "@providers/item/ItemCleaner";
 import { Locker } from "@providers/locks/Locker";
-import { SkillStatsIncrease } from "@providers/skill/SkillStatsIncrease";
+import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
 import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
@@ -65,12 +63,12 @@ export class CharacterNetworkCreate {
     private magePassiveHabilities: MagePassiveHabilities,
     private inMemoryHashTable: InMemoryHashTable,
     private socketSessionControl: SocketSessionControl,
+
     private characterDeath: CharacterDeath,
     private itemCleaner: ItemCleaner,
     private characterBuffValidation: CharacterBuffValidation,
     private battleTargeting: BattleTargeting,
-    private locker: Locker,
-    private skillStatsIncrease: SkillStatsIncrease
+    private locker: Locker
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -120,17 +118,7 @@ export class CharacterNetworkCreate {
 
         await this.gridManager.setWalkable(map, ToGridX(character.x), ToGridY(character.y), false);
 
-        const hasSession = await this.socketSessionControl.hasSession(character);
-
-        if (hasSession) {
-          console.log("Character already has a session in place! Clearing up!");
-          await channel.leave(data.channelId);
-          await this.socketSessionControl.deleteSession(character);
-        }
-
-        await this.socketSessionControl.setSession(character);
-
-        await channel.join(data.channelId);
+        await this.manageSocketConnections(channel, character);
 
         if (character.isBanned) {
           console.log(`🚫 ${character.name} tried to create its instance while banned!`);
@@ -203,6 +191,21 @@ export class CharacterNetworkCreate {
       },
       false
     );
+  }
+
+  private async manageSocketConnections(channel: SocketChannel, character: ICharacter): Promise<void> {
+    const channelId = channel.id?.toString()!;
+
+    const hasSocketConnection = await this.socketSessionControl.hasSession(channelId);
+
+    if (!hasSocketConnection) {
+      await channel.join(channelId);
+      await this.socketSessionControl.setSession(channelId, character._id);
+
+      channel.on("disconnect", async () => {
+        await this.socketSessionControl.deleteSession(channelId);
+      });
+    }
   }
 
   private sendCreatedMessageToCharacterCreator(channelId: string, dataFromServer: ICharacterCreateFromServer): void {
