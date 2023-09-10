@@ -4,10 +4,15 @@ import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { ICraftItemPayload, ILoadCraftBookPayload, ItemSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemCraftable } from "../ItemCraftable";
+import { ItemCraftbook } from "../ItemCraftbook";
 
 @provide(ItemNetworkCraftable)
 export class ItemNetworkCraftable {
-  constructor(private socketAuth: SocketAuth, private itemCraftable: ItemCraftable) {}
+  constructor(
+    private socketAuth: SocketAuth,
+    private itemCraftbook: ItemCraftbook,
+    private itemCraftable: ItemCraftable
+  ) {}
 
   public onCraftableItemsLoad(channel: SocketChannel): void {
     this.socketAuth.authCharacterOn(
@@ -15,7 +20,7 @@ export class ItemNetworkCraftable {
       ItemSocketEvents.LoadCraftBook,
       async (data: ILoadCraftBookPayload, character) => {
         if (data) {
-          await this.itemCraftable.loadCraftableItems(data.itemSubType, character);
+          await this.itemCraftbook.loadCraftableItems(data.itemSubType, character);
         }
       }
     );

@@ -15,7 +15,7 @@ import {
   ItemType,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
-import * as Bluebird from "bluebird";
+import { Promise } from "bluebird";
 import { provide } from "inversify-binding-decorators";
 import { ItemCoordinates } from "./ItemCoordinates";
 
@@ -92,8 +92,8 @@ export class ItemView {
   public async warnCharacterAboutItemsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     const itemsNearby = await this.getItemsInCharacterView(character);
 
-    const [itemsOnCharView] = await Bluebird.all([
-      Bluebird.map(itemsNearby, (item) => this.characterView.getElementOnView(character, item._id, "items")),
+    const [itemsOnCharView] = await Promise.all([
+      Promise.map(itemsNearby, (item) => this.characterView.getElementOnView(character, item._id, "items")),
     ]);
 
     const itemsToUpdate: IItemUpdate[] = [];
@@ -121,7 +121,7 @@ export class ItemView {
       );
     }
 
-    await Bluebird.all(addToViewPromises);
+    await Promise.all(addToViewPromises);
 
     if (itemsToUpdate.length > 0) {
       this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {

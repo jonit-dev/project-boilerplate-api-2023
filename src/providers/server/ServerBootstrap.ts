@@ -87,6 +87,7 @@ export class ServerBootstrap {
     await this.pathfindingResults.clearAllResults();
 
     await this.inMemoryHashTable.deleteAll("crafting-recipes");
+    await this.inMemoryHashTable.deleteAll("craftable-item-ingredients");
 
     await this.inMemoryHashTable.deleteAll("raids");
 
