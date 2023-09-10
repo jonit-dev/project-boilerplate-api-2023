@@ -11,7 +11,7 @@ export const itemBandage: ICraftableItemBlueprint = {
   name: "Bandage",
   description: "A piece of soft cloth material that can be used to stop bleeding.",
   weight: 0.04,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 12,
   usableEffectKey: UsableEffectsBlueprint.ClearBleedingUsableEffect,
 };

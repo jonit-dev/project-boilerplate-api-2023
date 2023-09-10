@@ -10,6 +10,6 @@ export const itemRock: ICraftableItemBlueprint = {
   name: "Rock",
   description: "A piece of Rock.",
   weight: 0.1,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 1,
 };

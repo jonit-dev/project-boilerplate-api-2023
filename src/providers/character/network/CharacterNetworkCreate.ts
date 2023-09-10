@@ -35,7 +35,7 @@ import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
-import { ItemCleaner } from "@providers/item/ItemCleaner";
+import { ItemMissingReferenceCleaner } from "@providers/item/cleaner/ItemMissingReferenceCleaner";
 import { Locker } from "@providers/locks/Locker";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { clearCacheForKey } from "speedgoose";
@@ -65,7 +65,7 @@ export class CharacterNetworkCreate {
     private socketSessionControl: SocketSessionControl,
 
     private characterDeath: CharacterDeath,
-    private itemCleaner: ItemCleaner,
+    private itemMissingReferenceCleaner: ItemMissingReferenceCleaner,
     private characterBuffValidation: CharacterBuffValidation,
     private battleTargeting: BattleTargeting,
     private locker: Locker
@@ -101,7 +101,7 @@ export class CharacterNetworkCreate {
 
         await this.characterView.clearCharacterView(character);
 
-        await this.itemCleaner.clearMissingReferences(character);
+        await this.itemMissingReferenceCleaner.clearMissingReferences(character);
 
         await this.inMemoryHashTable.delete("character-weapon", character._id);
         await this.locker.unlock(`character-changing-scene-${character._id}`);

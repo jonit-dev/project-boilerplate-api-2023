@@ -10,6 +10,6 @@ export const itemBlueFeather: ICraftableItemBlueprint = {
   name: "Blue Feather",
   description: "A craft material used to make arrows.",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 10,
 };

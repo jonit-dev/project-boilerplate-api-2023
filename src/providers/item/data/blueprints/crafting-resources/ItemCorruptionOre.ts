@@ -10,7 +10,7 @@ export const itemCorruptionOre: ICraftableItemBlueprint = {
   name: "Corruption Ore",
   description: "Corruption ore that can be smelted into ingots.",
   weight: 2,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 30,
   canSell: false,
 };

@@ -10,6 +10,6 @@ export const itemFeather: ICraftableItemBlueprint = {
   name: "Feather",
   description: "A common crafting resource, used mainly for making projectiles",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 2,
 };

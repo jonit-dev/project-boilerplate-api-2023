@@ -10,7 +10,7 @@ export const itemWoodenBoard: ICraftableItemBlueprint = {
   name: "Wooden Board",
   description: "A board made from wood. Can be used to craft a variety of items.",
   weight: 2,
-  maxStackSize: 30,
+  maxStackSize: 999,
   basePrice: 10,
   canSell: false,
 };

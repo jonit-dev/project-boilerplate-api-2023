@@ -10,7 +10,7 @@ export const itemObsidiumOre: ICraftableItemBlueprint = {
   name: "Obsidium Ore",
   description: "Obsidium ore that can be smelted into ingots.",
   weight: 0.5,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 50,
   canSell: false,
 };

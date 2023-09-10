@@ -10,7 +10,7 @@ export const itemObsidiumIngot: ICraftableItemBlueprint = {
   name: "obsidium-ingot",
   description: "A rare and powerful ingot imbued with magical properties, used as a material for forging weapons.",
   weight: 1,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 28,
   canSell: false,
 };

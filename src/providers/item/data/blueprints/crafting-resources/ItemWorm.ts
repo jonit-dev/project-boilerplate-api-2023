@@ -10,7 +10,7 @@ export const itemWorm: ICraftableItemBlueprint = {
   name: "Worm",
   description: "A worm used for fishing.",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 0.5,
   canSell: false,
 };

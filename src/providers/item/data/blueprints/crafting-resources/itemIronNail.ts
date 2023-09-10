@@ -10,7 +10,7 @@ export const itemIronNail: ICraftableItemBlueprint = {
   name: "Iron nail",
   description: "An useful and common crafting resource.",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
 
   basePrice: 2,
 };
