@@ -14,5 +14,5 @@ export const itemTuna: IConsumableItemBlueprint = {
   maxStackSize: 100,
   basePrice: 4,
   canSell: false,
-  usableEffectKey: UsableEffectsBlueprint.MinorEatingEffect,
+  usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,
 };

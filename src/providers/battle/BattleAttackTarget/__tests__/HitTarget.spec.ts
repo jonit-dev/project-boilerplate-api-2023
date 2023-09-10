@@ -80,7 +80,7 @@ describe("HitTarget", () => {
         .spyOn(hitTarget.battleEvent, "calculateEvent" as any)
         .mockImplementation(() => BattleEventType.Hit);
       // @ts-ignore
-      jest.spyOn(hitTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
+      jest.spyOn(hitTarget.battleDamageCalculator, "calculateHitDamage" as any).mockImplementation(() => 50);
 
       const increaseSkillsOnBattle = jest.spyOn(
         // @ts-ignore
@@ -117,7 +117,7 @@ describe("HitTarget", () => {
         .spyOn(hitTarget.battleEvent, "calculateEvent" as any)
         .mockImplementation(() => BattleEventType.Hit);
       // @ts-ignore
-      jest.spyOn(hitTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 200);
+      jest.spyOn(hitTarget.battleDamageCalculator, "calculateHitDamage" as any).mockImplementation(() => 200);
 
       // @ts-ignore
       const charDeath = jest.spyOn(hitTarget.battleAttackTargetDeath, "handleDeathAfterHit");
@@ -209,7 +209,7 @@ describe("HitTarget", () => {
       // @ts-ignore
       jest.spyOn(hitTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
       // @ts-ignore
-      jest.spyOn(hitTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
+      jest.spyOn(hitTarget.battleDamageCalculator, "calculateHitDamage" as any).mockImplementation(() => 50);
       // @ts-ignore
       // prettier-ignore
       const applyEntityEffectsCharacter = jest.spyOn(hitTarget, "applyEntityEffectsCharacter").mockResolvedValue(undefined);
@@ -227,7 +227,7 @@ describe("HitTarget", () => {
       // @ts-ignore
       jest.spyOn(hitTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
       // @ts-ignore
-      jest.spyOn(hitTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
+      jest.spyOn(hitTarget.battleDamageCalculator, "calculateHitDamage" as any).mockImplementation(() => 50);
       // @ts-ignore
       // prettier-ignore
       const applyEntityEffectsCharacter = jest.spyOn(hitTarget, "applyEntityEffectsCharacter").mockResolvedValue(undefined);
@@ -260,7 +260,7 @@ describe("HitTarget", () => {
       // @ts-ignore
       jest.spyOn(hitTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
       // @ts-ignore
-      jest.spyOn(hitTarget.battleEvent, "calculateHitDamage" as any).mockImplementation(() => 50);
+      jest.spyOn(hitTarget.battleDamageCalculator, "calculateHitDamage" as any).mockImplementation(() => 50);
 
       // @ts-ignore
       const increaseSkillsOnBattle = jest.spyOn(hitTarget.skillIncrease, "increaseMagicResistanceSP" as any);

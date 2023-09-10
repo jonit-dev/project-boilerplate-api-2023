@@ -14,6 +14,7 @@ import {
   MacesBlueprint,
   MagicsBlueprint,
   RangedWeaponsBlueprint,
+  ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -120,6 +121,22 @@ export const npcDwarfMage: Partial<INPC> = {
       itemBlueprintKey: MagicsBlueprint.FireRune,
       chance: 20,
       quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
+      chance: 7,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
+      chance: 5,
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.IronHeartShield,
+      chance: 15,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],

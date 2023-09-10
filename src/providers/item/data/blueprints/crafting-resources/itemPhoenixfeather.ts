@@ -10,6 +10,6 @@ export const itemPhoenixFeather: ICraftableItemBlueprint = {
   name: "Phoenix Feather",
   description: "Feather from a phoenix. Can be used to craft a variety of items.",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 20,
 };

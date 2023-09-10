@@ -107,11 +107,15 @@ export const npcElf: Partial<INPC> = {
       chance: 10,
       quantityRange: [1, 5],
     },
-
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Herb,
       chance: 30,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.WardenArrow,
+      chance: 20,
+      quantityRange: [10, 20],
     },
   ],
 };

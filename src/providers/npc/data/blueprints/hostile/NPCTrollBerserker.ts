@@ -131,6 +131,10 @@ export const npcTrollBerserker = {
       chance: 5,
       quantityRange: [5, 10],
     },
+    {
+      itemBlueprintKey: SwordsBlueprint.AngelicSword,
+      chance: 15,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

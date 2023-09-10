@@ -61,7 +61,8 @@ describe("ItemCraftable.ts", () => {
   });
 
   it("should load craftable items", async () => {
-    await craftableItem.loadCraftableItems(ItemSubType.Potion, testCharacter);
+    // @ts-ignore
+    await craftableItem.itemCraftbook.loadCraftableItems(ItemSubType.Potion, testCharacter);
 
     expect(sendEventToUser).toHaveBeenCalledTimes(1);
 

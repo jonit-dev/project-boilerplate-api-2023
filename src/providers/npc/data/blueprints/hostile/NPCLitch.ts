@@ -15,6 +15,7 @@ import {
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   StaffsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
 import { AnimationEffectKeys, MagicPower, NPCAlignment, SpellsBlueprint } from "@rpg-engine/shared";
@@ -132,6 +133,10 @@ export const npcLitch: Partial<INPC> = {
     {
       itemBlueprintKey: RangedWeaponsBlueprint.HellishBow,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.IronFistSword,
+      chance: 15,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],

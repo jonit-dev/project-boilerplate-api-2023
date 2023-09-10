@@ -17,6 +17,7 @@ import { blueprintManager } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import PartyManagement from "@providers/party/PartyManagement";
+import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
 import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -43,7 +44,8 @@ export class ServerBootstrap {
     private partyManagement: PartyManagement,
     private inMemoryHashTable: InMemoryHashTable,
     private hitTarget: HitTarget,
-    private discordBot: DiscordBot
+    private discordBot: DiscordBot,
+    private socketSessionControl: SocketSessionControl
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -71,6 +73,8 @@ export class ServerBootstrap {
   }
 
   private async execOneTimeOperations(): Promise<void> {
+    await this.socketSessionControl.clearAllSessions();
+
     await blueprintManager.loadAllBlueprints();
 
     await this.npcManager.disableNPCBehaviors();
@@ -87,6 +91,7 @@ export class ServerBootstrap {
     await this.pathfindingResults.clearAllResults();
 
     await this.inMemoryHashTable.deleteAll("crafting-recipes");
+    await this.inMemoryHashTable.deleteAll("craftable-item-ingredients");
 
     await this.inMemoryHashTable.deleteAll("raids");
 
@@ -100,8 +105,6 @@ export class ServerBootstrap {
     this.npcFreezer.init();
 
     await this.locker.clear();
-
-    await this.hitTarget.clearAllQueueJobs();
   }
 
   private async clearAllQueues(): Promise<void> {

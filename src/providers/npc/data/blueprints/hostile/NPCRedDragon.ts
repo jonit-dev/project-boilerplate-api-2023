@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   ArmorsBlueprint,
+  AxesBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
   HelmetsBlueprint,
@@ -108,6 +109,10 @@ export const npcRedDragon = {
     {
       itemBlueprintKey: ShieldsBlueprint.SilverShield,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.GuardianAxe,
+      chance: 10,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],

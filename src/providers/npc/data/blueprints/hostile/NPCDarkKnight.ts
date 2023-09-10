@@ -8,12 +8,14 @@ import {
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
+  HammersBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
   OthersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
+  StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -171,6 +173,18 @@ export const npcDarkKnight: Partial<INPC> = {
     {
       itemBlueprintKey: SpearsBlueprint.BohemianEarspoon,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.EagleEyeWand,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.WarlordBroadsword,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.ThorHammer,
+      chance: 15,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],

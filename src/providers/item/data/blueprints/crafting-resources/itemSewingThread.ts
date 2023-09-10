@@ -10,6 +10,6 @@ export const itemSewingThread: ICraftableItemBlueprint = {
   name: "Sewing Thread",
   description: "A spool of simple Sewing Thread for crafts.",
   weight: 0.3,
-  maxStackSize: 40,
+  maxStackSize: 999,
   basePrice: 4,
 };

@@ -20,7 +20,6 @@ import { ServerBootstrap } from "@providers/server/ServerBootstrap";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
-import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
@@ -32,11 +31,11 @@ import { Database } from "../server/Database";
 import { ServerHelper } from "../server/ServerHelper";
 import {
   abTestsControllerContainer,
+  blueprintControllerContainer,
   dbTasksControllerContainer,
   formControllerContainer,
   useCasesControllers,
   userControllerContainer,
-  blueprintControllerContainer,
 } from "./ControllersInversify";
 
 const container = new Container();
@@ -78,8 +77,6 @@ export const spellCalculator = container.get<SpellCalculator>(SpellCalculator);
 export const characterBuffActivator = container.get<CharacterBuffActivator>(CharacterBuffActivator);
 
 export const skillIncrease = container.get<SkillIncrease>(SkillIncrease);
-
-export const socketSessionControl = container.get<SocketSessionControl>(SocketSessionControl);
 
 export const serverBootstrap = container.get<ServerBootstrap>(ServerBootstrap);
 

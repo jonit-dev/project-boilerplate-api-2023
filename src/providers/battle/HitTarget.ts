@@ -24,19 +24,15 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { appEnv } from "@providers/config/env";
-import { Queue, Worker } from "bullmq";
+import { BONUS_DAMAGE_MULTIPLIER } from "@providers/constants/BattleConstants";
 import random from "lodash/random";
 import { BattleAttackTargetDeath } from "./BattleAttackTarget/BattleAttackTargetDeath";
+import { BattleDamageCalculator } from "./BattleDamageCalculator";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
 
 @provide(HitTarget)
 export class HitTarget {
-  private npcQueue: Queue;
-  private characterQueue: Queue;
-  private worker: Worker;
-
   constructor(
     private battleEvent: BattleEvent,
     private skillIncrease: SkillIncrease,
@@ -49,54 +45,9 @@ export class HitTarget {
     private npcWarn: NPCWarn,
     private characterMovementWarn: CharacterMovementWarn,
     private socketMessaging: SocketMessaging,
-    private entityEffectUse: EntityEffectUse
-  ) {
-    this.npcQueue = new Queue("npc-hit", {
-      connection: {
-        host: appEnv.database.REDIS_CONTAINER,
-        port: Number(appEnv.database.REDIS_PORT),
-      },
-    });
-    this.characterQueue = new Queue("character-hit", {
-      connection: {
-        host: appEnv.database.REDIS_CONTAINER,
-        port: Number(appEnv.database.REDIS_PORT),
-      },
-    });
-
-    this.worker = new Worker(
-      "character-hit",
-      async (job) => {
-        const { attacker, target, magicAttack, bonusDamage } = job.data;
-
-        await this.execHit(attacker, target, magicAttack, bonusDamage);
-      },
-      {
-        connection: {
-          host: appEnv.database.REDIS_CONTAINER,
-          port: Number(appEnv.database.REDIS_PORT),
-        },
-      }
-    );
-    this.worker = new Worker(
-      "npc-hit",
-      async (job) => {
-        const { attacker, target, magicAttack, bonusDamage } = job.data;
-
-        await this.execHit(attacker, target, magicAttack, bonusDamage);
-      },
-      {
-        connection: {
-          host: appEnv.database.REDIS_CONTAINER,
-          port: Number(appEnv.database.REDIS_PORT),
-        },
-      }
-    );
-
-    this.worker.on("failed", (job, err) => {
-      console.log(`Job ${job?.id} failed with error ${err.message}`);
-    });
-  }
+    private entityEffectUse: EntityEffectUse,
+    private battleDamageCalculator: BattleDamageCalculator
+  ) {}
 
   @TrackNewRelicTransaction()
   public async hit(
@@ -123,13 +74,13 @@ export class HitTarget {
     };
 
     if (battleEvent === BattleEventType.Hit) {
-      let baseDamage = await this.battleEvent.calculateHitDamage(attacker, target, magicAttack);
+      let baseDamage = await this.battleDamageCalculator.calculateHitDamage(attacker, target, magicAttack);
 
       if (bonusDamage) {
-        baseDamage += bonusDamage;
+        baseDamage += bonusDamage * BONUS_DAMAGE_MULTIPLIER;
       }
 
-      const damage = this.battleEvent.getCriticalHitDamageIfSucceed(baseDamage);
+      const damage = this.battleDamageCalculator.getCriticalHitDamageIfSucceed(baseDamage);
 
       const damageRelatedPromises: any[] = [];
 
@@ -236,51 +187,6 @@ export class HitTarget {
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
     await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
     await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
-  }
-
-  @TrackNewRelicTransaction()
-  private async execHit(
-    attacker: ICharacter | INPC,
-    target: ICharacter | INPC,
-    magicAttack?: boolean,
-    bonusDamage?: number
-  ): Promise<void> {
-    if (appEnv.general.IS_UNIT_TEST) {
-      await this.execHit(attacker, target, magicAttack, bonusDamage);
-      return;
-    }
-
-    if (attacker.type === EntityType.Character) {
-      await this.characterQueue.add(
-        "character-hit",
-        { attacker, target, magicAttack, bonusDamage },
-        {
-          removeOnComplete: true,
-          removeOnFail: true,
-        }
-      );
-    } else {
-      await this.npcQueue.add(
-        "npc-hit",
-        { attacker, target, magicAttack, bonusDamage },
-        {
-          removeOnComplete: true,
-          removeOnFail: true,
-        }
-      );
-    }
-  }
-
-  public async clearAllQueueJobs(): Promise<void> {
-    const jobs = await this.npcQueue.getJobs(["waiting", "active", "delayed", "paused"]);
-    for (const job of jobs) {
-      await job.remove();
-    }
-
-    const jobs2 = await this.characterQueue.getJobs(["waiting", "active", "delayed", "paused"]);
-    for (const job of jobs2) {
-      await job.remove();
-    }
   }
 
   private async sendBattleEvent(character: ICharacter, battleEventPayload: IBattleEventFromServer): Promise<void> {

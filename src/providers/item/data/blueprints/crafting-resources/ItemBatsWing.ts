@@ -10,6 +10,6 @@ export const itemBatsWing: ICraftableItemBlueprint = {
   name: "Bat Wing",
   description: "A crafting resource used for witchcraft and sorcery",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 2,
 };

@@ -14,14 +14,11 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { blueprintManager } from "@providers/inversify/container";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { recipeBlueprintsIndex } from "@providers/useWith/recipes/index";
-import { IUseWithCraftingRecipe, IUseWithCraftingRecipeItem } from "@providers/useWith/useWithTypes";
-import Shared, {
+import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import {
   AnimationEffectKeys,
   CraftingSkill,
   ICraftItemPayload,
-  ICraftableItem,
-  ICraftableItemIngredient,
   IEquipmentAndInventoryUpdatePayload,
   IItemContainer,
   IUIShowMessage,
@@ -42,6 +39,9 @@ import {
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
+import { ItemCraftbook } from "./ItemCraftbook";
+import { ItemCraftingRecipes } from "./ItemCraftingRecipes";
+
 @provide(ItemCraftable)
 export class ItemCraftable {
   constructor(
@@ -55,54 +55,10 @@ export class ItemCraftable {
     private skillIncrease: SkillIncrease,
     private characterInventory: CharacterInventory,
     private inMemoryHashTable: InMemoryHashTable,
-    private traitGetter: TraitGetter
+    private traitGetter: TraitGetter,
+    private itemCraftingRecipes: ItemCraftingRecipes,
+    private itemCraftbook: ItemCraftbook
   ) {}
-
-  @TrackNewRelicTransaction()
-  public async loadCraftableItems(itemSubType: string, character: ICharacter): Promise<void> {
-    const cache = await this.inMemoryHashTable.get("load-craftable-items", character._id);
-
-    const itemSubTypeCache = cache?.[itemSubType];
-
-    if (itemSubTypeCache) {
-      this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, itemSubTypeCache);
-      return;
-    }
-
-    // Retrieve character inventory items
-    const inventoryIngredients = await this.getCharacterInventoryIngredients(character);
-
-    const skills = (await Skill.findOne({ owner: character._id })
-      .lean()
-      .cacheQuery({
-        cacheKey: `${character._id}-skills`,
-      })) as ISkill;
-
-    // Retrieve the list of recipes for the given item sub-type
-    const recipes =
-      itemSubType === "Suggested"
-        ? await this.getRecipesWithAnyIngredientInInventory(character, inventoryIngredients)
-        : await this.getRecipes(itemSubType);
-
-    // Process each recipe to generate craftable items
-    const craftableItemsPromises = recipes.map((recipe) => this.getCraftableItem(inventoryIngredients, recipe, skills));
-    const craftableItems = ((await Promise.all(craftableItemsPromises)) as ICraftableItem[]).sort((a, b) => {
-      // this what is craftable should be first
-      if (a.canCraft && !b.canCraft) return -1;
-      if (!a.canCraft && b.canCraft) return 1;
-      return 0;
-    });
-
-    const currentCache = await this.inMemoryHashTable.get("load-craftable-items", character._id);
-
-    await this.inMemoryHashTable.set("load-craftable-items", character._id, {
-      ...currentCache,
-      [itemSubType]: craftableItems,
-    });
-
-    // Send the list of craftable items to the user through a socket event
-    this.socketMessaging.sendEventToUser(character.channelId!, ItemSocketEvents.CraftableItems, craftableItems);
-  }
 
   public async craftItem(itemToCraft: ICraftItemPayload, character: ICharacter): Promise<void> {
     if (!character.skills) {
@@ -129,16 +85,16 @@ export class ItemCraftable {
     }
 
     const blueprint = await blueprintManager.getBlueprint("items", itemToCraft.itemKey as AvailableBlueprints);
-    const recipe = this.getAllRecipes()[itemToCraft.itemKey];
+    const recipe = this.itemCraftingRecipes.getAllRecipes()[itemToCraft.itemKey];
 
     if (!blueprint || !recipe) {
       this.socketMessaging.sendErrorMessageToCharacter(character, "Sorry, this item can not be crafted.");
       return;
     }
 
-    const inventoryInfo = await this.getCharacterInventoryIngredients(character);
+    const inventoryInfo = await this.itemCraftingRecipes.getCharacterInventoryIngredients(character);
 
-    if (!this.canCraftRecipe(inventoryInfo, recipe)) {
+    if (!this.itemCraftingRecipes.canCraftRecipe(inventoryInfo, recipe)) {
       this.socketMessaging.sendErrorMessageToCharacter(
         character,
         "Sorry, you do not have required items in your inventory."
@@ -168,7 +124,7 @@ export class ItemCraftable {
     };
 
     // Check if the character meets the minimum skill requirements for crafting
-    const hasMinimumSkills = await this.haveMinimumSkills(character.skills as ISkill, recipe);
+    const hasMinimumSkills = await this.itemCraftingRecipes.haveMinimumSkills(character.skills as ISkill, recipe);
 
     if (!hasMinimumSkills) {
       this.socketMessaging.sendErrorMessageToCharacter(
@@ -283,7 +239,7 @@ export class ItemCraftable {
     );
 
     const throttledLoadCraftableItems = throttle(
-      (itemSubType, character) => this.loadCraftableItems(itemSubType, character),
+      (itemSubType, character) => this.itemCraftbook.loadCraftableItems(itemSubType, character),
       1000
     );
 
@@ -320,198 +276,6 @@ export class ItemCraftable {
 
       await this.characterItemInventory.addItemToInventory(recipe.outputKey, character, props);
     } while (qty > 0);
-  }
-
-  @TrackNewRelicTransaction()
-  private async getCraftableItem(
-    inventoryInfo: Map<string, number>,
-    recipe: IUseWithCraftingRecipe,
-    skills: ISkill
-  ): Promise<ICraftableItem> {
-    const item = await blueprintManager.getBlueprint<Shared.IItem>("items", recipe.outputKey as AvailableBlueprints);
-
-    const ingredients: ICraftableItemIngredient[] = await Promise.all(
-      recipe.requiredItems.map((item) => this.getCraftableItemIngredient(item))
-    );
-
-    const minCraftingRequirements = recipe.minCraftingRequirements;
-
-    const haveMinimumSkills = await this.haveMinimumSkills(skills, recipe);
-
-    const canCraft = this.canCraftRecipe(inventoryInfo, recipe) && haveMinimumSkills;
-
-    return {
-      ...item,
-      canCraft,
-      ingredients: ingredients,
-      minCraftingRequirements,
-      levelIsOk: haveMinimumSkills,
-    };
-  }
-
-  private canCraftRecipe(inventoryInfo: Map<string, number>, recipe: IUseWithCraftingRecipe): boolean {
-    return recipe.requiredItems.every((ing) => {
-      const availableQty = inventoryInfo.get(ing.key) ?? 0;
-
-      return availableQty >= ing.qty;
-    });
-  }
-
-  @TrackNewRelicTransaction()
-  private haveMinimumSkills(skills: ISkill, recipe: IUseWithCraftingRecipe): boolean {
-    // Retrieve the minimum crafting requirements from the recipe
-    const minCraftingRequirements = recipe.minCraftingRequirements;
-
-    // Determine the character's skill level for the required crafting skill
-    let skillLevel: number = 0;
-    switch (minCraftingRequirements[0]) {
-      case CraftingSkill.Blacksmithing:
-        skillLevel = skills.blacksmithing.level;
-        break;
-      case CraftingSkill.Lumberjacking:
-        skillLevel = skills.lumberjacking.level;
-        break;
-      case CraftingSkill.Alchemy:
-        skillLevel = skills.alchemy.level;
-        break;
-      case CraftingSkill.Mining:
-        skillLevel = skills.mining.level;
-        break;
-      case CraftingSkill.Cooking:
-        skillLevel = skills.cooking.level;
-        break;
-      case CraftingSkill.Fishing:
-        skillLevel = skills.fishing.level;
-        break;
-      default:
-        break;
-    }
-
-    // Check if the character's skill level meets the minimum crafting requirements
-    if (skillLevel < minCraftingRequirements[1]) {
-      return false;
-    }
-
-    // If all checks pass, return true
-    return true;
-  }
-
-  @TrackNewRelicTransaction()
-  private async getCraftableItemIngredient(item: IUseWithCraftingRecipeItem): Promise<ICraftableItemIngredient> {
-    const blueprint = await blueprintManager.getBlueprint<IItem>("items", item.key as AvailableBlueprints);
-
-    return {
-      key: item.key,
-      qty: item.qty,
-      name: blueprint ? blueprint.name : "",
-      texturePath: blueprint ? blueprint.texturePath : "",
-    };
-  }
-
-  @TrackNewRelicTransaction()
-  private async getRecipes(subType: string): Promise<IUseWithCraftingRecipe[]> {
-    const hasCache = (await this.inMemoryHashTable.get("crafting-recipes", subType)) as IUseWithCraftingRecipe[];
-
-    if (hasCache) {
-      return hasCache;
-    }
-
-    const availableRecipes: IUseWithCraftingRecipe[] = [];
-    const recipes = this.getAllRecipes();
-
-    const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
-
-    for (const itemKey of itemKeys) {
-      const item = await blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints);
-      if (item.subType === subType && recipes[item.key]) {
-        availableRecipes.push(recipes[item.key]);
-      }
-    }
-
-    const result = availableRecipes.sort((a, b) => a.minCraftingRequirements[1] - b.minCraftingRequirements[1]);
-
-    await this.inMemoryHashTable.set("crafting-recipes", subType, result);
-
-    // Sorts the availableRecipes array based minCraftingRequirements level
-    return result;
-  }
-
-  @TrackNewRelicTransaction()
-  private async getCharacterInventoryIngredients(character: ICharacter): Promise<Map<string, number>> {
-    const items = await this.characterItemInventory.getAllItemsFromInventoryNested(character);
-
-    if (!items) {
-      return new Map<string, number>();
-    }
-
-    const ingredientMap = new Map<string, number>();
-
-    for (const item of items) {
-      if (item.stackQty) {
-        ingredientMap.set(item.key, item.stackQty + (ingredientMap.get(item.key) ?? 0));
-      } else {
-        ingredientMap.set(item.key, (ingredientMap.get(item.key) ?? 0) + 1);
-      }
-    }
-
-    return ingredientMap;
-  }
-
-  @TrackNewRelicTransaction()
-  private async getRecipesWithAnyIngredientInInventory(
-    character: ICharacter,
-    inventoryIngredients: Map<string, number>
-  ): Promise<IUseWithCraftingRecipe[]> {
-    const recipes = this.getAllRecipes();
-
-    // First, get all item keys
-    const itemKeys = await blueprintManager.getAllBlueprintKeys("items");
-
-    // Then, get all items in parallel
-    const items = await Promise.all(
-      itemKeys.map((itemKey) => blueprintManager.getBlueprint<IItem>("items", itemKey as AvailableBlueprints))
-    );
-
-    // Filter out only the items that are also recipes and have any required items in the inventory
-    const availableRecipes = items.reduce((acc, item) => {
-      const recipe = recipes[item.key];
-      if (recipe && recipe.requiredItems.some((ing) => (inventoryIngredients.get(ing.key) ?? 0) > 0)) {
-        acc.push(recipe);
-      }
-      return acc;
-    }, [] as IUseWithCraftingRecipe[]);
-
-    // Pre-calculate the quantities of ingredients and store them for sorting
-    const quantities = availableRecipes.map((recipe) =>
-      recipe.requiredItems.reduce((acc, ing) => acc + (inventoryIngredients.get(ing.key) ?? 0), 0)
-    );
-
-    // Finally, sort the available recipes
-    return availableRecipes.sort((a, b) => {
-      const aQty = quantities[availableRecipes.indexOf(a)];
-      const bQty = quantities[availableRecipes.indexOf(b)];
-
-      if (aQty > bQty) {
-        return -1;
-      }
-
-      if (aQty < bQty) {
-        return 1;
-      }
-
-      // sort by minCraftingRequirements level second
-      return a.minCraftingRequirements[1] - b.minCraftingRequirements[1];
-    });
-  }
-
-  private getAllRecipes(): Object {
-    const obj = {};
-    for (const itemKey in recipeBlueprintsIndex) {
-      for (const recipe of recipeBlueprintsIndex[itemKey]) {
-        obj[recipe.outputKey] = recipe;
-      }
-    }
-    return obj;
   }
 
   private getQty(recipe: IUseWithCraftingRecipe): number {

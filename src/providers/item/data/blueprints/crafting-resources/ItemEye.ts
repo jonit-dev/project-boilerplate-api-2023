@@ -10,6 +10,6 @@ export const itemEye: ICraftableItemBlueprint = {
   name: "Eye",
   description: "A valuable resource collected from fallen enemies, used for crafting weapons or tools.",
   weight: 0.2,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 8,
 };

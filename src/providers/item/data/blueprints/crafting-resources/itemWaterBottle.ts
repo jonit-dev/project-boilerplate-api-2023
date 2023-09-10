@@ -10,6 +10,6 @@ export const itemWaterBottle: ICraftableItemBlueprint = {
   name: "Water",
   description: "A bottle of water",
   weight: 0.05,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 3,
 };

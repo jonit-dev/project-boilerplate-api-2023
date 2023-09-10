@@ -1,6 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { ItemMissingReferenceCleaner } from "@providers/item/cleaner/ItemMissingReferenceCleaner";
 import { MapHelper } from "@providers/map/MapHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
@@ -10,74 +11,92 @@ import nodeCron from "node-cron";
 
 @provide(ItemDeleteCrons)
 export class ItemDeleteCrons {
-  constructor(private socketMessaging: SocketMessaging, private newRelic: NewRelic, private mapHelper: MapHelper) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private newRelic: NewRelic,
+    private mapHelper: MapHelper,
+    private itemMissingReferenceCleaner: ItemMissingReferenceCleaner
+  ) {}
 
   public schedule(): void {
     nodeCron.schedule("0 */1 * * *", async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "ItemDeleteCrons", async () => {
-        const allOnlineCharacters = await Character.find({ isOnline: true }).lean();
+      await this.cleanupFloorItems();
+    });
 
-        for (const character of allOnlineCharacters) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
-            message: "Server: Cleaning up items on the floor in 5 min. Please don't drop any item!",
-            type: "info",
-          });
-        }
+    // once per day at midnight
+    nodeCron.schedule("0 0 0 * * *", async () => {
+      await this.deleteItemsWithoutOwner();
+    });
+  }
 
-        //! THIS IS ONE OF THE MOST DANGEROUS CRON JOBS ON THE SYSTEM. DO NOT TOUCH THIS SHIT IF YOU DONT KNOW WHAT YOU ARE DOING.
+  private async deleteItemsWithoutOwner(): Promise<void> {
+    await this.itemMissingReferenceCleaner.cleanupItemsWithoutOwnership();
+  }
 
-        setTimeout(async () => {
-          // query items that are dropped on the scene (x,y,scene), not equipped, are not in a container and has no owner
+  private async cleanupFloorItems(): Promise<void> {
+    await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "ItemDeleteCrons", async () => {
+      const allOnlineCharacters = await Character.find({ isOnline: true }).lean();
 
-          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      for (const character of allOnlineCharacters) {
+        this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+          message: "Server: Cleaning up items on the floor in 5 min. Please don't drop any item!",
+          type: "info",
+        });
+      }
 
-          const items = await Item.find({
-            //* Items that have COORDINATES
-            // @ts-ignore
-            x: { $exists: true, $ne: null },
-            y: { $exists: true, $ne: null },
-            scene: { $exists: true, $ne: null },
+      //! THIS IS ONE OF THE MOST DANGEROUS CRON JOBS ON THE SYSTEM. DO NOT TOUCH THIS SHIT IF YOU DONT KNOW WHAT YOU ARE DOING.
 
-            //* And also without an owner
-            owner: { $in: [null, undefined] },
+      setTimeout(async () => {
+        // query items that are dropped on the scene (x,y,scene), not equipped, are not in a container and has no owner
 
-            //* Are not equipped and not picked up
-            isEquipped: { $ne: true },
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-            name: { $ne: "Depot" },
-            itemContainer: { $exists: false },
+        const items = await Item.find({
+          //* Items that have COORDINATES
+          // @ts-ignore
+          x: { $exists: true, $ne: null },
+          y: { $exists: true, $ne: null },
+          scene: { $exists: true, $ne: null },
 
-            isInDepot: { $exists: false, $ne: true },
+          //* And also without an owner
+          owner: { $in: [null, undefined] },
 
-            //* And were manipulated more than an hour ago
-            updatedAt: { $lt: oneHourAgo }, // delete items that are older than 1 hour!
-          });
+          //* Are not equipped and not picked up
+          isEquipped: { $ne: true },
 
-          for (const item of items) {
-            // lets also double check!
-            const isItemOnMap =
-              this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
+          name: { $ne: "Depot" },
+          itemContainer: { $exists: false },
 
-            if (!isItemOnMap) {
-              continue;
-            }
+          isInDepot: { $exists: false, $ne: true },
 
-            if (item.owner) {
-              continue;
-            }
+          //* And were manipulated more than an hour ago
+          updatedAt: { $lt: oneHourAgo }, // delete items that are older than 1 hour!
+        });
 
-            if (item.isInDepot) {
-              continue;
-            }
+        for (const item of items) {
+          // lets also double check!
+          const isItemOnMap =
+            this.mapHelper.isCoordinateValid(item.x) && this.mapHelper.isCoordinateValid(item.y) && item.scene;
 
-            if (item.isEquipped) {
-              continue;
-            }
-
-            await item.remove();
+          if (!isItemOnMap) {
+            continue;
           }
-        }, 60 * 1000 * 5);
-      });
+
+          if (item.owner) {
+            continue;
+          }
+
+          if (item.isInDepot) {
+            continue;
+          }
+
+          if (item.isEquipped) {
+            continue;
+          }
+
+          await item.remove();
+        }
+      }, 60 * 1000 * 5);
     });
   }
 }

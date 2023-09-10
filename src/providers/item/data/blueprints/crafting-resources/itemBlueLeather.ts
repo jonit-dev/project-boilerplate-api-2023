@@ -10,6 +10,6 @@ export const itemBlueLeather: ICraftableItemBlueprint = {
   name: "Blue Leather",
   description: "A craft material used for special armors.",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 12,
 };

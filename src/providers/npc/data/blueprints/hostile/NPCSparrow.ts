@@ -45,7 +45,7 @@ export const npcSparrow: Partial<INPC> = {
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Worm,
-      chance: 50,
+      chance: 30,
       quantityRange: [5, 10],
     },
     {

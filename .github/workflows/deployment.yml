@@ -84,7 +84,3 @@ jobs:
             git pull origin release
 
             bash ~/definya/api/environment/api-refresh-containers.sh
-
-            docker container prune -f
-
-            docker image prune -a -f

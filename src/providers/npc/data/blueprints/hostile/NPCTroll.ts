@@ -10,6 +10,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
@@ -107,6 +108,10 @@ export const npcTroll = {
     {
       itemBlueprintKey: LegsBlueprint.BronzeLegs,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.DewDagger,
+      chance: 10,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

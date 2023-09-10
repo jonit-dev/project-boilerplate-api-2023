@@ -4,6 +4,9 @@ import { itemWoodenAxe } from "./tier0/ItemWoodenAxe";
 import { itemCopperAxe } from "./tier1/ItemCopperAxe";
 import { itemHatchet } from "./tier1/ItemHatchet";
 import { itemBardiche } from "./tier1/itemBardiche";
+import { itemSerpentDanceAxe } from "./tier10/ItemSerpentDanceAxe";
+import { itemSilentScreamAxe } from "./tier10/ItemSilentScreamAxe";
+import { itemGoldenReaverAxe } from "./tier11/ItemGoldenReaverAxe";
 import { itemCorruptionAxe } from "./tier2/ItemCorruptionAxe";
 import { itemRuneAxe } from "./tier2/ItemRuneAxe";
 import { itemSilverAxe } from "./tier2/ItemSilverAxe";
@@ -27,6 +30,16 @@ import { itemYggdrasilVikingAxe } from "./tier4/ItemYggdrasilVikingAxe";
 import { itemGoldenAxe } from "./tier5/ItemGoldenAxe";
 import { itemRoyalDoubleAxe } from "./tier5/ItemRoyalDoubleAxe";
 import { itemYggdrasilWarAxe } from "./tier5/ItemYggdrasilWarAxe";
+import { itemDaramianWaraxe } from "./tier6/ItemDaramianWaraxe";
+import { itemPhoenixWingAxe } from "./tier6/ItemPhoenixWingAxe";
+import { itemCelestialArcAxe } from "./tier7/ItemCelestialArcAxe";
+import { itemHandAxe } from "./tier7/ItemHandAxe";
+import { itemMoonBeamAxe } from "./tier7/ItemMoonBeamAxe";
+import { itemGrandSanguineBattleaxe } from "./tier8/ItemGrandSanguineBattleaxe";
+import { itemRustBreakerAxe } from "./tier8/ItemRustBreakerAxe";
+import { itemGloriousAxe } from "./tier9/ItemGloriousAxe";
+import { itemGuardianAxe } from "./tier9/ItemGuardianAxe";
+import { itemHydraSlayerAxe } from "./tier9/ItemHydraSlayerAxe";
 
 export const axesBlueprintIndex = {
   [AxesBlueprint.Axe]: itemAxe,
@@ -57,4 +70,17 @@ export const axesBlueprintIndex = {
   [AxesBlueprint.WhiteRavenAxe]: itemWhiteRavenAxe,
   [AxesBlueprint.GlacialAxe]: itemGlacialAxe,
   [AxesBlueprint.GlacialHatchet]: itemGlacialHatchet,
+  [AxesBlueprint.GuardianAxe]: itemGuardianAxe,
+  [AxesBlueprint.GrandSanguineBattleaxe]: itemGrandSanguineBattleaxe,
+  [AxesBlueprint.GloriousAxe]: itemGloriousAxe,
+  [AxesBlueprint.HydraSlayerAxe]: itemHydraSlayerAxe,
+  [AxesBlueprint.SerpentDanceAxe]: itemSerpentDanceAxe,
+  [AxesBlueprint.SilentScreamAxe]: itemSilentScreamAxe,
+  [AxesBlueprint.RustBreakerAxe]: itemRustBreakerAxe,
+  [AxesBlueprint.MoonBeamAxe]: itemMoonBeamAxe,
+  [AxesBlueprint.HandAxe]: itemHandAxe,
+  [AxesBlueprint.PhoenixWingAxe]: itemPhoenixWingAxe,
+  [AxesBlueprint.GoldenReaverAxe]: itemGoldenReaverAxe,
+  [AxesBlueprint.DaramianWaraxe]: itemDaramianWaraxe,
+  [AxesBlueprint.CelestialArcAxe]: itemCelestialArcAxe,
 };

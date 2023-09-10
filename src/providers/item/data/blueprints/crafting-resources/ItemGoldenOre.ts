@@ -10,7 +10,7 @@ export const itemGoldenOre: ICraftableItemBlueprint = {
   name: "Golden Ore",
   description: "Golden ore that can be smelted into ingots.",
   weight: 2,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 40,
   canSell: false,
 };

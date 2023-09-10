@@ -103,6 +103,11 @@ export const npcForestWalker: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.EldensSword,
       chance: 1,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.EarthArrow,
+      chance: 20,
+      quantityRange: [10, 20],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],
   areaSpells: [

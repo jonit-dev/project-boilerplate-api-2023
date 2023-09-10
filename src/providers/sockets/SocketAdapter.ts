@@ -4,13 +4,18 @@ import { ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosIO } from "./GeckosIO";
 import { SocketIO } from "./SocketIO";
+import { SocketSessionControl } from "./SocketSessionControl";
 import { SocketClasses } from "./SocketsTypes";
 
 @provide(SocketAdapter)
 export class SocketAdapter implements ISocket {
   public static socketClass: SocketClasses; // Setting this method as static is necessary, otherwise it will be undefined after every injection (state does not persist!);
 
-  constructor(private socketIO: SocketIO, private geckosIO: GeckosIO) {}
+  constructor(
+    private socketIO: SocketIO,
+    private geckosIO: GeckosIO,
+    private socketSessionControl: SocketSessionControl
+  ) {}
 
   public async init(socketType: SocketTypes): Promise<void> {
     switch (socketType as SocketTypes) {
@@ -52,7 +57,13 @@ export class SocketAdapter implements ISocket {
   }
 
   public onConnect(): void {
-    SocketAdapter.socketClass?.onConnect((channel) => {
+    SocketAdapter.socketClass?.onConnect(async (channel) => {
+      const hasSocketSession = await this.socketSessionControl.hasSession(channel.id);
+
+      if (hasSocketSession) {
+        return; // avoid binding events multiple times
+      }
+
       socketEventsBinder.bindEvents(channel);
     });
   }
