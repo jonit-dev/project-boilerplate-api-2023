@@ -261,7 +261,9 @@ export class HitTarget {
 
         if (target.isAlive) {
           if (attacker.type === EntityType.Character) {
-            damageRelatedPromises.push(this.applyEntityEffectsCharacter(attacker as ICharacter, target));
+            if (target.appliedEntityEffects?.length! === 0) {
+              damageRelatedPromises.push(this.applyEntityEffectsCharacter(attacker as ICharacter, target));
+            }
           } else if (attacker.type === EntityType.NPC) {
             damageRelatedPromises.push(this.applyEntityEffectsIfApplicable(attacker as INPC, target));
           }
