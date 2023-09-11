@@ -19,6 +19,7 @@ export const entityEffectFreezing: IEntityEffect = {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const calculateEffectDamage = container.get(CalculateEffectDamage);
+
     const effectDamage = await calculateEffectDamage.calculateEffectDamage(attacker, target);
 
     itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
