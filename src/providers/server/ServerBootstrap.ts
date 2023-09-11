@@ -104,6 +104,8 @@ export class ServerBootstrap {
 
     this.npcFreezer.init();
 
+    await this.hitTarget.clearAllQueueJobs();
+
     await this.locker.clear();
   }
 

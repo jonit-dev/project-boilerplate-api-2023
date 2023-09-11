@@ -80,20 +80,22 @@ export class CalculateEffectDamage {
     magicResistanceLevel: number,
     options?: ICalculateDamageOptions
   ): number {
-    const maxDamage = Math.ceil(
-      attackerLevel * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER +
-        Math.max(attackerMagicLevel, attackerStrengthLevel) * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER +
-        (options?.maxBonusDamage ?? 0)
-    );
+    // Unified approach for calculating maxDamage
+    const baseDamage = attackerLevel * ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER;
+    const additionalDamage = Math.max(attackerMagicLevel, attackerStrengthLevel);
+    const maxDamage = Math.ceil(baseDamage + additionalDamage + (options?.maxBonusDamage ?? 0));
 
-    const minDamage = minRawDamage + Math.round(attackerLevel / 10);
+    // Min damage no longer relies on attackerLevel, making it constant
+    const minDamage = minRawDamage;
 
-    const effectDamageRaw = random(minRawDamage, maxDamage);
+    // Random number between min and max damage for attack and defense
+    const effectDamageRaw = random(minDamage, maxDamage);
     const maxDefense = random(minRawDamage, resistanceLevel + magicResistanceLevel);
 
+    // Final effect damage calculation
     const effectDamage = effectDamageRaw - maxDefense + (options?.finalBonusDamage ?? 0);
 
-    return effectDamage < minDamage ? minDamage : effectDamage;
+    return Math.max(effectDamage, minDamage);
   }
 
   private async getAttackerMagicStrengthLevel(attackerSkills: ISkill): Promise<{
