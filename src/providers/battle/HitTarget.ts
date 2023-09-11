@@ -70,9 +70,9 @@ export class HitTarget {
     this.worker = new Worker(
       "character-hit",
       async (job) => {
-        const { attacker, target, magicAttack, bonusDamage } = job.data;
+        const { attacker, target, magicAttack, bonusDamage, spellHit } = job.data;
 
-        await this.execHit(attacker, target, magicAttack, bonusDamage);
+        await this.execHit(attacker, target, magicAttack, bonusDamage, spellHit);
       },
       {
         connection: {
@@ -84,9 +84,9 @@ export class HitTarget {
     this.worker = new Worker(
       "npc-hit",
       async (job) => {
-        const { attacker, target, magicAttack, bonusDamage } = job.data;
+        const { attacker, target, magicAttack, bonusDamage, spellHit } = job.data;
 
-        await this.execHit(attacker, target, magicAttack, bonusDamage);
+        await this.execHit(attacker, target, magicAttack, bonusDamage, spellHit);
       },
       {
         connection: {
@@ -106,17 +106,18 @@ export class HitTarget {
     attacker: ICharacter | INPC,
     target: ICharacter | INPC,
     magicAttack?: boolean,
-    bonusDamage?: number
+    bonusDamage?: number,
+    spellHit?: boolean
   ): Promise<void> {
     if (appEnv.general.IS_UNIT_TEST) {
-      await this.execHit(attacker, target, magicAttack, bonusDamage);
+      await this.execHit(attacker, target, magicAttack, bonusDamage, spellHit);
       return;
     }
 
     if (attacker.type === EntityType.Character) {
       await this.characterQueue.add(
         "character-hit",
-        { attacker, target, magicAttack, bonusDamage },
+        { attacker, target, magicAttack, bonusDamage, spellHit },
         {
           removeOnComplete: true,
           removeOnFail: true,
@@ -125,7 +126,7 @@ export class HitTarget {
     } else {
       await this.npcQueue.add(
         "npc-hit",
-        { attacker, target, magicAttack, bonusDamage },
+        { attacker, target, magicAttack, bonusDamage, spellHit },
         {
           removeOnComplete: true,
           removeOnFail: true,
