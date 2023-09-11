@@ -111,7 +111,7 @@ export const npcCaveTroll = {
     },
     {
       itemBlueprintKey: MacesBlueprint.WitchBaneMace,
-      chance: 10,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

@@ -9,23 +9,28 @@ export const recipeLightBringerSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 15,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.ElvenLeaf,
-      qty: 12,
+      qty: 120,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 5,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 50,
+    },
+    {
+      key: CraftingResourcesBlueprint.MagicRecipe,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 15],
-      [CraftingResourcesBlueprint.ElvenLeaf, 12],
-      [CraftingResourcesBlueprint.Leather, 5],
+      [CraftingResourcesBlueprint.SilverIngot, 100],
+      [CraftingResourcesBlueprint.ElvenLeaf, 120],
+      [CraftingResourcesBlueprint.WoodenBoard, 50],
+      [CraftingResourcesBlueprint.MagicRecipe, 50],
     ]),
   ],
 };

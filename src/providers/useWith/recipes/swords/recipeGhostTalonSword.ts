@@ -9,15 +9,15 @@ export const recipeGhostTalonSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 20,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Eye,
-      qty: 20,
+      qty: 100,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 20,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.DragonHead,
@@ -27,9 +27,9 @@ export const recipeGhostTalonSword: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 20],
-      [CraftingResourcesBlueprint.Eye, 20],
-      [CraftingResourcesBlueprint.Leather, 20],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 80],
+      [CraftingResourcesBlueprint.Eye, 100],
+      [CraftingResourcesBlueprint.WoodenBoard, 100],
       [CraftingResourcesBlueprint.DragonHead, 6],
     ]),
   ],

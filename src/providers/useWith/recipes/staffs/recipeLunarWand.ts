@@ -9,23 +9,23 @@ export const recipeLunarWand: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 14,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 10,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 5,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 14],
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
-      [CraftingResourcesBlueprint.MagicRecipe, 5],
+      [CraftingResourcesBlueprint.SilverIngot, 140],
+      [CraftingResourcesBlueprint.BlueSapphire, 100],
+      [CraftingResourcesBlueprint.MagicRecipe, 50],
     ]),
   ],
 };

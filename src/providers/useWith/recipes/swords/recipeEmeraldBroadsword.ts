@@ -8,24 +8,24 @@ export const recipeEmeraldBroadsword: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.GreenOre,
-      qty: 19,
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 16,
+      qty: 160,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 14,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 9,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.ElvenLeaf,
-      qty: 10,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
@@ -35,11 +35,11 @@ export const recipeEmeraldBroadsword: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreenOre, 19],
-      [CraftingResourcesBlueprint.Herb, 16],
-      [CraftingResourcesBlueprint.Leather, 14],
-      [CraftingResourcesBlueprint.Jade, 9],
-      [CraftingResourcesBlueprint.ElvenLeaf, 10],
+      [CraftingResourcesBlueprint.GreenIngot, 50],
+      [CraftingResourcesBlueprint.Herb, 160],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
+      [CraftingResourcesBlueprint.Jade, 90],
+      [CraftingResourcesBlueprint.ElvenLeaf, 100],
       [CraftingResourcesBlueprint.DragonTooth, 9],
     ]),
   ],

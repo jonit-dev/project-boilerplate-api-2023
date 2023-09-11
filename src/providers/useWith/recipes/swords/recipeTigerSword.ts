@@ -9,23 +9,23 @@ export const recipeTigerSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 3,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.WolfTooth,
-      qty: 10,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 19,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 3],
-      [CraftingResourcesBlueprint.WolfTooth, 10],
-      [CraftingResourcesBlueprint.Leather, 19],
+      [CraftingResourcesBlueprint.SteelIngot, 30],
+      [CraftingResourcesBlueprint.WolfTooth, 30],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
     ]),
   ],
 };

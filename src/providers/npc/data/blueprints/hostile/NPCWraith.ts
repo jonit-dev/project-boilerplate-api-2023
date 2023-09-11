@@ -103,15 +103,15 @@ export const npcWraith: Partial<INPC> = {
     },
     {
       itemBlueprintKey: StaffsBlueprint.SerpentWand,
-      chance: 15,
+      chance: 2,
     },
     {
       itemBlueprintKey: SwordsBlueprint.WindCutterSword,
-      chance: 15,
+      chance: 1,
     },
     {
       itemBlueprintKey: AxesBlueprint.SerpentDanceAxe,
-      chance: 15,
+      chance: 1,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

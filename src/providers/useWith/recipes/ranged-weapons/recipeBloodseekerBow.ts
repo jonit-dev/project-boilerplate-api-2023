@@ -9,23 +9,33 @@ export const recipeBloodseekerBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Bones,
-      qty: 3,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 2,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 2,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 50,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Bones, 3],
-      [CraftingResourcesBlueprint.Herb, 2],
-      [CraftingResourcesBlueprint.Skull, 2],
+      [CraftingResourcesBlueprint.Bones, 100],
+      [CraftingResourcesBlueprint.Herb, 20],
+      [CraftingResourcesBlueprint.Skull, 100],
+      [CraftingResourcesBlueprint.WoodenBoard, 50],
+      [CraftingResourcesBlueprint.SteelIngot, 20],
     ]),
   ],
 };

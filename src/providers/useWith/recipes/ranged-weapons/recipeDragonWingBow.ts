@@ -9,23 +9,28 @@ export const recipeDragonWingBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 1,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 1,
+      qty: 10,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 1,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 1],
-      [CraftingResourcesBlueprint.DragonTooth, 1],
-      [CraftingResourcesBlueprint.Leather, 1],
+      [CraftingResourcesBlueprint.CopperIngot, 30],
+      [CraftingResourcesBlueprint.DragonTooth, 10],
+      [CraftingResourcesBlueprint.WoodenBoard, 100],
+      [CraftingResourcesBlueprint.CorruptionIngot, 20],
     ]),
   ],
 };

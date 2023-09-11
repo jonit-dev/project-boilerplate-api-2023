@@ -116,11 +116,11 @@ export const npcIceTroll: Partial<INPC> = {
     },
     {
       itemBlueprintKey: DaggersBlueprint.FrostBiteDagger,
-      chance: 10,
+      chance: 3,
     },
     {
       itemBlueprintKey: StaffsBlueprint.FrostbiteWand,
-      chance: 10,
+      chance: 4,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],

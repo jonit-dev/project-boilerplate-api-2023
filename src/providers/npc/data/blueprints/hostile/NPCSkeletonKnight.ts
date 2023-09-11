@@ -88,7 +88,7 @@ export const npcSkeletonKnight = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.CopperveinBlade,
-      chance: 15,
+      chance: 2,
     },
   ],
 } as Partial<INPC>;

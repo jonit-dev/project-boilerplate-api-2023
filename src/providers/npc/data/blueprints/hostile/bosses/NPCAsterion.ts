@@ -10,6 +10,7 @@ import {
   ShieldsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
+  SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { generateMoveTowardsMovement } from "@providers/npc/data/abstractions/BaseNeutralNPC";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -48,6 +49,10 @@ export const npcAsterion = {
     {
       itemBlueprintKey: BootsBlueprint.CopperBoots,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.MinotaurSword,
+      chance: 2,
     },
     {
       itemBlueprintKey: SpearsBlueprint.RoyalSpear,

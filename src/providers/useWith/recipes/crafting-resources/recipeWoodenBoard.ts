@@ -13,7 +13,11 @@ export const recipeWoodenBoard: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WoodenSticks,
-      qty: 10,
+      qty: 20,
+    },
+    {
+      key: CraftingResourcesBlueprint.SmallWoodenStick,
+      qty: 30,
     },
   ],
   minCraftingRequirements: [

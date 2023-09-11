@@ -9,23 +9,28 @@ export const recipeSpectralMace: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 9,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 8,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.BlueFeather,
-      qty: 4,
+      qty: 40,
+    },
+    {
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 40,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 9],
-      [CraftingResourcesBlueprint.BlueSapphire, 8],
-      [CraftingResourcesBlueprint.BlueFeather, 4],
+      [CraftingResourcesBlueprint.SilverIngot, 90],
+      [CraftingResourcesBlueprint.BlueSapphire, 80],
+      [CraftingResourcesBlueprint.BlueFeather, 40],
+      [CraftingResourcesBlueprint.CorruptionIngot, 40],
     ]),
   ],
 };

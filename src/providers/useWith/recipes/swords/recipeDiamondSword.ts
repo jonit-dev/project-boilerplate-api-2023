@@ -9,28 +9,28 @@ export const recipeDiamondSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 8,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 13,
+      qty: 130,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 14,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 6,
+      qty: 60,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Diamond, 8],
-      [CraftingResourcesBlueprint.SteelIngot, 13],
-      [CraftingResourcesBlueprint.Leather, 14],
-      [CraftingResourcesBlueprint.Jade, 6],
+      [CraftingResourcesBlueprint.Diamond, 100],
+      [CraftingResourcesBlueprint.SteelIngot, 130],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
+      [CraftingResourcesBlueprint.Jade, 60],
     ]),
   ],
 };

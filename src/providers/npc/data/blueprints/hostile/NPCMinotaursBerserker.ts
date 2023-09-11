@@ -107,7 +107,11 @@ export const npcMinotaurBerserker = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.PixieCutSword,
-      chance: 10,
+      chance: 3,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.StellarBlade,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

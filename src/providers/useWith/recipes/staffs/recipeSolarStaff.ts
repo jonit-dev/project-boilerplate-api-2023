@@ -9,23 +9,23 @@ export const recipeSolarStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 9,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 9,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 1,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 9],
-      [CraftingResourcesBlueprint.Diamond, 9],
-      [CraftingResourcesBlueprint.MagicRecipe, 1],
+      [CraftingResourcesBlueprint.GoldenIngot, 90],
+      [CraftingResourcesBlueprint.Diamond, 90],
+      [CraftingResourcesBlueprint.MagicRecipe, 10],
     ]),
   ],
 };

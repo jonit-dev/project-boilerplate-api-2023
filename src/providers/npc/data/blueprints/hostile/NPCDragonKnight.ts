@@ -90,11 +90,11 @@ export const npcDragonKnight: Partial<INPC> = {
     },
     {
       itemBlueprintKey: AxesBlueprint.DaramianWaraxe,
-      chance: 10,
+      chance: 3,
     },
     {
       itemBlueprintKey: SwordsBlueprint.GuardianSword,
-      chance: 15,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

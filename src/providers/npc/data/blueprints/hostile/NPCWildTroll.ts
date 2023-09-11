@@ -85,7 +85,7 @@ export const npcWildTroll = {
     },
     {
       itemBlueprintKey: AxesBlueprint.HandAxe,
-      chance: 5,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

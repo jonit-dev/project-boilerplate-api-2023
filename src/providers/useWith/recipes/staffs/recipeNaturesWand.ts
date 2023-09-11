@@ -9,23 +9,23 @@ export const recipeNaturesWand: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 11,
+      qty: 110,
     },
     {
-      key: CraftingResourcesBlueprint.Herb,
-      qty: 18,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 112,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 2,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ElvenWood, 11],
-      [CraftingResourcesBlueprint.Herb, 18],
-      [CraftingResourcesBlueprint.MagicRecipe, 2],
+      [CraftingResourcesBlueprint.ElvenWood, 110],
+      [CraftingResourcesBlueprint.WoodenBoard, 112],
+      [CraftingResourcesBlueprint.MagicRecipe, 20],
     ]),
   ],
 };

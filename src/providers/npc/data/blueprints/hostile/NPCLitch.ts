@@ -136,7 +136,7 @@ export const npcLitch: Partial<INPC> = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.IronFistSword,
-      chance: 15,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],

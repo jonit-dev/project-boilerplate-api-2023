@@ -9,23 +9,28 @@ export const recipeHydraSlayerAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.Rope,
-      qty: 1,
+      qty: 10,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 5],
-      [CraftingResourcesBlueprint.Diamond, 5],
-      [CraftingResourcesBlueprint.Rope, 1],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
+      [CraftingResourcesBlueprint.Diamond, 50],
+      [CraftingResourcesBlueprint.Rope, 10],
+      [CraftingResourcesBlueprint.WoodenBoard, 50],
     ]),
   ],
 };

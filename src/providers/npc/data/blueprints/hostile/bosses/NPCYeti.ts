@@ -162,7 +162,7 @@ export const npcYeti: Partial<INPC> = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.SeekerArrow,
-      chance: 30,
+      chance: 2,
       quantityRange: [10, 20],
     },
   ],

@@ -9,28 +9,28 @@ export const recipeHellishBronzeStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 6,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 8,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 3,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 2,
+      qty: 8,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 6],
-      [CraftingResourcesBlueprint.IronIngot, 8],
-      [CraftingResourcesBlueprint.MagicRecipe, 3],
-      [CraftingResourcesBlueprint.DragonTooth, 2],
+      [CraftingResourcesBlueprint.CopperIngot, 60],
+      [CraftingResourcesBlueprint.IronIngot, 80],
+      [CraftingResourcesBlueprint.MagicRecipe, 30],
+      [CraftingResourcesBlueprint.DragonTooth, 8],
     ]),
   ],
 };
