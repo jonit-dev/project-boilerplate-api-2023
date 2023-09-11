@@ -9,23 +9,28 @@ export const recipeWardenOfTheWoods: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 8,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.ElvenLeaf,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 8,
+      qty: 80,
+    },
+    {
+      key: CraftingResourcesBlueprint.MagicRecipe,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ElvenWood, 8],
-      [CraftingResourcesBlueprint.ElvenLeaf, 5],
-      [CraftingResourcesBlueprint.Herb, 8],
+      [CraftingResourcesBlueprint.ElvenWood, 80],
+      [CraftingResourcesBlueprint.ElvenLeaf, 50],
+      [CraftingResourcesBlueprint.Herb, 80],
+      [CraftingResourcesBlueprint.MagicRecipe, 20],
     ]),
   ],
 };

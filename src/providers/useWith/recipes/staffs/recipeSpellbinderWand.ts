@@ -9,23 +9,23 @@ export const recipeSpellbinderWand: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 8,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 4,
+      qty: 40,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 8],
-      [CraftingResourcesBlueprint.Diamond, 5],
-      [CraftingResourcesBlueprint.MagicRecipe, 4],
+      [CraftingResourcesBlueprint.IronIngot, 80],
+      [CraftingResourcesBlueprint.Diamond, 50],
+      [CraftingResourcesBlueprint.MagicRecipe, 40],
     ]),
   ],
 };

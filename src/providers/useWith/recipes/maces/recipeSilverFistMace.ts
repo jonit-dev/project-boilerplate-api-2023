@@ -9,23 +9,28 @@ export const recipeSilverFistMace: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 15,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.Diamond,
-      qty: 4,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.Silk,
-      qty: 2,
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 30,
+    },
+    {
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 15],
-      [CraftingResourcesBlueprint.Diamond, 4],
-      [CraftingResourcesBlueprint.Silk, 2],
+      [CraftingResourcesBlueprint.SilverIngot, 30],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
+      [CraftingResourcesBlueprint.SteelIngot, 30],
+      [CraftingResourcesBlueprint.IronIngot, 50],
     ]),
   ],
 };

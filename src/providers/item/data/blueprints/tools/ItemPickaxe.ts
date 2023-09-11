@@ -68,7 +68,7 @@ export const itemPickaxe: IToolItemBlueprint = {
         {
           key: RangedWeaponsBlueprint.Stone,
           qty: [3, 5],
-          chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 15, rarityOfTool),
+          chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 10, rarityOfTool),
         },
       ],
     };
@@ -84,7 +84,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.IronOre,
               qty: [5, 7],
-              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 20, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 15, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -97,7 +97,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.CopperOre,
               qty: [3, 4],
-              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 15, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 10, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -111,7 +111,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.SilverOre,
               qty: [2, 3],
-              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 7, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 5, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -124,7 +124,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.GoldenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 5, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 3, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -137,7 +137,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.GreenOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 3, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 2, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -150,7 +150,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.ObsidiumOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 2, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 1, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };
@@ -163,7 +163,7 @@ export const itemPickaxe: IToolItemBlueprint = {
             {
               key: CraftingResourcesBlueprint.CorruptionOre,
               qty: [1, 2],
-              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 2, rarityOfTool),
+              chance: await itemCraftable.getCraftChance(character, CraftingSkill.Mining, 1, rarityOfTool),
             },
           ] as IUseWithItemToTileReward[],
         };

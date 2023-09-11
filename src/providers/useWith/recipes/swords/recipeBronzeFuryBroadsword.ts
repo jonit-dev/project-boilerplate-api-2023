@@ -8,24 +8,29 @@ export const recipeBronzeFuryBroadsword: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.CorruptionOre,
-      qty: 5,
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 5,
+      qty: 50,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 13,
+      key: CraftingResourcesBlueprint.RedSapphire,
+      qty: 50,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 130,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CorruptionOre, 5],
-      [CraftingResourcesBlueprint.IronIngot, 5],
-      [CraftingResourcesBlueprint.Leather, 13],
+      [CraftingResourcesBlueprint.CorruptionIngot, 50],
+      [CraftingResourcesBlueprint.IronIngot, 50],
+      [CraftingResourcesBlueprint.RedSapphire, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 130],
     ]),
   ],
 };

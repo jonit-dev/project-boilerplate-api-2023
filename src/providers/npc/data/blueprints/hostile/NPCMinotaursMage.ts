@@ -146,6 +146,10 @@ export const npcMinotaurMage = {
     },
     {
       itemBlueprintKey: HammersBlueprint.GoldHammer,
+      chance: 2,
+    },
+    {
+      itemBlueprintKey: CraftingResourcesBlueprint.WeaponRecipe,
       chance: 10,
     },
   ],

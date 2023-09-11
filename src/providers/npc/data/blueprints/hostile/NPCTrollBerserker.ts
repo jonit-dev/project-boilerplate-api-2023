@@ -133,7 +133,7 @@ export const npcTrollBerserker = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.AngelicSword,
-      chance: 15,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

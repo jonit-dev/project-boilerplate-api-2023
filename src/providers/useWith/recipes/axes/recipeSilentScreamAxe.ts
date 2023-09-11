@@ -9,23 +9,28 @@ export const recipeSilentScreamAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 12,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 6,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.BatsWing,
-      qty: 4,
+      qty: 40,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 12],
-      [CraftingResourcesBlueprint.Skull, 6],
-      [CraftingResourcesBlueprint.BatsWing, 4],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 30],
+      [CraftingResourcesBlueprint.Skull, 60],
+      [CraftingResourcesBlueprint.BatsWing, 40],
+      [CraftingResourcesBlueprint.WoodenBoard, 50],
     ]),
   ],
 };

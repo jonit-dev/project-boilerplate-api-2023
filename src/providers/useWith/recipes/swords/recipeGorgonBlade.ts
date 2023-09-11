@@ -8,24 +8,24 @@ export const recipeGorgonBlade: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.GreenOre,
-      qty: 18,
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.Eye,
-      qty: 5,
+      qty: 50,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 3,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 100,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenOre, 18],
-      [CraftingResourcesBlueprint.Eye, 5],
-      [CraftingResourcesBlueprint.Leather, 3],
+      [CraftingResourcesBlueprint.GreenIngot, 100],
+      [CraftingResourcesBlueprint.Eye, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 100],
     ]),
   ],
 };

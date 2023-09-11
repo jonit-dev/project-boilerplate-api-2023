@@ -9,23 +9,28 @@ export const recipeGoldenReaverAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 15,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 20,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 10,
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 50,
+    },
+    {
+      key: CraftingResourcesBlueprint.PhoenixFeather,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 15],
-      [CraftingResourcesBlueprint.PolishedStone, 20],
-      [CraftingResourcesBlueprint.Leather, 10],
+      [CraftingResourcesBlueprint.GoldenIngot, 50],
+      [CraftingResourcesBlueprint.PolishedStone, 30],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
+      [CraftingResourcesBlueprint.PhoenixFeather, 50],
     ]),
   ],
 };

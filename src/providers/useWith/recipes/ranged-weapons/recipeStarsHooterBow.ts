@@ -9,23 +9,23 @@ export const recipeStarsHooterBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 9,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 10,
+      qty: 80,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 4,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 40,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 9],
-      [CraftingResourcesBlueprint.Diamond, 10],
-      [CraftingResourcesBlueprint.Leather, 4],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 90],
+      [CraftingResourcesBlueprint.Diamond, 80],
+      [CraftingResourcesBlueprint.WoodenBoard, 40],
     ]),
   ],
 };

@@ -89,7 +89,7 @@ export const npcMinotaurArcher = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.EaglesEyeBow,
-      chance: 10,
+      chance: 3,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],

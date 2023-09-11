@@ -9,23 +9,23 @@ export const recipeElucidatorSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 18,
+      qty: 180,
     },
     {
       key: CraftingResourcesBlueprint.CorruptionOre,
-      qty: 16,
+      qty: 160,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 9,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 90,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 18],
-      [CraftingResourcesBlueprint.CorruptionOre, 16],
-      [CraftingResourcesBlueprint.Leather, 9],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 180],
+      [CraftingResourcesBlueprint.CorruptionOre, 160],
+      [CraftingResourcesBlueprint.WoodenBoard, 90],
     ]),
   ],
 };

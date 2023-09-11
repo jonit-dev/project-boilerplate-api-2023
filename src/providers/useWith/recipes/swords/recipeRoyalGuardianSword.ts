@@ -9,23 +9,28 @@ export const recipeRoyalGuardianSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 20,
+      qty: 200,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 19,
+      qty: 200,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 17,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 20],
-      [CraftingResourcesBlueprint.RedSapphire, 19],
-      [CraftingResourcesBlueprint.Leather, 17],
+      [CraftingResourcesBlueprint.GoldenIngot, 200],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
+      [CraftingResourcesBlueprint.RedSapphire, 200],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
     ]),
   ],
 };

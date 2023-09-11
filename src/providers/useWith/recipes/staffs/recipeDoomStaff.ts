@@ -9,28 +9,28 @@ export const recipeDoomStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumOre,
-      qty: 15,
+      qty: 150,
     },
     {
       key: CraftingResourcesBlueprint.DragonHead,
-      qty: 3,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 4,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 8,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumOre, 15],
-      [CraftingResourcesBlueprint.DragonHead, 3],
-      [CraftingResourcesBlueprint.DragonTooth, 4],
-      [CraftingResourcesBlueprint.MagicRecipe, 8],
+      [CraftingResourcesBlueprint.ObsidiumOre, 150],
+      [CraftingResourcesBlueprint.DragonHead, 5],
+      [CraftingResourcesBlueprint.DragonTooth, 10],
+      [CraftingResourcesBlueprint.MagicRecipe, 80],
     ]),
   ],
 };

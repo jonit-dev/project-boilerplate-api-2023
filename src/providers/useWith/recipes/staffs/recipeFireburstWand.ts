@@ -9,23 +9,23 @@ export const recipeFireburstWand: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenOre,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 7,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 2,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenOre, 5],
-      [CraftingResourcesBlueprint.RedSapphire, 7],
-      [CraftingResourcesBlueprint.MagicRecipe, 2],
+      [CraftingResourcesBlueprint.GoldenOre, 50],
+      [CraftingResourcesBlueprint.RedSapphire, 70],
+      [CraftingResourcesBlueprint.MagicRecipe, 20],
     ]),
   ],
 };

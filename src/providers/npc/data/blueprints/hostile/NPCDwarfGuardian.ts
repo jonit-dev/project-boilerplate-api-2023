@@ -5,7 +5,6 @@ import {
   AccessoriesBlueprint,
   AxesBlueprint,
   ContainersBlueprint,
-  CraftingResourcesBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
@@ -98,21 +97,10 @@ export const npcDwarfGuardian: Partial<INPC> = {
       itemBlueprintKey: DaggersBlueprint.VerdantDagger,
       chance: 10,
     },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.CorruptionOre,
-      chance: 5,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.SilverOre,
-      chance: 7,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.GoldenOre,
-      chance: 5,
-    },
+
     {
       itemBlueprintKey: AxesBlueprint.MoonBeamAxe,
-      chance: 5,
+      chance: 2,
     },
   ],
 };

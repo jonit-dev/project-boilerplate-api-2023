@@ -8,24 +8,29 @@ export const recipeTitaniumBroadsword: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 80,
+    },
+    {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 10,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.Rock,
-      qty: 8,
+      qty: 80,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 11,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 10],
-      [CraftingResourcesBlueprint.Rock, 8],
-      [CraftingResourcesBlueprint.Leather, 11],
+      [CraftingResourcesBlueprint.GreenIngot, 80],
+      [CraftingResourcesBlueprint.SteelIngot, 30],
+      [CraftingResourcesBlueprint.Rock, 80],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
     ]),
   ],
 };

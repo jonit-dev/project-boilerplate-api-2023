@@ -9,23 +9,28 @@ export const recipeGossamerBolt: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Silk,
-      qty: 2,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.BatsWing,
-      qty: 1,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.SmallWoodenStick,
-      qty: 1,
+      qty: 10,
+    },
+    {
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Silk, 2],
-      [CraftingResourcesBlueprint.BatsWing, 1],
-      [CraftingResourcesBlueprint.SmallWoodenStick, 1],
+      [CraftingResourcesBlueprint.Silk, 20],
+      [CraftingResourcesBlueprint.BatsWing, 10],
+      [CraftingResourcesBlueprint.SmallWoodenStick, 10],
+      [CraftingResourcesBlueprint.CorruptionIngot, 10],
     ]),
   ],
 };

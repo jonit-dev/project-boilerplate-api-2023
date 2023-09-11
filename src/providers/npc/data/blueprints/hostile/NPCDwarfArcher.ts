@@ -93,11 +93,11 @@ export const npcDwarfArcher: Partial<INPC> = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.WhisperWindBow,
-      chance: 10,
+      chance: 1,
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.HeartseekerArrow,
-      chance: 20,
+      chance: 3,
       quantityRange: [10, 20],
     },
   ],
