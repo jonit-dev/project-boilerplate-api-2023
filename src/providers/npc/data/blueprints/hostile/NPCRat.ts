@@ -43,7 +43,7 @@ export const npcRat = {
     },
     {
       itemBlueprintKey: CraftingResourcesBlueprint.Worm,
-      chance: 25,
+      chance: 10,
       quantityRange: [5, 10],
     },
   ],

@@ -80,12 +80,12 @@ export const itemFishingRod: IToolItemBlueprint = {
           {
             key: FoodsBlueprint.Tuna,
             qty: [2, 3],
-            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Fishing, 10, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Fishing, 3, rarityOfTool),
           },
           {
             key: FoodsBlueprint.BrownFish,
             qty: [1, 2],
-            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Fishing, 10, rarityOfTool),
+            chance: await itemCraftable.getCraftChance(character, CraftingSkill.Fishing, 5, rarityOfTool),
           },
         ],
       },

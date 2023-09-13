@@ -105,6 +105,10 @@ export const npcMinotaurBerserker = {
       chance: 20,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: SwordsBlueprint.PixieCutSword,
+      chance: 10,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 } as Partial<INPC>;

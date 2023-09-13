@@ -10,7 +10,7 @@ export const itemSilverOre: ICraftableItemBlueprint = {
   name: "Silver Ore",
   description: "Silver ore that can be smelted into ingots.",
   weight: 1.6,
-  maxStackSize: 100,
+  maxStackSize: 999,
   canSell: false,
   basePrice: 35,
 };

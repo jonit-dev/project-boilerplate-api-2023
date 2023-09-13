@@ -10,6 +10,6 @@ export const itemSkull: ICraftableItemBlueprint = {
   name: "Skull",
   description: "A skull that can be used for crafting weapons or tools.",
   weight: 0.28,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 9,
 };

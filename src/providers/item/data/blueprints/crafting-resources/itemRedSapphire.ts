@@ -10,6 +10,6 @@ export const itemRedSapphire: ICraftableItemBlueprint = {
   name: "Red Sapphire",
   description: "Red is a precious gemstone, formed from a mineral called arundu.",
   weight: 0.5,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 30,
 };

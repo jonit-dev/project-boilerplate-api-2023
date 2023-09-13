@@ -16,6 +16,15 @@ export class ScriptsController implements interfaces.Controller {
     });
   }
 
+  @httpGet("/cleanup/items")
+  public async cleanupItems(@response() res): Promise<void> {
+    await this.scriptsUseCase.cleanupItems();
+
+    return res.status(200).send({
+      message: "Items cleaned up!",
+    });
+  }
+
   @httpGet("/adjust-speed")
   public async adjustSpeed(@response() res): Promise<void> {
     await this.scriptsUseCase.setAllBaseSpeedsToStandard();
@@ -42,48 +51,6 @@ export class ScriptsController implements interfaces.Controller {
 
     return res.status(200).send({
       message: "Initial coordinates adjusted succesfully",
-    });
-  }
-
-  @httpGet("/max-health-max-mana")
-  public async maxHealthMaxMana(@response() res): Promise<void> {
-    // update all initial coordinates from users performatically
-
-    await this.scriptsUseCase.adjustMaxHealthMaxMana();
-
-    return res.status(200).send({
-      message: "Max HP/Mana adjusted and buffs removed",
-    });
-  }
-
-  @httpGet("/spell-fix")
-  public async spellFix(@response() res): Promise<void> {
-    // update all initial coordinates from users performatically
-
-    await this.scriptsUseCase.spellNameFix();
-
-    return res.status(200).send({
-      message: "Eagles Eye Fixes",
-    });
-  }
-
-  @httpGet("/fix-bugged-depots")
-  public async buggedDepots(@response() res): Promise<void> {
-    // update all initial coordinates from users performatically
-
-    await this.scriptsUseCase.fixWrongDepot();
-
-    return res.status(200).send({
-      message: "Depot fixed",
-    });
-  }
-
-  @httpGet("/fix-depot-reference")
-  public async fixDepotReference(@response() res): Promise<void> {
-    await this.scriptsUseCase.fixAllDepotReferences();
-
-    return res.status(200).send({
-      message: "Depot reference fixed",
     });
   }
 }

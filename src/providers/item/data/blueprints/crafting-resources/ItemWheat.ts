@@ -10,6 +10,6 @@ export const itemWheat: ICraftableItemBlueprint = {
   name: "Wheat",
   description: "A crafting material commonly used to make food.",
   weight: 0.05,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 0.5,
 };

@@ -10,6 +10,6 @@ export const itemDragonTooth: ICraftableItemBlueprint = {
   name: "Dragon Tooth",
   description: "A dragon tooth  used to craft magic items.",
   weight: 1,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 500,
 };

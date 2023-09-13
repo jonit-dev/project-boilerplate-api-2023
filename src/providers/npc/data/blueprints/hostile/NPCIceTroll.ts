@@ -7,11 +7,13 @@ import {
   AxesBlueprint,
   BootsBlueprint,
   CraftingResourcesBlueprint,
+  DaggersBlueprint,
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
+  StaffsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -111,6 +113,14 @@ export const npcIceTroll: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.Skull,
       chance: 15,
       quantityRange: [1, 3],
+    },
+    {
+      itemBlueprintKey: DaggersBlueprint.FrostBiteDagger,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.FrostbiteWand,
+      chance: 10,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],

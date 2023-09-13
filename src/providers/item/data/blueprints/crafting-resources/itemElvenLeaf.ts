@@ -10,6 +10,6 @@ export const itemElvenLeaf: ICraftableItemBlueprint = {
   name: "Elven Leaf",
   description: "A leaf from the Elven Tree.",
   weight: 0.02,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 20,
 };

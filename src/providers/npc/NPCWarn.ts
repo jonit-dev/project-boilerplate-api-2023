@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
+import { PROMISE_DEFAULT_CONCURRENCY } from "@providers/constants/ServerConstants";
 import { DataStructureHelper } from "@providers/dataStructures/DataStructuresHelper";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -10,7 +11,7 @@ import {
   NPCAlignment,
   NPCSocketEvents,
 } from "@rpg-engine/shared";
-import * as Promise from "bluebird";
+import { Promise } from "bluebird";
 import { provide } from "inversify-binding-decorators";
 import { NPCQuest } from "./NPCQuest";
 import { NPCView } from "./NPCView";
@@ -52,7 +53,7 @@ export class NPCWarn {
         }
         await this.warnCharacterAboutSingleNPCCreation(npc, character);
       },
-      { concurrency: 10 }
+      { concurrency: PROMISE_DEFAULT_CONCURRENCY }
     );
 
     await npcWarnings;

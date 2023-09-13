@@ -10,7 +10,7 @@ export const itemCorruptionIngot: ICraftableItemBlueprint = {
   name: "corruption-ingot",
   description: "A dark and malevolent ingot infused with corruptive energy, often used for crafting weapons.",
   weight: 1,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 40,
   canSell: false,
 };

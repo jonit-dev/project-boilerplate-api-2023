@@ -6,6 +6,7 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
@@ -142,6 +143,10 @@ export const npcMinotaurMage = {
     {
       itemBlueprintKey: SpearsBlueprint.PoseidonTrident,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.GoldHammer,
+      chance: 10,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],

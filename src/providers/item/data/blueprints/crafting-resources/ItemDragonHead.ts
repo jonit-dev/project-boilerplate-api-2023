@@ -10,6 +10,6 @@ export const itemDragonHead: ICraftableItemBlueprint = {
   name: "Dragon Head",
   description: "A dragon head skull used to craft magic items.",
   weight: 1,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 1000,
 };

@@ -8,6 +8,7 @@ import {
   FoodsBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  MacesBlueprint,
   RangedWeaponsBlueprint,
   ShieldsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -99,6 +100,10 @@ export const npcStoneGolem: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.Rock,
       chance: 30,
       quantityRange: [1, 10],
+    },
+    {
+      itemBlueprintKey: MacesBlueprint.SkullCrusherMace,
+      chance: 10,
     },
   ],
 };

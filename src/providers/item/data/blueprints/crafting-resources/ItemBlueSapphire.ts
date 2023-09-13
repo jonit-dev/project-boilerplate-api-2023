@@ -10,6 +10,6 @@ export const itemBlueSapphire: ICraftableItemBlueprint = {
   name: "Blue Sapphire",
   description: "Sapphire is a precious gemstone, formed from a mineral called corundum.",
   weight: 0.1,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 30,
 };

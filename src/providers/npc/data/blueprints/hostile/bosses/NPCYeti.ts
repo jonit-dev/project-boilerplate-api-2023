@@ -160,6 +160,11 @@ export const npcYeti: Partial<INPC> = {
       chance: 10,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.SeekerArrow,
+      chance: 30,
+      quantityRange: [10, 20],
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
 };

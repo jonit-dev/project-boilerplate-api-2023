@@ -9,6 +9,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AxesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
@@ -91,6 +92,10 @@ export const npcTrollWarrior = {
       itemBlueprintKey: RangedWeaponsBlueprint.Shuriken,
       chance: 10,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: AxesBlueprint.HandAxe,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

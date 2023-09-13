@@ -10,6 +10,6 @@ export const itemColoredFeather: ICraftableItemBlueprint = {
   name: "Colored feather",
   description: "A crafting resource used for making arrows and magic items",
   weight: 0.01,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 30,
 };

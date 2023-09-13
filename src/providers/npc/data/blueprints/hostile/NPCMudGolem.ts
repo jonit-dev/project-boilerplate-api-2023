@@ -7,6 +7,7 @@ import {
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
+  HammersBlueprint,
   ShieldsBlueprint,
   SpearsBlueprint,
   StaffsBlueprint,
@@ -80,6 +81,14 @@ export const npcMudGolem: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.PolishedStone,
       chance: 10,
       quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: HammersBlueprint.DragonFistHammer,
+      chance: 10,
+    },
+    {
+      itemBlueprintKey: StaffsBlueprint.GravityStaff,
+      chance: 10,
     },
   ],
 };

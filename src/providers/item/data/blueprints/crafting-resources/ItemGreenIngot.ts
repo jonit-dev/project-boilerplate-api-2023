@@ -10,7 +10,7 @@ export const itemGreenIngot: ICraftableItemBlueprint = {
   name: "green-ingot",
   description: "A special ingot infused with magical energy, used as a material for crafting weapons.",
   weight: 1.2,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 24,
   canSell: false,
 };

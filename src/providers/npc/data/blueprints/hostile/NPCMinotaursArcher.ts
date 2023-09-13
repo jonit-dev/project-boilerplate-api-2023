@@ -87,6 +87,10 @@ export const npcMinotaurArcher = {
       chance: 20,
       quantityRange: [1, 5],
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.EaglesEyeBow,
+      chance: 10,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Burning],
 } as Partial<INPC>;

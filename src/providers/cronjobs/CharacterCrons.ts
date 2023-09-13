@@ -18,6 +18,7 @@ export class CharacterCrons {
     private socketMessaging: SocketMessaging,
     private characterLastAction: CharacterLastAction,
     private newRelic: NewRelic,
+
     private socketSessionControl: SocketSessionControl
   ) {}
 
@@ -115,7 +116,7 @@ export class CharacterCrons {
 
         (await Character.findByIdAndUpdate({ _id: character._id }, { isOnline: false })) as ICharacter;
 
-        await this.socketSessionControl.deleteSession(character);
+        await this.socketSessionControl.deleteSession(character.channelId!);
 
         await this.characterLastAction.clearLastAction(character._id);
 
