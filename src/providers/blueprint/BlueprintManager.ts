@@ -5,6 +5,9 @@ import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTy
 import { usableEffectsIndex } from "@providers/item/data/usableEffects";
 import { IUsableEffect, IUsableEffectRune } from "@providers/item/data/usableEffects/types";
 import { npcsBlueprintIndex } from "@providers/npc/data";
+import { questsBlueprintIndex } from "@providers/quest/data";
+import { spellsBlueprintsIndex } from "@providers/spells/data";
+import { recipeBlueprintsIndex } from "@providers/useWith/blueprints/index";
 import crypto from "crypto";
 import { provide } from "inversify-binding-decorators";
 
@@ -23,6 +26,9 @@ export class BlueprintManager {
     await Promise.all([
       this.loadBlueprintFor("npcs", npcsBlueprintIndex),
       this.loadBlueprintFor("items", itemsBlueprintIndex),
+      this.loadBlueprintFor("quests", questsBlueprintIndex),
+      this.loadBlueprintFor("spells", spellsBlueprintsIndex),
+      this.loadBlueprintFor("recipes", recipeBlueprintsIndex),
     ]);
   }
 
