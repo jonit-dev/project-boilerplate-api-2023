@@ -113,18 +113,19 @@ export class BattleDamageCalculator {
     damage: number,
     isMagicAttack: boolean
   ): Promise<number> {
-    if (target.type === EntityType.NPC) {
-      const [defenderResistanceLevel, defenderMagicResistanceLevel] = await Promise.all([
-        defenderSkills?.resistance.level,
-        defenderSkills?.magicResistance.level,
-      ]);
+    //! Disable for now NPC damage reduction
+    // if (target.type === EntityType.NPC) {
+    //   const [defenderResistanceLevel, defenderMagicResistanceLevel] = await Promise.all([
+    //     defenderSkills?.resistance.level,
+    //     defenderSkills?.magicResistance.level,
+    //   ]);
 
-      const defenseAttribute = isMagicAttack ? defenderMagicResistanceLevel : defenderResistanceLevel;
-      damage = this.calculateDamageReduction(
-        damage,
-        this.calculateCharacterRegularDefense(defenderSkills.level, defenseAttribute)
-      );
-    }
+    //   const defenseAttribute = isMagicAttack ? defenderMagicResistanceLevel : defenderResistanceLevel;
+    //   damage = this.calculateDamageReduction(
+    //     damage,
+    //     this.calculateCharacterRegularDefense(defenderSkills.level, defenseAttribute)
+    //   );
+    // }
 
     if (target.type === EntityType.Character) {
       const character = target as ICharacter;

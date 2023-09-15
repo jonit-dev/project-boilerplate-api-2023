@@ -9,7 +9,7 @@ export const BONUS_DAMAGE_MULTIPLIER = 2.5;
 
 // Damage Reduction
 export const DAMAGE_REDUCTION_MIN_DAMAGE = 1;
-export const DAMAGE_REDUCTION_MAX_REDUCTION_PERCENTAGE = 0.2;
+export const DAMAGE_REDUCTION_MAX_REDUCTION_PERCENTAGE = 0.4;
 
 // Total potential damage
 
