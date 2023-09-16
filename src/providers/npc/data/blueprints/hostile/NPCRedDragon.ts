@@ -33,8 +33,9 @@ export const npcRedDragon = {
   skillRandomizerDice: Dice.D20,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   canSwitchToLowHealthTarget: true,
+  canSwitchToRandomTarget: true,
   skills: {
-    level: 200,
+    level: 250,
     strength: {
       level: 200,
     },

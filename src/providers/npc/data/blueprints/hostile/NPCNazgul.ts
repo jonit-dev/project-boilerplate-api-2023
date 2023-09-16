@@ -8,32 +8,31 @@ import {
   DaggersBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
-  RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { MagicPower, NPCAlignment, RangeTypes, SpellsBlueprint } from "@rpg-engine/shared";
+import { AnimationEffectKeys, MagicPower, NPCAlignment, RangeTypes, SpellsBlueprint } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcObsidiaNightguard: Partial<INPC> = {
+export const npcNazgul: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
   name: "Obsidia Nightguard",
-  key: HostileNPCsBlueprint.ObsidiaNightguard,
-  textureKey: "obsidia-nightguard",
+  key: HostileNPCsBlueprint.Nazgul,
+  textureKey: HostileNPCsBlueprint.Nazgul,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.MeleeRanged,
   speed: MovementSpeed.Fast,
-  ammoKey: RangedWeaponsBlueprint.Bolt,
+  ammoKey: AnimationEffectKeys.Dark,
   maxRangeAttack: RangeTypes.High,
-  baseHealth: 1500,
+  baseHealth: 6000,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   canSwitchToLowHealthTarget: true,
   skills: {
-    level: 95,
+    level: 150,
     strength: {
-      level: 120,
+      level: 150,
     },
     dexterity: {
       level: 70,
@@ -48,7 +47,7 @@ export const npcObsidiaNightguard: Partial<INPC> = {
   loots: [
     {
       itemBlueprintKey: SwordsBlueprint.LeviathanSword,
-      chance: 15,
+      chance: 5,
     },
     {
       itemBlueprintKey: DaggersBlueprint.PhoenixDagger,
@@ -71,17 +70,12 @@ export const npcObsidiaNightguard: Partial<INPC> = {
       chance: 30,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
+  entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Corruption],
   areaSpells: [
     {
-      spellKey: SpellsBlueprint.Arrowstorm,
-      probability: 10,
-      power: MagicPower.Medium,
-    },
-    {
-      spellKey: SpellsBlueprint.Blizzard,
+      spellKey: SpellsBlueprint.CorruptionWave,
       probability: 5,
-      power: MagicPower.High,
+      power: MagicPower.UltraHigh,
     },
   ],
 };

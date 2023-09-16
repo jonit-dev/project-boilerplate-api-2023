@@ -11,15 +11,15 @@ import {
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { NPCAlignment } from "@rpg-engine/shared";
+import { MagicPower, NPCAlignment, SpellsBlueprint } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcIceCyclop = {
+export const npcIceCyclops = {
   ...generateMoveTowardsMovement(),
-  name: "Ice Cyclop",
-  key: HostileNPCsBlueprint.IceCyclop,
-  textureKey: HostileNPCsBlueprint.IceCyclop,
+  name: "Ice Cyclops",
+  key: HostileNPCsBlueprint.IceCyclops,
+  textureKey: HostileNPCsBlueprint.IceCyclops,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
@@ -65,5 +65,12 @@ export const npcIceCyclop = {
       quantityRange: [5, 10],
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding],
+  entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
+  areaSpells: [
+    {
+      spellKey: SpellsBlueprint.Blizzard,
+      probability: 10,
+      power: MagicPower.High,
+    },
+  ],
 } as Partial<INPC>;

@@ -7,24 +7,21 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
-  RangedWeaponsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { MagicPower, NPCAlignment, RangeTypes, SpellsBlueprint } from "@rpg-engine/shared";
+import { MagicPower, NPCAlignment, SpellsBlueprint } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcWarlord: Partial<INPC> = {
+export const npcOrcWarlord: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Warlord",
-  key: HostileNPCsBlueprint.Warlord,
-  textureKey: "warlord",
+  name: "Orc Warlord",
+  key: HostileNPCsBlueprint.OrcWarlord,
+  textureKey: HostileNPCsBlueprint.OrcWarlord,
   alignment: NPCAlignment.Hostile,
-  attackType: EntityAttackType.MeleeRanged,
+  attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
-  ammoKey: RangedWeaponsBlueprint.Bolt,
-  maxRangeAttack: RangeTypes.High,
   baseHealth: 2000,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
@@ -50,7 +47,6 @@ export const npcWarlord: Partial<INPC> = {
       chance: 75,
       quantityRange: [1, 10],
     },
-
     {
       itemBlueprintKey: DaggersBlueprint.VerdantDagger,
       chance: 25,
@@ -69,16 +65,11 @@ export const npcWarlord: Partial<INPC> = {
       chance: 10,
     },
   ],
-  entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
+  entityEffects: [EntityEffectBlueprint.Bleeding],
   areaSpells: [
     {
       spellKey: SpellsBlueprint.Arrowstorm,
       probability: 10,
-      power: MagicPower.Medium,
-    },
-    {
-      spellKey: SpellsBlueprint.Blizzard,
-      probability: 5,
       power: MagicPower.High,
     },
   ],

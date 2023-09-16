@@ -12,9 +12,9 @@ import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcCentipede } from "./NPCCentipede";
 import { npcConde } from "./NPCConde";
 import { npcCondessa } from "./NPCCondessa";
-import { npcCyclop } from "./NPCCyclop";
 import { npcCyclopBerserker } from "./NPCCyclopBerserker";
 import { npcCyclopWarrior } from "./NPCCyclopWarrior";
+import { npcCyclops } from "./NPCCyclops";
 import { npcDarkKnight } from "./NPCDarkKnight";
 import { npcDarkWraith } from "./NPCDarkWraith";
 import { npcDragonKnight } from "./NPCDragonKnight";
@@ -26,6 +26,7 @@ import { npcDwarfGuardian } from "./NPCDwarfGuardian";
 import { npcDwarfMage } from "./NPCDwarfMage";
 import { npcElderGolem } from "./NPCElderGolem";
 import { npcElf } from "./NPCElf";
+import { npcFellbeast } from "./NPCFellbeast";
 import { npcFireFox } from "./NPCFireFox";
 import { npcForestCyclop } from "./NPCForestCyclop";
 import { npcForestTroll } from "./NPCForestTroll";
@@ -36,9 +37,8 @@ import { npcGhoul } from "./NPCGhoul";
 import { npcGiantBat } from "./NPCGiantBat";
 import { npcGiantSpider } from "./NPCGiantSpider";
 import { npcGoblin } from "./NPCGoblin";
-import { npcGolem } from "./NPCGolem";
 import { npcHighElf } from "./NPCHighElf";
-import { npcIceCyclop } from "./NPCIceCyclop";
+import { npcIceCyclops } from "./NPCIceCyclop";
 import { npcIceFox } from "./NPCIceFox";
 import { npcIceThing } from "./NPCIceThing";
 import { npcIceTroll } from "./NPCIceTroll";
@@ -49,17 +49,17 @@ import { npcMinotaurArcher } from "./NPCMinotaursArcher";
 import { npcMinotaurBerserker } from "./NPCMinotaursBerserker";
 import { npcMinotaurMage } from "./NPCMinotaursMage";
 import { npcMudGolem } from "./NPCMudGolem";
-import { npcObsidiaNightguard } from "./NPCObsidiaNightguard";
-import { npcOchrePteroling } from "./NPCOchrePteroling";
+import { npcNazgul } from "./NPCNazgul";
+import { npcNightFellbeast } from "./NPCNightFellbeast";
 import { npcOrc } from "./NPCOrc";
 import { npcOrcArcher } from "./NPCOrcArcher";
 import { npcOrcBerserker } from "./NPCOrcBerserker";
 import { npcOrcMage } from "./NPCOrcMage";
 import { npcOrcRaider } from "./NPCOrcRaider";
+import { npcOrcWarlord } from "./NPCOrcWarlord";
 import { npcOrcWarrior } from "./NPCOrcWarrior";
 import { npcPandaBear } from "./NPCPandaBear";
 import { npcPolarBear } from "./NPCPolarBear";
-import { npcPteroling } from "./NPCPteroling";
 import { npcRaccoon } from "./NPCRaccoon";
 import { npcRat } from "./NPCRat";
 import { npcRedCentipede } from "./NPCRedCentipede";
@@ -76,7 +76,6 @@ import { npcStoneGolem } from "./NPCStoneGolem";
 import { npcTroll } from "./NPCTroll";
 import { npcTrollBerserker } from "./NPCTrollBerserker";
 import { npcTrollWarrior } from "./NPCTrollWarrior";
-import { npcWarlord } from "./NPCWarlord";
 import { npcWildCyclop } from "./NPCWildCyclop";
 import { npcWildTroll } from "./NPCWildTroll";
 import { npcWinterWolf } from "./NPCWinterWolf";
@@ -157,16 +156,15 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.CaveCyclop]: npcCaveCyclop,
   [HostileNPCsBlueprint.Conde]: npcConde,
   [HostileNPCsBlueprint.Condessa]: npcCondessa,
-  [HostileNPCsBlueprint.Cyclop]: npcCyclop,
-  [HostileNPCsBlueprint.CyclopBerserker]: npcCyclopBerserker,
-  [HostileNPCsBlueprint.CyclopWarrior]: npcCyclopWarrior,
-  [HostileNPCsBlueprint.ForestCyclop]: npcForestCyclop,
-  [HostileNPCsBlueprint.Golem]: npcGolem,
-  [HostileNPCsBlueprint.IceCyclop]: npcIceCyclop,
-  [HostileNPCsBlueprint.ObsidiaNightguard]: npcObsidiaNightguard,
-  [HostileNPCsBlueprint.OchrePteroling]: npcOchrePteroling,
+  [HostileNPCsBlueprint.Cyclops]: npcCyclops,
+  [HostileNPCsBlueprint.CyclopsBerserker]: npcCyclopBerserker,
+  [HostileNPCsBlueprint.CyclopsWarrior]: npcCyclopWarrior,
+  [HostileNPCsBlueprint.ForestCyclops]: npcForestCyclop,
+  [HostileNPCsBlueprint.IceCyclops]: npcIceCyclops,
+  [HostileNPCsBlueprint.Nazgul]: npcNazgul,
+  [HostileNPCsBlueprint.Fellbeast]: npcFellbeast,
   [HostileNPCsBlueprint.OrcRaider]: npcOrcRaider,
-  [HostileNPCsBlueprint.Pteroling]: npcPteroling,
-  [HostileNPCsBlueprint.Warlord]: npcWarlord,
-  [HostileNPCsBlueprint.WildCyclop]: npcWildCyclop,
+  [HostileNPCsBlueprint.NightFellbeast]: npcNightFellbeast,
+  [HostileNPCsBlueprint.OrcWarlord]: npcOrcWarlord,
+  [HostileNPCsBlueprint.WildCyclops]: npcWildCyclop,
 };

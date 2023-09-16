@@ -15,11 +15,11 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcCyclop = {
+export const npcCyclops = {
   ...generateMoveTowardsMovement(),
-  name: "Cyclop",
-  key: HostileNPCsBlueprint.Cyclop,
-  textureKey: HostileNPCsBlueprint.Cyclop,
+  name: "Cyclops",
+  key: HostileNPCsBlueprint.Cyclops,
+  textureKey: HostileNPCsBlueprint.Cyclops,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,

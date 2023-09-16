@@ -17,8 +17,8 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcForestCyclop = {
   ...generateMoveTowardsMovement(),
   name: "Forest Cyclop",
-  key: HostileNPCsBlueprint.ForestCyclop,
-  textureKey: HostileNPCsBlueprint.ForestCyclop,
+  key: HostileNPCsBlueprint.ForestCyclops,
+  textureKey: HostileNPCsBlueprint.ForestCyclops,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,

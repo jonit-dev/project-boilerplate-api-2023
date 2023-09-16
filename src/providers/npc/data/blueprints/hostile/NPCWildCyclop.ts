@@ -19,8 +19,8 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 export const npcWildCyclop = {
   ...generateMoveTowardsMovement(),
   name: "Wild Cyclop",
-  key: HostileNPCsBlueprint.WildCyclop,
-  textureKey: HostileNPCsBlueprint.WildCyclop,
+  key: HostileNPCsBlueprint.WildCyclops,
+  textureKey: HostileNPCsBlueprint.WildCyclops,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
