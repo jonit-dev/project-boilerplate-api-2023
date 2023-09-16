@@ -9,23 +9,23 @@ export const recipeBladeBarrier: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 8,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.IronNail,
-      qty: 6,
+      qty: 60,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 5,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 8],
-      [CraftingResourcesBlueprint.IronNail, 6],
-      [CraftingResourcesBlueprint.Leather, 5],
+      [CraftingResourcesBlueprint.SteelIngot, 80],
+      [CraftingResourcesBlueprint.IronNail, 60],
+      [CraftingResourcesBlueprint.WoodenBoard, 50],
     ]),
   ],
 };

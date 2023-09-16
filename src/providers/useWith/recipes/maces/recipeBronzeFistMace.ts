@@ -9,23 +9,28 @@ export const recipeBronzeFistMace: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 4,
+      qty: 40,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 3,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 2,
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 30,
+    },
+    {
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 10],
-      [CraftingResourcesBlueprint.WoodenBoard, 5],
-      [CraftingResourcesBlueprint.Leather, 5],
+      [CraftingResourcesBlueprint.CopperIngot, 40],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
+      [CraftingResourcesBlueprint.SteelIngot, 30],
+      [CraftingResourcesBlueprint.IronIngot, 80],
     ]),
   ],
 };

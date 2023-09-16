@@ -103,7 +103,7 @@ export const npcStoneGolem: Partial<INPC> = {
     },
     {
       itemBlueprintKey: MacesBlueprint.SkullCrusherMace,
-      chance: 10,
+      chance: 2,
     },
   ],
 };

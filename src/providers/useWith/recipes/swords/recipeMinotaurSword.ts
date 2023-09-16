@@ -9,33 +9,33 @@ export const recipeMinotaurSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 17,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Bone,
-      qty: 14,
+      qty: 50,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 12,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 20,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 16,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 17],
-      [CraftingResourcesBlueprint.Bone, 14],
-      [CraftingResourcesBlueprint.Leather, 12],
-      [CraftingResourcesBlueprint.ObsidiumIngot, 20],
-      [CraftingResourcesBlueprint.SteelIngot, 16],
+      [CraftingResourcesBlueprint.CopperIngot, 80],
+      [CraftingResourcesBlueprint.Bone, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 60],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 50],
+      [CraftingResourcesBlueprint.SteelIngot, 20],
     ]),
   ],
 };

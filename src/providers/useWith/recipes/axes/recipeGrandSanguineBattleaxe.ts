@@ -9,23 +9,28 @@ export const recipeGrandSanguineBattleaxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 4,
+      qty: 40,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 5,
+      qty: 50,
     },
     {
-      key: CraftingResourcesBlueprint.Herb,
-      qty: 3,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
+    },
+    {
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 30,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 4],
-      [CraftingResourcesBlueprint.RedSapphire, 5],
-      [CraftingResourcesBlueprint.Herb, 3],
+      [CraftingResourcesBlueprint.SteelIngot, 40],
+      [CraftingResourcesBlueprint.RedSapphire, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
+      [CraftingResourcesBlueprint.GreenIngot, 30],
     ]),
   ],
 };

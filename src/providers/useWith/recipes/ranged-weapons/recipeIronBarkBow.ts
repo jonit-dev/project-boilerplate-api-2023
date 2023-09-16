@@ -8,24 +8,29 @@ export const recipeIronBarkBow: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 12,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.IronNail,
-      qty: 8,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
       qty: 10,
     },
+    {
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 30,
+    },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 12],
-      [CraftingResourcesBlueprint.IronNail, 8],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
+      [CraftingResourcesBlueprint.IronNail, 80],
       [CraftingResourcesBlueprint.ElvenWood, 10],
+      [CraftingResourcesBlueprint.CorruptionIngot, 30],
     ]),
   ],
 };

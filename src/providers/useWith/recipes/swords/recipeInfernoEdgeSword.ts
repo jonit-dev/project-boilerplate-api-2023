@@ -9,15 +9,15 @@ export const recipeInfernoEdgeSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 17,
+      qty: 170,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 18,
+      qty: 180,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 20,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
@@ -27,9 +27,9 @@ export const recipeInfernoEdgeSword: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 17],
-      [CraftingResourcesBlueprint.RedSapphire, 18],
-      [CraftingResourcesBlueprint.Leather, 20],
+      [CraftingResourcesBlueprint.SteelIngot, 170],
+      [CraftingResourcesBlueprint.RedSapphire, 180],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
       [CraftingResourcesBlueprint.DragonTooth, 2],
     ]),
   ],

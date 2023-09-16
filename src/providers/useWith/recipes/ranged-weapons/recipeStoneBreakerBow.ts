@@ -9,23 +9,28 @@ export const recipeStoneBreakerBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 9,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 4,
+      qty: 40,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 8,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
+    },
+    {
+      key: CraftingResourcesBlueprint.PhoenixFeather,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 9],
-      [CraftingResourcesBlueprint.PolishedStone, 4],
-      [CraftingResourcesBlueprint.Leather, 8],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 90],
+      [CraftingResourcesBlueprint.PolishedStone, 40],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
+      [CraftingResourcesBlueprint.PhoenixFeather, 80],
     ]),
   ],
 };

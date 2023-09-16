@@ -9,23 +9,33 @@ export const recipeGloriousAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 9,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 5,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 7,
+      qty: 50,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
+    },
+    {
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 30,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 9],
-      [CraftingResourcesBlueprint.Diamond, 5],
-      [CraftingResourcesBlueprint.PolishedStone, 7],
+      [CraftingResourcesBlueprint.GoldenIngot, 20],
+      [CraftingResourcesBlueprint.Diamond, 30],
+      [CraftingResourcesBlueprint.PolishedStone, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
+      [CraftingResourcesBlueprint.CorruptionIngot, 30],
     ]),
   ],
 };

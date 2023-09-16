@@ -110,16 +110,8 @@ export const npcOrcArcher: Partial<INPC> = {
       chance: 40,
     },
     {
-      itemBlueprintKey: CraftingResourcesBlueprint.CopperOre,
-      chance: 7,
-    },
-    {
-      itemBlueprintKey: CraftingResourcesBlueprint.IronOre,
-      chance: 7,
-    },
-    {
       itemBlueprintKey: RangedWeaponsBlueprint.SunflareArrow,
-      chance: 20,
+      chance: 2,
       quantityRange: [10, 20],
     },
   ],

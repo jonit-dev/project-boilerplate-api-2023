@@ -176,15 +176,15 @@ export const npcDarkKnight: Partial<INPC> = {
     },
     {
       itemBlueprintKey: StaffsBlueprint.EagleEyeWand,
-      chance: 10,
+      chance: 1,
     },
     {
       itemBlueprintKey: SwordsBlueprint.WarlordBroadsword,
-      chance: 15,
+      chance: 1,
     },
     {
       itemBlueprintKey: HammersBlueprint.ThorHammer,
-      chance: 15,
+      chance: 1,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],

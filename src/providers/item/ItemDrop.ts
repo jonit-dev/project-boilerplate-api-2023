@@ -176,6 +176,8 @@ export class ItemDrop {
 
     await this.itemCleanup.tryCharacterDroppedItemsCleanup(character);
 
+    await Item.updateOne({ _id: dropItem._id }, { isEquipped: false });
+
     await this.itemOwnership.removeItemOwnership(dropItem);
 
     return true;

@@ -9,23 +9,23 @@ export const recipeVortexStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 13,
+      qty: 130,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 6,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 2,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 13],
-      [CraftingResourcesBlueprint.BlueSapphire, 6],
-      [CraftingResourcesBlueprint.MagicRecipe, 2],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 130],
+      [CraftingResourcesBlueprint.BlueSapphire, 60],
+      [CraftingResourcesBlueprint.MagicRecipe, 20],
     ]),
   ],
 };

@@ -9,23 +9,23 @@ export const recipeCenturionBroadsword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 18,
+      qty: 180,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 9,
+      qty: 90,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 8,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 18],
-      [CraftingResourcesBlueprint.Skull, 9],
-      [CraftingResourcesBlueprint.Leather, 8],
+      [CraftingResourcesBlueprint.IronIngot, 180],
+      [CraftingResourcesBlueprint.Skull, 90],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
     ]),
   ],
 };

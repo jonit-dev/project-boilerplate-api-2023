@@ -9,23 +9,23 @@ export const recipeCrystallineArrow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 1,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 1,
+      qty: 20,
     },
     {
-      key: CraftingResourcesBlueprint.SilverOre,
-      qty: 1,
+      key: CraftingResourcesBlueprint.SilverIngot,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueSapphire, 1],
-      [CraftingResourcesBlueprint.Diamond, 1],
-      [CraftingResourcesBlueprint.SilverOre, 1],
+      [CraftingResourcesBlueprint.BlueSapphire, 10],
+      [CraftingResourcesBlueprint.Diamond, 20],
+      [CraftingResourcesBlueprint.SilverIngot, 5],
     ]),
   ],
 };

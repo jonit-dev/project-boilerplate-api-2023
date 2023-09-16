@@ -9,23 +9,28 @@ export const recipeCelestialArcAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 5,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 6,
+      qty: 50,
     },
     {
-      key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 2,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 20,
+    },
+    {
+      key: CraftingResourcesBlueprint.GoldenIngot,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Silk, 5],
-      [CraftingResourcesBlueprint.BlueSapphire, 6],
-      [CraftingResourcesBlueprint.ElvenWood, 2],
+      [CraftingResourcesBlueprint.SilverIngot, 20],
+      [CraftingResourcesBlueprint.BlueSapphire, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 20],
+      [CraftingResourcesBlueprint.GoldenIngot, 20],
     ]),
   ],
 };

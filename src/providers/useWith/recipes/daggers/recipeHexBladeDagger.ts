@@ -9,23 +9,23 @@ export const recipeHexBladeDagger: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 4,
+      qty: 40,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 8,
+      qty: 80,
     },
     {
-      key: CraftingResourcesBlueprint.Bandage,
-      qty: 9,
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 4],
-      [CraftingResourcesBlueprint.Skull, 8],
-      [CraftingResourcesBlueprint.Bandage, 9],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 40],
+      [CraftingResourcesBlueprint.Skull, 80],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
     ]),
   ],
 };

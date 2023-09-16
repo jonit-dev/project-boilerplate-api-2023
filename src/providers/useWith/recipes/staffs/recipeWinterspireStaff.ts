@@ -9,23 +9,23 @@ export const recipeWinterspireStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 7,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 6,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 6,
+      qty: 60,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 7],
-      [CraftingResourcesBlueprint.BlueSapphire, 6],
-      [CraftingResourcesBlueprint.MagicRecipe, 6],
+      [CraftingResourcesBlueprint.SilverIngot, 70],
+      [CraftingResourcesBlueprint.BlueSapphire, 60],
+      [CraftingResourcesBlueprint.MagicRecipe, 60],
     ]),
   ],
 };

@@ -9,28 +9,28 @@ export const recipeZenBroadsword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 19,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 114,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.ElvenLeaf,
-      qty: 10,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.DragonHead,
-      qty: 9,
+      qty: 3,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 19],
-      [CraftingResourcesBlueprint.ElvenWood, 11],
-      [CraftingResourcesBlueprint.ElvenLeaf, 10],
-      [CraftingResourcesBlueprint.DragonHead, 9],
+      [CraftingResourcesBlueprint.SilverIngot, 50],
+      [CraftingResourcesBlueprint.ElvenWood, 100],
+      [CraftingResourcesBlueprint.ElvenLeaf, 100],
+      [CraftingResourcesBlueprint.DragonHead, 3],
     ]),
   ],
 };

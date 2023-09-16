@@ -111,7 +111,7 @@ export const npcTroll = {
     },
     {
       itemBlueprintKey: DaggersBlueprint.DewDagger,
-      chance: 10,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

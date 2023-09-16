@@ -9,23 +9,28 @@ export const recipeSpiritBlade: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 20,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Bone,
-      qty: 8,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 10,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 20],
-      [CraftingResourcesBlueprint.Bone, 8],
-      [CraftingResourcesBlueprint.Herb, 10],
+      [CraftingResourcesBlueprint.IronIngot, 80],
+      [CraftingResourcesBlueprint.Bone, 80],
+      [CraftingResourcesBlueprint.Herb, 100],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
     ]),
   ],
 };

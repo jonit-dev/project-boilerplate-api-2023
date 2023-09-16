@@ -8,24 +8,24 @@ export const recipePhoenixWingAxe: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.ObsidiumOre,
-      qty: 2,
+      key: CraftingResourcesBlueprint.ObsidiumIngot,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 6,
+      qty: 60,
     },
     {
-      key: CraftingResourcesBlueprint.Herb,
-      qty: 1,
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumOre, 2],
-      [CraftingResourcesBlueprint.PhoenixFeather, 6],
-      [CraftingResourcesBlueprint.Herb, 1],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 20],
+      [CraftingResourcesBlueprint.PhoenixFeather, 60],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
     ]),
   ],
 };

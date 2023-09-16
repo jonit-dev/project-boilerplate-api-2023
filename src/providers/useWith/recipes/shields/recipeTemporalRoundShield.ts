@@ -9,23 +9,23 @@ export const recipeTemporalRoundShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 6,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 14,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 2,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 6],
-      [CraftingResourcesBlueprint.SilverIngot, 14],
-      [CraftingResourcesBlueprint.MagicRecipe, 2],
+      [CraftingResourcesBlueprint.IronIngot, 60],
+      [CraftingResourcesBlueprint.SilverIngot, 140],
+      [CraftingResourcesBlueprint.MagicRecipe, 20],
     ]),
   ],
 };

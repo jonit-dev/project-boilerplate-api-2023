@@ -114,7 +114,7 @@ export const npcElf: Partial<INPC> = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.WardenArrow,
-      chance: 20,
+      chance: 3,
       quantityRange: [10, 20],
     },
   ],

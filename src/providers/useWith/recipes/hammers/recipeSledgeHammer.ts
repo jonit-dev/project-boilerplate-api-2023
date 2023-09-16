@@ -9,23 +9,28 @@ export const recipeSledgeHammer: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.IronNail,
-      qty: 2,
+      qty: 20,
+    },
+    {
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 5],
-      [CraftingResourcesBlueprint.WoodenBoard, 5],
-      [CraftingResourcesBlueprint.IronNail, 2],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 50],
+      [CraftingResourcesBlueprint.IronNail, 20],
+      [CraftingResourcesBlueprint.GreenIngot, 20],
     ]),
   ],
 };

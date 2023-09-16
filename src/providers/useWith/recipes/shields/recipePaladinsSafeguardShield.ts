@@ -9,23 +9,33 @@ export const recipePaladinsSafeguardShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 16,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 2,
+      qty: 200,
     },
     {
       key: CraftingResourcesBlueprint.Bandage,
-      qty: 6,
+      qty: 60,
+    },
+    {
+      key: CraftingResourcesBlueprint.PhoenixFeather,
+      qty: 80,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 16],
-      [CraftingResourcesBlueprint.RedSapphire, 2],
-      [CraftingResourcesBlueprint.Bandage, 6],
+      [CraftingResourcesBlueprint.GoldenIngot, 100],
+      [CraftingResourcesBlueprint.SteelIngot, 100],
+      [CraftingResourcesBlueprint.RedSapphire, 200],
+      [CraftingResourcesBlueprint.Bandage, 60],
+      [CraftingResourcesBlueprint.PhoenixFeather, 80],
     ]),
   ],
 };

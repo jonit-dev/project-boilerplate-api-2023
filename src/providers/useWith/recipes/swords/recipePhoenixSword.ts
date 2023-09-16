@@ -9,28 +9,28 @@ export const recipePhoenixSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 15,
+      qty: 150,
     },
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 5,
+      qty: 50,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 11,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 13,
+      qty: 3,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.PhoenixFeather, 15],
-      [CraftingResourcesBlueprint.GoldenIngot, 5],
-      [CraftingResourcesBlueprint.Leather, 11],
-      [CraftingResourcesBlueprint.DragonTooth, 13],
+      [CraftingResourcesBlueprint.PhoenixFeather, 150],
+      [CraftingResourcesBlueprint.GoldenIngot, 50],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
+      [CraftingResourcesBlueprint.DragonTooth, 3],
     ]),
   ],
 };

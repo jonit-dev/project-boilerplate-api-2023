@@ -9,23 +9,23 @@ export const recipeRustBreakerAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 10,
+      qty: 100,
     },
     {
-      key: CraftingResourcesBlueprint.CorruptionOre,
-      qty: 10,
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 20,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 1,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 40,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 10],
-      [CraftingResourcesBlueprint.CorruptionOre, 10],
-      [CraftingResourcesBlueprint.Leather, 1],
+      [CraftingResourcesBlueprint.IronIngot, 100],
+      [CraftingResourcesBlueprint.CorruptionIngot, 20],
+      [CraftingResourcesBlueprint.WoodenBoard, 40],
     ]),
   ],
 };

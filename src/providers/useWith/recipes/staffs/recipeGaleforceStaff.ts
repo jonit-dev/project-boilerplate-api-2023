@@ -9,28 +9,28 @@ export const recipeGaleforceStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 16,
+      qty: 160,
     },
     {
       key: CraftingResourcesBlueprint.BlueFeather,
-      qty: 15,
+      qty: 150,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 5,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 4,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ElvenWood, 16],
-      [CraftingResourcesBlueprint.BlueFeather, 15],
-      [CraftingResourcesBlueprint.MagicRecipe, 5],
-      [CraftingResourcesBlueprint.DragonTooth, 4],
+      [CraftingResourcesBlueprint.ElvenWood, 160],
+      [CraftingResourcesBlueprint.BlueFeather, 150],
+      [CraftingResourcesBlueprint.MagicRecipe, 50],
+      [CraftingResourcesBlueprint.DragonTooth, 10],
     ]),
   ],
 };

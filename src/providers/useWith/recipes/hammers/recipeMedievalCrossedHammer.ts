@@ -9,23 +9,28 @@ export const recipeMedievalCrossedHammer: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 20,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 8,
+      qty: 80,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 4,
+      key: CraftingResourcesBlueprint.ElvenWood,
+      qty: 50,
+    },
+    {
+      key: CraftingResourcesBlueprint.SteelIngot,
+      qty: 30,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 20],
-      [CraftingResourcesBlueprint.WoodenBoard, 8],
-      [CraftingResourcesBlueprint.Leather, 4],
+      [CraftingResourcesBlueprint.IronIngot, 100],
+      [CraftingResourcesBlueprint.WoodenBoard, 80],
+      [CraftingResourcesBlueprint.ElvenWood, 50],
+      [CraftingResourcesBlueprint.SteelIngot, 30],
     ]),
   ],
 };

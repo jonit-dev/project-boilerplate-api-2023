@@ -9,28 +9,28 @@ export const recipeNemesisSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 16,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.WeaponRecipe,
-      qty: 5,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.Leather,
-      qty: 19,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 3,
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 16],
-      [CraftingResourcesBlueprint.WeaponRecipe, 5],
-      [CraftingResourcesBlueprint.Leather, 19],
-      [CraftingResourcesBlueprint.DragonHead, 3],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
+      [CraftingResourcesBlueprint.WeaponRecipe, 30],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
+      [CraftingResourcesBlueprint.CorruptionIngot, 50],
     ]),
   ],
 };

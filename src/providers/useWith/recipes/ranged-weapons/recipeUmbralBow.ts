@@ -9,23 +9,23 @@ export const recipeUmbralBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 15,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 10,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.Silk,
-      qty: 10,
+      qty: 100,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 15],
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
-      [CraftingResourcesBlueprint.Silk, 10],
+      [CraftingResourcesBlueprint.SilverIngot, 80],
+      [CraftingResourcesBlueprint.BlueSapphire, 100],
+      [CraftingResourcesBlueprint.Silk, 100],
     ]),
   ],
 };

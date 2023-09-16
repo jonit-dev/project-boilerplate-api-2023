@@ -105,7 +105,7 @@ export const npcForestWalker: Partial<INPC> = {
     },
     {
       itemBlueprintKey: RangedWeaponsBlueprint.EarthArrow,
-      chance: 20,
+      chance: 3,
       quantityRange: [10, 20],
     },
   ],

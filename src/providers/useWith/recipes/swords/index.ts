@@ -1,6 +1,5 @@
 import { SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
-import { recipeInfernoEdgeSword } from "./InfernoEdgeSword";
 import { recipeBasiliskSword } from "./recipeBasiliskSword";
 import { recipeBroadSword } from "./recipeBroadSword";
 import { recipeBronzeFuryBroadsword } from "./recipeBronzeFuryBroadsword";
@@ -21,6 +20,7 @@ import { recipeIronwoodTanto } from "./recipeIceIronwoodTanto";
 import { recipeIceShardLongsword } from "./recipeIceShardLongsword";
 import { recipeIceSword } from "./recipeIceSword";
 import { recipeTungstenSword } from "./recipeIceTungstenSword";
+import { recipeInfernoEdgeSword } from "./recipeInfernoEdgeSword";
 import { recipeJadeBlade } from "./recipeJadeBlade";
 import { recipeKatana } from "./recipeKatana";
 import { recipeLightBringerSword } from "./recipeLightBringerSword";

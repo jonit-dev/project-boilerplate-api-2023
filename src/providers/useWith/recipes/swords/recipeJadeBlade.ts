@@ -9,23 +9,28 @@ export const recipeJadeBlade: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 13,
+      qty: 100,
+    },
+    {
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 3,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.Silk,
-      qty: 7,
+      qty: 70,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Jade, 13],
-      [CraftingResourcesBlueprint.ElvenWood, 3],
-      [CraftingResourcesBlueprint.Silk, 7],
+      [CraftingResourcesBlueprint.Jade, 100],
+      [CraftingResourcesBlueprint.GreenIngot, 70],
+      [CraftingResourcesBlueprint.ElvenWood, 30],
+      [CraftingResourcesBlueprint.Silk, 70],
     ]),
   ],
 };

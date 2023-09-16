@@ -8,29 +8,29 @@ export const recipeHellfireEdgeSword: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
-      key: CraftingResourcesBlueprint.CorruptionOre,
-      qty: 19,
+      key: CraftingResourcesBlueprint.CorruptionIngot,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 19,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 14,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 14,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CorruptionOre, 19],
-      [CraftingResourcesBlueprint.RedSapphire, 19],
-      [CraftingResourcesBlueprint.BlueSapphire, 14],
-      [CraftingResourcesBlueprint.SteelIngot, 14],
+      [CraftingResourcesBlueprint.CorruptionIngot, 70],
+      [CraftingResourcesBlueprint.RedSapphire, 100],
+      [CraftingResourcesBlueprint.BlueSapphire, 100],
+      [CraftingResourcesBlueprint.SteelIngot, 50],
     ]),
   ],
 };

@@ -107,11 +107,11 @@ export const npcDragonServant: Partial<INPC> = {
     },
     {
       itemBlueprintKey: SwordsBlueprint.GuardianSword,
-      chance: 10,
+      chance: 5,
     },
     {
       itemBlueprintKey: StaffsBlueprint.ElementalStaff,
-      chance: 15,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],
