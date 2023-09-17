@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { HitTarget } from "@providers/battle/HitTarget";
 import { SPELL_AREA_MEDIUM_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { entityEffectBleeding } from "@providers/entityEffects/data/blueprints/entityEffectBleeding";
 import { container } from "@providers/inversify/container";
@@ -14,7 +13,7 @@ import {
   SpellCastingType,
   SpellsBlueprint,
 } from "@rpg-engine/shared";
-import { SpellLifeSteal } from "../../logic/other/SpellLifeSteal";
+import { SpellLifeSteal } from "../../logic/other/SpellLifeSteal/SpellLifeSteal";
 
 export const spellVampiricStorm: Partial<ISpell> = {
   key: SpellsBlueprint.VampiricStorm,
@@ -43,10 +42,6 @@ export const spellVampiricStorm: Partial<ISpell> = {
       entityEffect: entityEffectBleeding,
       spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
       customFn: async (target: ICharacter | INPC) => {
-        const hitTarget = container.get(HitTarget);
-
-        await hitTarget.hit(caster, target, true, MagicPower.High, true);
-
         await spellLifeSteal.performLifeSteal(caster, target);
       },
     });
