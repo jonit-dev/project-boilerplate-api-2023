@@ -17,7 +17,7 @@ import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
 export const npcNazgul: Partial<INPC> = {
   ...generateMoveTowardsMovement(),
-  name: "Obsidia Nightguard",
+  name: "Nazgul",
   key: HostileNPCsBlueprint.Nazgul,
   textureKey: HostileNPCsBlueprint.Nazgul,
   alignment: NPCAlignment.Hostile,
