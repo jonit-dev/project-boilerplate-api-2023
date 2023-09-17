@@ -15,17 +15,17 @@ export const npcCaveBat = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.ExtraFast,
-  baseHealth: 35,
+  baseHealth: 50,
   skills: {
-    level: 2,
+    level: 10,
     strength: {
-      level: 2,
+      level: 25,
     },
     dexterity: {
-      level: 1,
+      level: 10,
     },
     resistance: {
-      level: 2,
+      level: 20,
     },
   },
   loots: [

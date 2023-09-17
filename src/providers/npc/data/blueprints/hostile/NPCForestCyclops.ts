@@ -25,7 +25,7 @@ export const npcForestCyclops = {
   ammoKey: RangedWeaponsBlueprint.Stone,
   maxRangeAttack: 6,
   speed: MovementSpeed.Slow,
-  baseHealth: 800,
+  baseHealth: 1200,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D20,

@@ -142,7 +142,7 @@ export enum HostileNPCsBlueprint {
   DarkKnight = "dark-knight",
   Litch = "litch",
   CaveBat = "cave-bat",
-  CaveCyclop = "cave-cyclop",
+  CaveCyclops = "cave-cyclops",
   Conde = "conde",
   Condessa = "condessa",
   Cyclops = "cyclops",

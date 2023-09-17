@@ -6,7 +6,7 @@ import { npcBlackEagle } from "./NPCBlackEagle";
 import { npcBlackSpider } from "./NPCBlackSpider";
 import { npcBrownBear } from "./NPCBrownBear";
 import { npcCaveBat } from "./NPCCaveBat";
-import { npcCaveCyclop } from "./NPCCaveCyclop";
+import { npcCaveCyclops } from "./NPCCaveCyclops";
 import { npcCaveSpider } from "./NPCCaveSpider";
 import { npcCaveTroll } from "./NPCCaveTroll";
 import { npcCentipede } from "./NPCCentipede";
@@ -153,7 +153,7 @@ export const hostileNPCs = {
   [HostileNPCsBlueprint.MinotaurBerserker]: npcMinotaurBerserker,
   [HostileNPCsBlueprint.DragonServant]: npcDragonServant,
   [HostileNPCsBlueprint.CaveBat]: npcCaveBat,
-  [HostileNPCsBlueprint.CaveCyclop]: npcCaveCyclop,
+  [HostileNPCsBlueprint.CaveCyclops]: npcCaveCyclops,
   [HostileNPCsBlueprint.Conde]: npcConde,
   [HostileNPCsBlueprint.Condessa]: npcCondessa,
   [HostileNPCsBlueprint.Cyclops]: npcCyclops,

@@ -15,15 +15,15 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcCaveCyclop = {
+export const npcCaveCyclops = {
   ...generateMoveTowardsMovement(),
-  name: "Cave Cyclop",
-  key: HostileNPCsBlueprint.CaveCyclop,
-  textureKey: HostileNPCsBlueprint.CaveCyclop,
+  name: "Cave Cyclops",
+  key: HostileNPCsBlueprint.CaveCyclops,
+  textureKey: HostileNPCsBlueprint.CaveCyclops,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
-  baseHealth: 800,
+  baseHealth: 1400,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D20,

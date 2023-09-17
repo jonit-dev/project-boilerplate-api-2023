@@ -23,7 +23,7 @@ export const npcIceCyclops = {
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
-  baseHealth: 800,
+  baseHealth: 1600,
   healthRandomizerDice: Dice.D20,
   canSwitchToRandomTarget: true,
   skillRandomizerDice: Dice.D20,
