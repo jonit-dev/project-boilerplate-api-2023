@@ -146,5 +146,15 @@ export const npcLitch: Partial<INPC> = {
       probability: 10,
       power: MagicPower.Medium,
     },
+    {
+      spellKey: SpellsBlueprint.CorruptionWave,
+      probability: 10,
+      power: MagicPower.Medium,
+    },
+    {
+      spellKey: SpellsBlueprint.VampiricStorm,
+      probability: 10,
+      power: MagicPower.Medium,
+    },
   ],
 };

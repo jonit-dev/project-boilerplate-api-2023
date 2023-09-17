@@ -98,5 +98,10 @@ export const npcNightFellbeast = {
       probability: 5,
       power: MagicPower.High,
     },
+    {
+      spellKey: SpellsBlueprint.VampiricStorm,
+      probability: 10,
+      power: MagicPower.Medium,
+    },
   ],
 } as Partial<INPC>;

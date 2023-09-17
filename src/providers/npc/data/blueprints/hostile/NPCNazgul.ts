@@ -77,5 +77,10 @@ export const npcNazgul: Partial<INPC> = {
       probability: 5,
       power: MagicPower.UltraHigh,
     },
+    {
+      spellKey: SpellsBlueprint.VampiricStorm,
+      probability: 10,
+      power: MagicPower.High,
+    },
   ],
 };
