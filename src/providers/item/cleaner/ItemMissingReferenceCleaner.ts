@@ -35,6 +35,10 @@ export class ItemMissingReferenceCleaner {
       const marketplaceItemsIdsToDelete: string[] = [];
 
       for (const item of items) {
+        if (item.isEquipped || item.isInDepot) {
+          continue;
+        }
+
         itemsIdsToDelete.push(item._id);
 
         if (item.itemContainer) {

@@ -69,12 +69,10 @@ export class NPCSeeder {
           );
         }
 
-        await Promise.all([
-          this.resetNPC(npcFound, multipliedNPCData),
-          this.updateNPCSkills(multipliedNPCData, npcFound),
-          this.npcGiantForm.resetNPCToNormalForm(npcFound),
-          this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npcFound),
-        ]);
+        await this.resetNPC(npcFound, multipliedNPCData);
+        await this.updateNPCSkills(multipliedNPCData, npcFound);
+        await this.npcGiantForm.resetNPCToNormalForm(npcFound);
+        await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(npcFound);
       }
     }
   }
