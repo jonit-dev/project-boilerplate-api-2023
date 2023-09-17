@@ -4,8 +4,10 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
-  HelmetsBlueprint,
-  MacesBlueprint,
+  FoodsBlueprint,
+  MagicsBlueprint,
+  PotionsBlueprint,
+  RangedWeaponsBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -14,11 +16,11 @@ import { NPCAlignment } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import { generateMoveTowardsMovement } from "../../abstractions/BaseNeutralNPC";
 
-export const npcForestCyclop = {
+export const npcWildCyclops = {
   ...generateMoveTowardsMovement(),
-  name: "Forest Cyclop",
-  key: HostileNPCsBlueprint.ForestCyclops,
-  textureKey: HostileNPCsBlueprint.ForestCyclops,
+  name: "Wild Cyclops",
+  key: HostileNPCsBlueprint.WildCyclops,
+  textureKey: HostileNPCsBlueprint.WildCyclops,
   alignment: NPCAlignment.Hostile,
   attackType: EntityAttackType.Melee,
   speed: MovementSpeed.Slow,
@@ -28,35 +30,54 @@ export const npcForestCyclop = {
   skillRandomizerDice: Dice.D20,
   skillsToBeRandomized: ["level", "strength", "dexterity", "resistance"],
   skills: {
-    level: 75,
+    level: 70,
     strength: {
       level: 50,
     },
     dexterity: {
-      level: 50,
+      level: 40,
     },
     resistance: {
-      level: 60,
+      level: 75,
     },
   },
   fleeOnLowHealth: true,
   loots: [
     {
-      itemBlueprintKey: MacesBlueprint.SpikedClub,
-      chance: 15,
-    },
-    {
-      itemBlueprintKey: HelmetsBlueprint.AmethystHelmet,
-      chance: 10,
-    },
-    {
-      itemBlueprintKey: ShieldsBlueprint.BanditShield,
+      itemBlueprintKey: SwordsBlueprint.AzureMachete,
       chance: 15,
     },
 
     {
-      itemBlueprintKey: SwordsBlueprint.BasiliskSword,
+      itemBlueprintKey: PotionsBlueprint.ManaPotion,
+      chance: 30,
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.IronArrow,
+      chance: 20,
+      quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.PhoenixBow,
+      chance: 10,
+    },
+
+    {
+      itemBlueprintKey: FoodsBlueprint.Coconut,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.FalconsSword,
+      chance: 15,
+    },
+    {
+      itemBlueprintKey: MagicsBlueprint.PoisonRune,
+      chance: 10,
+      quantityRange: [1, 5],
+    },
+    {
+      itemBlueprintKey: ShieldsBlueprint.StuddedShield,
+      chance: 20,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

@@ -146,7 +146,7 @@ export enum HostileNPCsBlueprint {
   Conde = "conde",
   Condessa = "condessa",
   Cyclops = "cyclops",
-  CyclopsBerserker = "cyclops-berserker",
+  CorruptedCyclops = "corrupted-cyclops",
   CyclopsWarrior = "cyclops-Warrior",
   ForestCyclops = "forest-cyclops",
   IceCyclops = "ice-cyclops",
