@@ -24,6 +24,7 @@ export class CharacterView {
     private inMemoryHashTable: InMemoryHashTable
   ) {}
 
+  @TrackNewRelicTransaction()
   public async addToCharacterView(
     characterId: string,
     viewElement: IViewElement,
@@ -58,6 +59,7 @@ export class CharacterView {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async clearAllOutOfViewElements(characterId: string, characterX: number, characterY: number): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
     const clearPromises = types.map((type) => this.clearOutOfViewElements(characterId, characterX, characterY, type));
@@ -99,6 +101,7 @@ export class CharacterView {
     await Promise.all(removePromises);
   }
 
+  @TrackNewRelicTransaction()
   public async getElementOnView(
     character: ICharacter,
     elementId: string,
@@ -116,6 +119,7 @@ export class CharacterView {
     return query;
   }
 
+  @TrackNewRelicTransaction()
   public async getAllElementsOnView(
     character: ICharacter,
     type: CharacterViewType
@@ -123,12 +127,14 @@ export class CharacterView {
     return await this.inMemoryHashTable.getAll<IViewElement>(`character-view-${type}:${character._id}`);
   }
 
+  @TrackNewRelicTransaction()
   public async hasElementOnView(character: ICharacter, elementId: string, type: CharacterViewType): Promise<boolean> {
     const result = await this.inMemoryHashTable.has(`character-view-${type}:${character._id}`, elementId);
 
     return result;
   }
 
+  @TrackNewRelicTransaction()
   public async clearCharacterView(character: ICharacter): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
     for (const type of types) {
@@ -136,6 +142,7 @@ export class CharacterView {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async removeFromCharacterView(characterId: string, elementId: string, type: CharacterViewType): Promise<void> {
     await this.inMemoryHashTable.delete(`character-view-${type}:${characterId}`, elementId);
   }
