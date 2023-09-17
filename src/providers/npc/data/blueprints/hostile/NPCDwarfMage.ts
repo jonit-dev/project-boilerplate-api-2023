@@ -139,5 +139,10 @@ export const npcDwarfMage: Partial<INPC> = {
       probability: 5,
       power: MagicPower.Low,
     },
+    {
+      spellKey: SpellsBlueprint.VampiricStorm,
+      probability: 10,
+      power: MagicPower.Medium,
+    },
   ],
 };

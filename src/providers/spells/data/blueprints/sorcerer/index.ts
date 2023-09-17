@@ -1,6 +1,7 @@
 import { SpellsBlueprint } from "@rpg-engine/shared";
 import { spellCorruptionBolt } from "./SpellCorruptionBolt";
 import { spellCorruptionRuneCreation } from "./SpellCorruptionRuneCreation";
+import { spellCorruptionWave } from "./SpellCorruptionWave";
 import { spellCurseOfWeakness } from "./SpellCurseOfWeakness";
 import { spellDarkRuneCreation } from "./SpellDarkRuneCreation";
 import { spellFireStorm } from "./SpellFireStorm";
@@ -15,4 +16,5 @@ export const sorcererSpellsIndex = {
   [SpellsBlueprint.CorruptionBolt]: spellCorruptionBolt,
   [SpellsBlueprint.SorcererVeilofUndeath]: spellVeilofUndeath,
   [SpellsBlueprint.FireStorm]: spellFireStorm,
+  [SpellsBlueprint.CorruptionWave]: spellCorruptionWave,
 };

@@ -165,5 +165,10 @@ export const npcMinotaurMage = {
       probability: 10,
       power: MagicPower.Medium,
     },
+    {
+      spellKey: SpellsBlueprint.VampiricStorm,
+      probability: 10,
+      power: MagicPower.Medium,
+    },
   ],
 } as Partial<INPC>;
