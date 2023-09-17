@@ -15,7 +15,7 @@ interface ILifeStealable {
   sendLifeStealAmountEvent(): Promise<void>;
 }
 
-//! Factory pattern to support both NPC and Character life steal
+//! Factory pattern to support both NPC and Character life steal!
 @provide(LifeStealableFactory)
 class LifeStealableFactory {
   constructor(private spellCalculator: SpellCalculator, private socketMessaging: SocketMessaging) {}
