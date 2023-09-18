@@ -3,7 +3,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { appEnv } from "@providers/config/env";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
-import { MapTransition } from "@providers/map/MapTransition";
+import { MapTransitionTeleport } from "@providers/map/MapTransition/MapTransitionTeleport";
 import { MathHelper } from "@providers/math/MathHelper";
 import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
@@ -27,6 +27,8 @@ import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { Locker } from "@providers/locks/Locker";
+import { MapTransitionInfo } from "@providers/map/MapTransition/MapTransitionInfo";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import dayjs from "dayjs";
 import random from "lodash/random";
@@ -40,7 +42,8 @@ export class CharacterNetworkUpdate {
     private socketMessaging: SocketMessaging,
     private socketAuth: SocketAuth,
     private movementHelper: MovementHelper,
-    private mapTransition: MapTransition,
+    private mapTransitionInfo: MapTransitionInfo,
+    private mapTransitionTeleport: MapTransitionTeleport,
     private npcManager: NPCManager,
     private gridManager: GridManager,
     private mapNonPVPZone: MapNonPVPZone,
@@ -49,7 +52,8 @@ export class CharacterNetworkUpdate {
     private mathHelper: MathHelper,
     private characterView: CharacterView,
     private pm2Helper: PM2Helper,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private locker: Locker
   ) {}
 
   public onCharacterUpdatePosition(channel: SocketChannel): void {
@@ -58,6 +62,13 @@ export class CharacterNetworkUpdate {
       CharacterSocketEvents.CharacterPositionUpdate,
       async (data: ICharacterPositionUpdateFromClient, character: ICharacter) => {
         try {
+          const isChangingScene = await this.locker.hasLock(`character-changing-scene-${character._id}`);
+
+          // avoid sending network updates if the character is changing between scenes
+          if (isChangingScene) {
+            return;
+          }
+
           if (data) {
             // sometimes the character is just changing facing direction and not moving.. That's why we need this.
             const isMoving = this.movementHelper.isMoving(character.x, character.y, data.newX, data.newY);
@@ -232,11 +243,11 @@ export class CharacterNetworkUpdate {
     const frozenCharacter = Object.freeze(character);
 
     // verify if we're in a map transition. If so, we need to trigger a scene transition
-    const transition = this.mapTransition.getTransitionAtXY(frozenCharacter.scene, newX, newY);
+    const transition = this.mapTransitionInfo.getTransitionAtXY(frozenCharacter.scene, newX, newY);
     if (transition) {
-      const map = this.mapTransition.getTransitionProperty(transition, "map");
-      const gridX = Number(this.mapTransition.getTransitionProperty(transition, "gridX"));
-      const gridY = Number(this.mapTransition.getTransitionProperty(transition, "gridY"));
+      const map = this.mapTransitionInfo.getTransitionProperty(transition, "map");
+      const gridX = Number(this.mapTransitionInfo.getTransitionProperty(transition, "gridX"));
+      const gridY = Number(this.mapTransitionInfo.getTransitionProperty(transition, "gridY"));
 
       if (!map || !gridX || !gridY) {
         console.error("Failed to fetch required destination properties.");
@@ -255,9 +266,9 @@ export class CharacterNetworkUpdate {
    */
 
       if (destination.map === frozenCharacter.scene) {
-        await this.mapTransition.sameMapTeleport(frozenCharacter, destination);
+        await this.mapTransitionTeleport.sameMapTeleport(frozenCharacter, destination);
       } else {
-        await this.mapTransition.changeCharacterScene(frozenCharacter, destination);
+        await this.mapTransitionTeleport.changeCharacterScene(frozenCharacter, destination);
       }
     }
   }

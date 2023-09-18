@@ -11,11 +11,11 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { MapLoader } from "./MapLoader";
-import { MapTransition } from "./MapTransition";
+import { MapTransitionInfo } from "./MapTransition/MapTransitionInfo";
 
 @provide(MapTiles)
 export class MapTiles {
-  constructor(private mapTransition: MapTransition) {}
+  constructor(private mapTransitionInfo: MapTransitionInfo) {}
 
   public getFirstXY(map: string): [number, number] | undefined {
     const mapData = MapLoader.maps.get(map);
@@ -159,7 +159,8 @@ export class MapTiles {
 
     const tileId = rawTileId - targetTileset.firstgid;
 
-    const isTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY)) !== undefined;
+    const isTransition =
+      this.mapTransitionInfo.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY)) !== undefined;
 
     const isPassage = this.getTileProperty<boolean>(targetTileset!, tileId!, "is_passage");
 
