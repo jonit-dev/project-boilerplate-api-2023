@@ -156,8 +156,8 @@ export class CharacterInventory {
 
     const bag = new Item({
       ...containerBlueprint,
-      owner: equipment.owner,
-      carrier: equipment.owner,
+      owner: character._id,
+      carrier: character._id,
     });
     await bag.save();
 
