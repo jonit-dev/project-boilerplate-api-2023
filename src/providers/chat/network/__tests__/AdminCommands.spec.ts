@@ -52,6 +52,9 @@ describe("AdminCommands", () => {
     });
 
     it("properly teleports a character", async () => {
+      // @ts-ignore
+      jest.spyOn(adminCommands.mapTransition.mapSolids, "isTileSolid").mockReturnValue(false);
+
       await adminCommands.handleTeleportCommand([testCharacter.name, "1170", "1170", "ilya"], testCharacter);
 
       expect(changeCharacterSceneSpy).toHaveBeenCalledWith(

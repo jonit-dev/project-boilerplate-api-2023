@@ -4,20 +4,19 @@ import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetw
 import { CharacterView } from "@providers/character/CharacterView";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import {
   BattleSocketEvents,
   FromGridX,
   IBattleCancelTargeting,
-  ITiledObject,
+  IMapTransitionChangeMapPayload,
   IViewDestroyElementPayload,
+  MapLayers,
   MapSocketEvents,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import { MapLoader } from "./MapLoader";
-import { MapObjectsLoader } from "./MapObjectsLoader";
+import { MapSolids } from "../MapSolids";
 
 type TransitionDestination = {
   map: string;
@@ -25,15 +24,14 @@ type TransitionDestination = {
   gridY: number;
 };
 
-@provide(MapTransition)
-export class MapTransition {
+@provide(MapTransitionTeleport)
+export class MapTransitionTeleport {
   constructor(
-    private mapObjectsLoader: MapObjectsLoader,
     private socketMessaging: SocketMessaging,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private characterView: CharacterView,
-    private socketSessionControl: SocketSessionControl,
-    private locker: Locker
+    private locker: Locker,
+    private mapSolids: MapSolids
   ) {}
 
   @TrackNewRelicTransaction()
@@ -42,6 +40,17 @@ export class MapTransition {
       const canProceed = await this.locker.lock(`character-changing-scene-${character._id}`);
 
       if (!canProceed) {
+        return;
+      }
+
+      const isSolid = this.mapSolids.isTileSolid(
+        destination.map,
+        destination.gridX,
+        destination.gridY,
+        MapLayers.Character
+      );
+
+      if (isSolid) {
         return;
       }
 
@@ -58,25 +67,7 @@ export class MapTransition {
         }
       );
 
-      if (character.target?.id && character.target?.type) {
-        const targetId = character.target.id as unknown as string;
-        const targetType = character.target.type as unknown as EntityType;
-        const targetReason = "Your battle target was lost.";
-
-        const dataOfCancelTargeting: IBattleCancelTargeting = {
-          targetId: targetId,
-          type: targetType,
-          reason: targetReason,
-        };
-
-        this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-          character.channelId!,
-          BattleSocketEvents.CancelTargeting,
-          dataOfCancelTargeting
-        );
-
-        await this.battleNetworkStopTargeting.stopTargeting(character);
-      }
+      await this.clearCharacterBattleTarget(character);
 
       await this.characterView.clearCharacterView(character);
       /* 
@@ -85,7 +76,15 @@ export class MapTransition {
       refresh and scene reload on the client side. 
       */
 
-      this.socketMessaging.sendEventToUser(character.channelId!, MapSocketEvents.ChangeMap);
+      this.socketMessaging.sendEventToUser<IMapTransitionChangeMapPayload>(
+        character.channelId!,
+        MapSocketEvents.ChangeMap,
+        {
+          map: destination.map,
+          x: FromGridX(destination.gridX),
+          y: FromGridX(destination.gridY),
+        }
+      );
 
       await this.socketMessaging.sendEventToCharactersAroundCharacter<IViewDestroyElementPayload>(
         character,
@@ -112,6 +111,17 @@ export class MapTransition {
         return;
       }
 
+      const isSolid = this.mapSolids.isTileSolid(
+        destination.map,
+        destination.gridX,
+        destination.gridY,
+        MapLayers.Character
+      );
+
+      if (isSolid) {
+        return;
+      }
+
       if (character.scene !== destination.map) {
         throw new Error(
           `Character Scene: "${character.scene}" and map to teleport: "${destination.map}" should be the same!`
@@ -130,25 +140,7 @@ export class MapTransition {
         }
       );
 
-      if (character.target.id && character.target.type) {
-        const targetId = character.target.id as unknown as string;
-        const targetType = character.target.type as unknown as EntityType;
-        const targetReason = "Your battle target was lost.";
-
-        const dataOfCancelTargeting: IBattleCancelTargeting = {
-          targetId: targetId,
-          type: targetType,
-          reason: targetReason,
-        };
-
-        this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
-          character.channelId!,
-          BattleSocketEvents.CancelTargeting,
-          dataOfCancelTargeting
-        );
-
-        await this.battleNetworkStopTargeting.stopTargeting(character);
-      }
+      await this.clearCharacterBattleTarget(character);
 
       await this.characterView.clearCharacterView(character);
 
@@ -172,38 +164,25 @@ export class MapTransition {
     }
   }
 
-  public getTransitionAtXY(mapName: string, x: number, y: number): ITiledObject | undefined {
-    try {
-      const map = MapLoader.maps.get(mapName);
+  private async clearCharacterBattleTarget(character: ICharacter): Promise<void> {
+    if (character.target?.id && character.target?.type) {
+      const targetId = character.target.id as unknown as string;
+      const targetType = character.target.type as unknown as EntityType;
+      const targetReason = "Your battle target was lost.";
 
-      if (!map) {
-        throw new Error(`MapTransition: Map "${mapName}" is not found!`);
-      }
+      const dataOfCancelTargeting: IBattleCancelTargeting = {
+        targetId: targetId,
+        type: targetType,
+        reason: targetReason,
+      };
 
-      const transitions = this.mapObjectsLoader.getObjectLayerData("Transitions", map);
+      this.socketMessaging.sendEventToUser<IBattleCancelTargeting>(
+        character.channelId!,
+        BattleSocketEvents.CancelTargeting,
+        dataOfCancelTargeting
+      );
 
-      if (!transitions) {
-        return;
-      }
-
-      const sameXTransitions = transitions.filter((transition) => transition.x === x);
-
-      if (sameXTransitions) {
-        const transition = sameXTransitions.find((transition) => {
-          return transition.y === y;
-        });
-        return transition;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  public getTransitionProperty(transition: ITiledObject, propertyName: string): string | undefined {
-    const property = transition.properties.find((property) => property.name === propertyName);
-
-    if (property) {
-      return property.value;
+      await this.battleNetworkStopTargeting.stopTargeting(character);
     }
   }
 }

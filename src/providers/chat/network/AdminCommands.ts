@@ -1,6 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container } from "@providers/inversify/container";
-import { MapTransition } from "@providers/map/MapTransition";
+import { MapTransitionTeleport } from "@providers/map/MapTransition/MapTransitionTeleport";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -13,7 +13,7 @@ function formatPlayerName(playerName: string): string {
 
 @provide(AdminCommands)
 export class AdminCommands {
-  constructor(private socketMessaging: SocketMessaging, private mapTransition: MapTransition) {}
+  constructor(private socketMessaging: SocketMessaging, private mapTransition: MapTransitionTeleport) {}
 
   public async handleBanCommand(params: string[], character: ICharacter): Promise<void> {
     if (params.length < 2) {
@@ -117,9 +117,7 @@ export class AdminCommands {
 
     this.socketMessaging.sendMessageToCharacter(character, `Player '${playerName}' has been teleported to the temple`);
 
-    const mapTransition = container.get(MapTransition);
-
-    await mapTransition.changeCharacterScene(targetCharacter, {
+    await this.mapTransition.changeCharacterScene(targetCharacter, {
       map: targetCharacter.initialScene,
       gridX: ToGridX(targetCharacter.initialX),
       gridY: ToGridY(targetCharacter.initialY),
@@ -142,7 +140,7 @@ export class AdminCommands {
     }
 
     this.socketMessaging.sendMessageToCharacter(character, `Teleported to player '${characterName}' location`);
-    const mapTransition = container.get(MapTransition);
+    const mapTransition = container.get(MapTransitionTeleport);
 
     await mapTransition.changeCharacterScene(character, {
       map: character.initialScene,

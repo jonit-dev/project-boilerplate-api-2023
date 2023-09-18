@@ -3,7 +3,8 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapSolids, SolidCheckStrategy } from "@providers/map/MapSolids";
-import { MapTransition } from "@providers/map/MapTransition";
+import { MapTransitionInfo } from "@providers/map/MapTransition/MapTransitionInfo";
+
 import { MathHelper } from "@providers/math/MathHelper";
 import {
   AnimationDirection,
@@ -26,7 +27,7 @@ export class MovementHelper {
   constructor(
     private mathHelper: MathHelper,
     private mapSolids: MapSolids,
-    private mapTransition: MapTransition,
+    private mapTransitionInfo: MapTransitionInfo,
     private mapNonPVPZone: MapNonPVPZone
   ) {}
 
@@ -53,7 +54,7 @@ export class MovementHelper {
     }
 
     if (caller?.type === "NPC") {
-      const hasTransition = this.mapTransition.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
+      const hasTransition = this.mapTransitionInfo.getTransitionAtXY(map, FromGridX(gridX), FromGridY(gridY));
 
       if (hasTransition) {
         return true;
