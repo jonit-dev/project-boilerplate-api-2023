@@ -18,6 +18,13 @@ services:
         preferences:
           - spread: node.id
         max_replicas_per_node: 1
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 2
+        delay: 5s
       labels:
         # Basic setup for API
         - traefik.enable=true
