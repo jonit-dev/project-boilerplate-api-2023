@@ -546,8 +546,8 @@ export class CharacterItemInventory {
 
     const backpack = new Item({
       ...blueprintData,
-      owner: equipment.owner,
-      carrier: equipment.owner,
+      owner: character._id,
+      carrier: character._id,
     });
     await backpack.save();
 
