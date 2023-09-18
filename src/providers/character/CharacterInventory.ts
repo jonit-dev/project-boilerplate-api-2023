@@ -158,6 +158,7 @@ export class CharacterInventory {
       ...containerBlueprint,
       owner: character._id,
       carrier: character._id,
+      isEquipped: true,
     });
     await bag.save();
 

@@ -548,6 +548,7 @@ export class CharacterItemInventory {
       ...blueprintData,
       owner: character._id,
       carrier: character._id,
+      isEquipped: true,
     });
     await backpack.save();
 
