@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 
 services:
   rpg-api:
@@ -15,6 +15,16 @@ services:
       placement:
         constraints:
           - node.role == worker #! Only runs in worker node to preserve the DB on the manager node
+        preferences:
+          - spread: node.id
+        max_replicas_per_node: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
       labels:
         # Basic setup for API
         - traefik.enable=true
