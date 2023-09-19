@@ -177,6 +177,14 @@ export class EntityEffectCycle {
   private async handleDeath(target: ICharacter | INPC): Promise<void> {
     if (target.type === EntityType.Character) {
       const characterDeath = container.get(CharacterDeath);
+
+      const updatedTarget = await Character.findOne({ _id: target._id }).lean().select("health");
+
+      if (!updatedTarget || updatedTarget.health <= 0) {
+        // if our character is already dead, just dont kill it again!
+        return;
+      }
+
       await characterDeath.handleCharacterDeath(null, target as ICharacter);
     } else {
       const npcDeath = container.get(NPCDeath);
