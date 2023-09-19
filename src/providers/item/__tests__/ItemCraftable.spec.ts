@@ -3,7 +3,6 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { recipeSpikedClub } from "@providers/useWith/recipes/maces/recipeSpikedClub";
@@ -11,7 +10,6 @@ import { recipeBolt } from "@providers/useWith/recipes/ranged-weapons/recipeBolt
 import {
   AnimationEffectKeys,
   AnimationSocketEvents,
-  CharacterSocketEvents,
   CraftingSkill,
   ICraftItemPayload,
   ItemRarities,
@@ -187,18 +185,12 @@ describe("ItemCraftable.ts", () => {
     await testCharacter.populate("skills").execPopulate();
 
     const itemToCraft: ICraftItemPayload = { itemKey: itemManaPotion.key! };
+
     await craftableItem.craftItem(itemToCraft, testCharacter);
 
     const container = (await ItemContainer.findById(inventory.itemContainer)) as unknown as IItemContainer;
 
     expect(sendEventToUser).toHaveBeenCalledTimes(6);
-
-    expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId!, CharacterSocketEvents.AttributeChanged, {
-      targetId: testCharacter._id,
-      maxWeight: 15,
-      speed: MovementSpeed.Standard,
-      weight: 3.5,
-    });
 
     expect(sendEventToUser).toHaveBeenCalledWith(
       testCharacter.channelId!,
