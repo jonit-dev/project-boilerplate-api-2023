@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DiscordBot } from "@providers/discord/DiscordBot";
@@ -14,26 +14,43 @@ export class CharacterBan {
 
   @TrackNewRelicTransaction()
   public async addPenalty(character: ICharacter): Promise<void> {
-    character.penalty = character.penalty + 1;
-    await character.save();
+    // increment penalty by one
+    character = (await Character.findOneAndUpdate(
+      {
+        _id: character._id,
+      },
+      {
+        $inc: {
+          penalty: 1,
+        },
+      },
+      {
+        new: true,
+        returnOriginal: false,
+      }
+    )) as ICharacter;
 
     if (character.penalty % 10 === 0) {
-      character.isBanned = true;
-      character.isOnline = false;
-      character.banRemovalDate = dayjs(new Date()).add(character.penalty, "day").toDate();
-      await character.save();
+      await Character.updateOne(
+        { _id: character._id },
+        {
+          $set: {
+            isBanned: true,
+            isOnline: false,
+            banRemovalDate: dayjs(new Date()).add(character.penalty, "day").toDate(),
+          },
+        }
+      );
 
       this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
         reason: "Your character is now banned.",
       });
 
       if (character.penalty > 30) {
-        character.hasPermanentBan = true;
-        await character.save();
+        await Character.updateOne({ _id: character._id }, { $set: { hasPermanentBan: true } });
       }
-
-      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Penalty", 1);
     }
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Penalty", 1);
   }
 
   @TrackNewRelicTransaction()

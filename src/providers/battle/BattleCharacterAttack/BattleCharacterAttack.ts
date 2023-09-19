@@ -5,6 +5,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { CharacterSkull } from "@providers/character/CharacterSkull";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterClass, EntityAttackType } from "@rpg-engine/shared";
@@ -14,7 +15,6 @@ import { BattleCycle } from "../BattleCycle";
 import { BattleTargeting } from "../BattleTargeting";
 import { BattleNetworkStopTargeting } from "../network/BattleNetworkStopTargetting";
 import { BattleCharacterAttackValidation } from "./BattleCharacterAttackValidation";
-import { CharacterSkull } from "@providers/character/CharacterSkull";
 
 @provide(BattleCharacterAttack)
 export class BattleCharacterAttack {
@@ -111,6 +111,11 @@ export class BattleCharacterAttack {
         virtuals: true,
         defaults: true,
       });
+
+      if (!updatedTarget) {
+        this.battleCycle.stop(character._id);
+        return;
+      }
 
       const updatedCharacterSkills = await Skill.findOne({ owner: target._id, ownerType: "Character" }).cacheQuery({
         cacheKey: `${target._id}-skills`,

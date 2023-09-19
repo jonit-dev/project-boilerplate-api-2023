@@ -104,6 +104,11 @@ services:
       placement:
         constraints:
           - node.role == manager
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"] # Check if MongoDB is responsive using 'ping'
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
       - rpg-network
 
@@ -121,6 +126,11 @@ services:
       placement:
         constraints:
           - node.role == manager
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"] # Check if Redis is responsive using 'ping'
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   newrelic-infra:
     image: newrelic/infrastructure:latest

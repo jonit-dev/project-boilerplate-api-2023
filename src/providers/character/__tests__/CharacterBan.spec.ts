@@ -1,4 +1,4 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import dayjs from "dayjs";
 import { CharacterBan } from "../CharacterBan";
@@ -18,6 +18,8 @@ describe("CharacterBan.ts", () => {
   it("should add a penalty point, once called addPenalty in a character", async () => {
     await characterBan.addPenalty(testCharacter);
 
+    testCharacter = (await Character.findById(testCharacter._id).lean().select("penalty")) as ICharacter;
+
     expect(testCharacter.penalty).toBe(1);
   });
 
@@ -33,6 +35,10 @@ describe("CharacterBan.ts", () => {
     await characterBan.addPenalty(testCharacter);
     await characterBan.addPenalty(testCharacter);
 
+    testCharacter = (await Character.findById(testCharacter._id)
+      .lean()
+      .select("penalty isBanned banRemovalDate")) as ICharacter;
+
     expect(testCharacter.isBanned).toBe(true);
 
     expect(testCharacter.banRemovalDate).toBeDefined();
@@ -47,6 +53,10 @@ describe("CharacterBan.ts", () => {
   it("should ban a character with next penalty", async () => {
     testCharacter.penalty = 11;
     await characterBan.increasePenaltyAndBan(testCharacter);
+
+    testCharacter = (await Character.findById(testCharacter._id)
+      .lean()
+      .select("penalty isBanned banRemovalDate")) as ICharacter;
 
     expect(testCharacter.isBanned).toBe(true);
     expect(testCharacter.penalty).toBe(20);
