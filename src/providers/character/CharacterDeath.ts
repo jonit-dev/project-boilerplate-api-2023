@@ -104,21 +104,6 @@ export class CharacterDeath {
         await this.sendDiscordPVPMessage(killer as ICharacter, character);
       }
 
-      const characterDeathData: IBattleDeath = {
-        id: character.id,
-        type: "Character",
-      };
-
-      this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
-
-      // communicate all players around that character is dead
-
-      await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
-        character,
-        BattleSocketEvents.BattleDeath,
-        characterDeathData
-      );
-
       const characterBody = await this.generateCharacterBody(character);
 
       if (killer?.type === EntityType.Character) {
@@ -176,6 +161,8 @@ export class CharacterDeath {
       await this.characterWeight.updateCharacterWeight(character);
 
       await this.sendRefreshEquipmentEvent(character);
+
+      await this.sendBattleDeathEvents(character);
     } catch {
       await this.locker.unlock(`character-death-${character.id}`);
     } finally {
@@ -222,6 +209,23 @@ export class CharacterDeath {
     );
 
     await this.locker.unlock(`character-death-${character.id}`);
+  }
+
+  private async sendBattleDeathEvents(character: ICharacter): Promise<void> {
+    const characterDeathData: IBattleDeath = {
+      id: character.id,
+      type: "Character",
+    };
+
+    this.socketMessaging.sendEventToUser(character.channelId!, BattleSocketEvents.BattleDeath, characterDeathData);
+
+    // communicate all players around that character is dead
+
+    await this.socketMessaging.sendEventToCharactersAroundCharacter<IBattleDeath>(
+      character,
+      BattleSocketEvents.BattleDeath,
+      characterDeathData
+    );
   }
 
   private async sendDiscordPVPMessage(killer: ICharacter, target: ICharacter): Promise<void> {
@@ -275,11 +279,7 @@ export class CharacterDeath {
   }
 
   private async sendRefreshEquipmentEvent(character: ICharacter): Promise<void> {
-    const equipment = (await Equipment.findById(character.equipment)
-      .lean()
-      .cacheQuery({
-        cacheKey: `${character._id}-equipment`,
-      })) as IEquipment;
+    const equipment = (await Equipment.findById(character.equipment).lean()) as IEquipment;
 
     const equipmentSet = await this.equipmentSlots.getEquipmentSlots(character._id, equipment._id);
 

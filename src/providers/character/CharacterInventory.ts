@@ -141,9 +141,7 @@ export class CharacterInventory {
     if (!useExistingEquipment) {
       equipment = new Equipment();
     } else {
-      equipment = await Equipment.findById(character.equipment).cacheQuery({
-        cacheKey: `${character._id}-equipment`,
-      });
+      equipment = await Equipment.findById(character.equipment);
 
       if (!equipment) {
         throw new Error("Equipment not found");

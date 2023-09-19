@@ -23,7 +23,5 @@ export const spellTeleport: Partial<ISpell> = {
       gridX: ToGridX(character.initialX),
       gridY: ToGridY(character.initialY),
     });
-
-    console.log("triggering map transition");
   },
 };
