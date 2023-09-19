@@ -69,6 +69,8 @@ export class ItemDeleteCrons {
 
           isInDepot: { $exists: false, $ne: true },
 
+          carrier: { $exists: false },
+
           //* And were manipulated more than an hour ago
           updatedAt: { $lt: oneHourAgo }, // delete items that are older than 1 hour!
         });
