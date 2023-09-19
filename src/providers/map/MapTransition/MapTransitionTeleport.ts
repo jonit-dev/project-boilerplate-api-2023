@@ -47,7 +47,8 @@ export class MapTransitionTeleport {
         destination.map,
         destination.gridX,
         destination.gridY,
-        MapLayers.Character
+        MapLayers.Character,
+        "CHECK_SINGLE_LAYER"
       );
 
       if (isSolid) {
