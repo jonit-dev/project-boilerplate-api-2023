@@ -9,23 +9,28 @@ export const recipeEarthbinderSpear: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 3,
+      qty: 30,
+    },
+    {
+      key: CraftingResourcesBlueprint.PolishedStone,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 3,
+      qty: 30,
     },
     {
-      key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 3,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 30,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 3],
-      [CraftingResourcesBlueprint.IronIngot, 3],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
+      [CraftingResourcesBlueprint.SteelIngot, 30],
+      [CraftingResourcesBlueprint.PolishedStone, 30],
+      [CraftingResourcesBlueprint.Herb, 30],
+      [CraftingResourcesBlueprint.WoodenBoard, 30],
     ]),
   ],
 };

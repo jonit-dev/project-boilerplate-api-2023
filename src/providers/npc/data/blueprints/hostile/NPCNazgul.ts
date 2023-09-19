@@ -8,6 +8,7 @@ import {
   DaggersBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
+  SpearsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -64,6 +65,10 @@ export const npcNazgul: Partial<INPC> = {
     {
       itemBlueprintKey: BootsBlueprint.GoldenBoots,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: SpearsBlueprint.RustedDoubleVoulge,
+      chance: 3,
     },
     {
       itemBlueprintKey: HelmetsBlueprint.RoyalHelmet,

@@ -9,18 +9,23 @@ export const recipeBronzeArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 10,
+      qty: 15,
+    },
+    {
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 6,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 10],
-      [CraftingResourcesBlueprint.Leather, 6],
+      [CraftingResourcesBlueprint.CopperIngot, 15],
+      [CraftingResourcesBlueprint.IronIngot, 15],
+      [CraftingResourcesBlueprint.Leather, 10],
     ]),
   ],
 };

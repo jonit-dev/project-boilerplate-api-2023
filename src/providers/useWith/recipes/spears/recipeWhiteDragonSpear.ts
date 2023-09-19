@@ -13,19 +13,24 @@ export const recipeWhiteDragonSpear: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 10,
+      qty: 20,
     },
     {
-      key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 10,
+      key: CraftingResourcesBlueprint.ObsidiumIngot,
+      qty: 30,
+    },
+    {
+      key: CraftingResourcesBlueprint.GreenIngot,
+      qty: 30,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.DragonTooth, 5],
-      [CraftingResourcesBlueprint.PhoenixFeather, 10],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
+      [CraftingResourcesBlueprint.PhoenixFeather, 20],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 30],
+      [CraftingResourcesBlueprint.GreenIngot, 30],
     ]),
   ],
 };

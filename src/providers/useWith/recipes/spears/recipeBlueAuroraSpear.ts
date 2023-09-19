@@ -9,23 +9,23 @@ export const recipeBlueAuroraSpear: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 2,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 5,
+      qty: 10,
     },
     {
-      key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 3,
+      key: CraftingResourcesBlueprint.WoodenBoard,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 2],
-      [CraftingResourcesBlueprint.BlueSapphire, 5],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
+      [CraftingResourcesBlueprint.SteelIngot, 10],
+      [CraftingResourcesBlueprint.BlueSapphire, 10],
+      [CraftingResourcesBlueprint.WoodenBoard, 10],
     ]),
   ],
 };

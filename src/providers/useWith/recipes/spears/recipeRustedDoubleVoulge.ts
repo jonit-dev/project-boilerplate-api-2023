@@ -8,24 +8,24 @@ export const recipeMushroomSpear: IUseWithCraftingRecipe = {
   outputQtyRange: [1, 1],
   requiredItems: [
     {
+      key: CraftingResourcesBlueprint.DragonTooth,
+      qty: 5,
+    },
+    {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 20,
+      qty: 10,
     },
     {
-      key: CraftingResourcesBlueprint.SteelIngot,
+      key: CraftingResourcesBlueprint.ObsidiumIngot,
       qty: 20,
-    },
-    {
-      key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 15,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreenIngot, 20],
-      [CraftingResourcesBlueprint.SteelIngot, 20],
-      [CraftingResourcesBlueprint.WoodenBoard, 15],
+      [CraftingResourcesBlueprint.GreenIngot, 5],
+      [CraftingResourcesBlueprint.SteelIngot, 5],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
     ]),
   ],
 };

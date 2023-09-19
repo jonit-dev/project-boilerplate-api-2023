@@ -9,7 +9,11 @@ export const recipeKnightArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 10,
+      qty: 20,
+    },
+    {
+      key: CraftingResourcesBlueprint.ObsidiumIngot,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
@@ -19,7 +23,8 @@ export const recipeKnightArmor: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CorruptionIngot, 10],
+      [CraftingResourcesBlueprint.CorruptionIngot, 20],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 5],
       [CraftingResourcesBlueprint.Leather, 10],
     ]),
   ],

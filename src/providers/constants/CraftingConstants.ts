@@ -1,4 +1,4 @@
-export const CRAFTING_MIN_LEVEL_RATIO = 1.5;
+export const CRAFTING_MIN_LEVEL_RATIO = 3.5;
 
 // remember this regulates mining, blacksmithing, fishing, etc.
 export const CRAFTING_DIFFICULTY_RATIO = 1.75; // higher means harder
