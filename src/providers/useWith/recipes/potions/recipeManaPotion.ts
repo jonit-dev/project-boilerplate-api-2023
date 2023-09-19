@@ -4,7 +4,7 @@ import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeManaPotion: IUseWithCraftingRecipe = {
   outputKey: PotionsBlueprint.ManaPotion,
-  outputQtyRange: [1, 1],
+  outputQtyRange: [5, 10],
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueFeather,

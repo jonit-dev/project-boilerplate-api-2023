@@ -4,7 +4,7 @@ import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeLifePotion: IUseWithCraftingRecipe = {
   outputKey: PotionsBlueprint.LifePotion,
-  outputQtyRange: [1, 3],
+  outputQtyRange: [5, 10],
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Herb,
