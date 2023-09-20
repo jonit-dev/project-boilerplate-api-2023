@@ -116,7 +116,7 @@ export class CharacterCrons {
 
         (await Character.findByIdAndUpdate({ _id: character._id }, { isOnline: false })) as ICharacter;
 
-        await this.socketSessionControl.deleteSession(character.channelId!);
+        await this.socketSessionControl.deleteSession(character._id!);
 
         await this.characterLastAction.clearLastAction(character._id);
 

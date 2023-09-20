@@ -101,7 +101,7 @@ export class CharacterNetworkLogout {
             textureKey: textureKeyVeil || character.textureKey,
           }
         );
-        await this.socketSessionControl.deleteSession(character.channelId!);
+        await this.socketSessionControl.deleteSession(character._id);
 
         await this.specialEffect.clearEffects(character);
 

@@ -196,14 +196,16 @@ export class CharacterNetworkCreate {
   private async manageSocketConnections(channel: SocketChannel, character: ICharacter): Promise<void> {
     const channelId = channel.id?.toString()!;
 
-    const hasSocketConnection = await this.socketSessionControl.hasSession(channelId);
+    const hasSocketConnection = await this.socketSessionControl.hasSession(character._id);
 
     if (!hasSocketConnection) {
       await channel.join(channelId);
-      await this.socketSessionControl.setSession(channelId, character._id);
+      await this.socketSessionControl.setSession(character._id);
 
       channel.on("disconnect", async () => {
-        await this.socketSessionControl.deleteSession(channelId);
+        await this.socketSessionControl.deleteSession(character._id);
+        // @ts-ignore
+        channel.removeAllListeners?.(); // make sure we leave no left overs
       });
     }
   }

@@ -1,6 +1,7 @@
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { socketEventsBinder } from "@providers/inversify/container";
-import { ISocket, SocketTypes } from "@rpg-engine/shared";
+import { CharacterSocketEvents, ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosIO } from "./GeckosIO";
 import { SocketIO } from "./SocketIO";
@@ -58,10 +59,30 @@ export class SocketAdapter implements ISocket {
 
   public onConnect(): void {
     SocketAdapter.socketClass?.onConnect(async (channel) => {
-      const hasSocketSession = await this.socketSessionControl.hasSession(channel.id);
+      const socketQuery = channel?.handshake?.query;
 
-      if (hasSocketSession) {
-        return; // avoid binding events multiple times
+      const hasCharacterId = socketQuery.characterId !== "undefined" && socketQuery.characterId !== undefined;
+
+      if (hasCharacterId) {
+        const characterId = socketQuery.characterId as string;
+
+        const hasSocketOngoingSession = await this.socketSessionControl.hasSession(characterId);
+
+        console.log(hasSocketOngoingSession);
+
+        if (hasSocketOngoingSession) {
+          // force disconnect the previous socket connection
+
+          const previousCharacter = await Character.findById(characterId).lean().select("channelId");
+
+          if (!previousCharacter) {
+            throw new Error("Character not found!");
+          }
+
+          this.emitToUser(previousCharacter.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "You have been disconnected because you logged in from another device!",
+          });
+        }
       }
 
       socketEventsBinder.bindEvents(channel);
