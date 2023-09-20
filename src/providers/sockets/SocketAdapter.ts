@@ -80,11 +80,22 @@ export class SocketAdapter implements ISocket {
           this.emitToUser(previousCharacter.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
             reason: "You have been disconnected because you logged in from another device!",
           });
+
+          const previousChannel = this.getChannelById(previousCharacter.channelId!);
+
+          if (previousChannel) {
+            await previousChannel.leave();
+            previousChannel.removeAllListeners();
+          }
         }
       }
 
       socketEventsBinder.bindEvents(channel);
     });
+  }
+
+  public getChannelById(channelId: string): any {
+    return SocketAdapter.socketClass?.getChannelById(channelId);
   }
 
   public async disconnect(): Promise<void> {

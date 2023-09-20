@@ -62,4 +62,8 @@ export class SocketIO implements ISocket {
     console.log("🔌 Shutting down TCP socket connections...");
     await this.socket.close();
   }
+
+  public getChannelById(channelId: string): Socket | undefined {
+    return this.socket.sockets.sockets.get(channelId);
+  }
 }

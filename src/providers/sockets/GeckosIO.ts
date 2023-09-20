@@ -51,4 +51,8 @@ export class GeckosIO implements ISocket {
       await this.socket.connectionsManager.deleteConnection(webRTCConnection, channelId!);
     }
   }
+
+  public getChannelById(channelId: string): any {
+    return this.socket.room(channelId);
+  }
 }
