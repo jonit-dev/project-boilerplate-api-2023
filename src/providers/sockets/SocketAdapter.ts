@@ -68,8 +68,6 @@ export class SocketAdapter implements ISocket {
 
         const hasSocketOngoingSession = await this.socketSessionControl.hasSession(characterId);
 
-        console.log(hasSocketOngoingSession);
-
         if (hasSocketOngoingSession) {
           // force disconnect the previous socket connection
 
