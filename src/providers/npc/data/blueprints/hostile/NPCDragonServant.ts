@@ -6,6 +6,7 @@ import {
   ArmorsBlueprint,
   BooksBlueprint,
   CraftingResourcesBlueprint,
+  GlovesBlueprint,
   HelmetsBlueprint,
   OthersBlueprint,
   ShieldsBlueprint,
@@ -111,6 +112,10 @@ export const npcDragonServant: Partial<INPC> = {
     },
     {
       itemBlueprintKey: StaffsBlueprint.ElementalStaff,
+      chance: 2,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.GenesisGloves,
       chance: 2,
     },
   ],

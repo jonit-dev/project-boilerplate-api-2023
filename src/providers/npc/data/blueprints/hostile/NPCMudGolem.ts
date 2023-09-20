@@ -90,5 +90,9 @@ export const npcMudGolem: Partial<INPC> = {
       itemBlueprintKey: StaffsBlueprint.GravityStaff,
       chance: 2,
     },
+    {
+      itemBlueprintKey: GlovesBlueprint.OsirisGloves,
+      chance: 1,
+    },
   ],
 };

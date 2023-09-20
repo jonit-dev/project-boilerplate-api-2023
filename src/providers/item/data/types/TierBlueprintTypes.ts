@@ -788,6 +788,15 @@ export type LightArmorTier1Defense = LightArmorTier0Defense | 5 | 6 | 7;
 export type LightArmorTier2Defense = LightArmorTier1Defense | 8 | 9 | 10;
 export type LightArmorTier3Defense = LightArmorTier2Defense | 11 | 12 | 13 | 14 | 15 | 16;
 export type LightArmorTier4Defense = LightArmorTier3Defense | 17 | 18 | 19 | 20 | 21 | 22;
+export type LightArmorTier5Defense = LightArmorTier4Defense | 23 | 24 | 25 | 26 | 27 | 28;
+export type LightArmorTier6Defense = LightArmorTier5Defense | 29 | 30 | 31 | 32 | 33 | 34;
+export type LightArmorTier7Defense = LightArmorTier6Defense | 35 | 36 | 37 | 38 | 39 | 40;
+export type LightArmorTier8Defense = LightArmorTier7Defense | 41 | 42 | 43 | 44 | 45 | 46;
+export type LightArmorTier9Defense = LightArmorTier8Defense | 47 | 48 | 49 | 50 | 51 | 50;
+export type LightArmorTier10Defense = LightArmorTier9Defense | 53 | 54 | 55 | 56 | 57 | 58;
+export type LightArmorTier11Defense = LightArmorTier10Defense | 59 | 60 | 61 | 62 | 63 | 64;
+export type LightArmorTier12Defense = LightArmorTier11Defense | 65 | 66 | 67 | 68 | 69 | 70;
+export type LightArmorTier13Defense = LightArmorTier12Defense | 71 | 72 | 73 | 74 | 75 | 76;
 
 export interface IEquippableLightArmorTier0Blueprint extends IEquippableArmorBlueprint {
   tier: 0;
@@ -812,4 +821,43 @@ export interface IEquippableLightArmorTier3Blueprint extends IEquippableArmorBlu
 export interface IEquippableLightArmorTier4Blueprint extends IEquippableArmorBlueprint {
   tier: 4;
   defense: LightArmorTier4Defense;
+}
+
+export interface IEquippableLightArmorTier5Blueprint extends IEquippableArmorBlueprint {
+  tier: 5;
+  defense: LightArmorTier5Defense;
+}
+
+export interface IEquippableLightArmorTier6Blueprint extends IEquippableArmorBlueprint {
+  tier: 6;
+  defense: LightArmorTier6Defense;
+}
+export interface IEquippableLightArmorTier7Blueprint extends IEquippableArmorBlueprint {
+  tier: 7;
+  defense: LightArmorTier7Defense;
+}
+
+export interface IEquippableLightArmorTier8Blueprint extends IEquippableArmorBlueprint {
+  tier: 8;
+  defense: LightArmorTier8Defense;
+}
+export interface IEquippableLightArmorTier9Blueprint extends IEquippableArmorBlueprint {
+  tier: 9;
+  defense: LightArmorTier9Defense;
+}
+export interface IEquippableLightArmorTier10Blueprint extends IEquippableArmorBlueprint {
+  tier: 10;
+  defense: LightArmorTier10Defense;
+}
+export interface IEquippableLightArmorTier11Blueprint extends IEquippableArmorBlueprint {
+  tier: 11;
+  defense: LightArmorTier11Defense;
+}
+export interface IEquippableLightArmorTier12Blueprint extends IEquippableArmorBlueprint {
+  tier: 12;
+  defense: LightArmorTier12Defense;
+}
+export interface IEquippableLightArmorTier13Blueprint extends IEquippableArmorBlueprint {
+  tier: 13;
+  defense: LightArmorTier13Defense;
 }

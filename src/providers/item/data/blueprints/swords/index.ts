@@ -63,8 +63,10 @@ import { itemTigerSword } from "./tier6/ItemTigerSword";
 import { itemCenturionBroadsword } from "./tier7/ItemCenturionBroadsword";
 import { itemJadeBlade } from "./tier7/ItemJadeBlade";
 import { itemWindCutterSword } from "./tier7/ItemWindCutterSword";
+import { itemYggdrasilBroadsword } from "./tier7/ItemYggdrasilBroadsword";
 import { itemIronFistSword } from "./tier8/ItemIronFistSword";
 import { itemMoonshadeSword } from "./tier8/ItemMoonshadeSword";
+import { itemTitanTetherTachiSword } from "./tier8/ItemTitanTetherTachiSword";
 import { itemVenomStrikeSword } from "./tier8/ItemVenomStrikeSword";
 import { itemGorgonBlade } from "./tier9/ItemGorgonBlade";
 import { itemLightBringerSword } from "./tier9/ItemLightBringerSword";
@@ -143,4 +145,6 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.VioletVenomSword]: itemVioletVenomSword,
   [SwordsBlueprint.NemesisSword]: itemNemesisSword,
   [SwordsBlueprint.PixieCutSword]: itemPixieCutSword,
+  [SwordsBlueprint.TitanTetherTachiSword]: itemTitanTetherTachiSword,
+  [SwordsBlueprint.YggdrasilBroadsword]: itemYggdrasilBroadsword,
 };

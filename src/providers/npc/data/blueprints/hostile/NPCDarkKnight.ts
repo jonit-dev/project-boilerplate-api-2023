@@ -186,6 +186,14 @@ export const npcDarkKnight: Partial<INPC> = {
       itemBlueprintKey: HammersBlueprint.ThorHammer,
       chance: 1,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.TempestTalonTautBow,
+      chance: 1,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.TitanTetherTachiSword,
+      chance: 1,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
   areaSpells: [

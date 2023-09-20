@@ -1,5 +1,6 @@
 import { SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
+import { recipeYggdrasilBroadsword } from "./YggdrasilBroadsword";
 import { recipeBasiliskSword } from "./recipeBasiliskSword";
 import { recipeBroadSword } from "./recipeBroadSword";
 import { recipeBronzeFuryBroadsword } from "./recipeBronzeFuryBroadsword";
@@ -78,4 +79,5 @@ export const recipeSwordsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [SwordsBlueprint.VenomStrikeSword]: [recipeVenomStrikeSword],
   [SwordsBlueprint.VioletVenomSword]: [recipeVioletVenomSword],
   [SwordsBlueprint.ZenBroadsword]: [recipeZenBroadsword],
+  [SwordsBlueprint.YggdrasilBroadsword]: [recipeYggdrasilBroadsword],
 };

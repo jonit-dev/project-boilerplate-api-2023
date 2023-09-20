@@ -126,5 +126,9 @@ export const npcGorgok = {
       itemBlueprintKey: AxesBlueprint.GoldenAxe,
       chance: 1,
     },
+    {
+      itemBlueprintKey: RangedWeaponsBlueprint.GorgonGazeGuardianBow,
+      chance: 1,
+    },
   ],
 } as Partial<INPC>;

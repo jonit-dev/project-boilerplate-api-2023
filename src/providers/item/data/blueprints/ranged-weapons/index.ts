@@ -62,10 +62,15 @@ import { itemValkyriesBow } from "./tier5/ItemValkyriesBow";
 import { itemYggdrasilBow } from "./tier5/ItemYggdrasilBow";
 import { itemZephyrusBow } from "./tier5/ItemZephyrusBow";
 import { itemIronBarkBow } from "./tier6/ItemIronBarkBow";
+import { itemParallelPrecisionBow } from "./tier6/ItemParallelPrecisionBow";
 import { itemWhisperWindBow } from "./tier6/ItemWhisperWindBow";
 import { itemEaglesEyeBow } from "./tier7/ItemEaglesEyeBow";
+import { itemGaleGuardianGripCrossbow } from "./tier7/ItemGaleGuardianGripCrossbow";
 import { itemStoneBreakerBow } from "./tier8/ItemStoneBreakerBow";
+import { itemTempestTalonTautBow } from "./tier8/ItemTempestTalonTautBow";
 import { itemBloodseekerBow } from "./tier9/ItemBloodseekerBow";
+import { itemChordedCataclysmBow } from "./tier9/ItemChordedCataclysmBow";
+import { itemGorgonGazeGuardianBow } from "./tier9/ItemGorgonGazeGuardianBow";
 
 export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.Slingshot]: itemSlingshot,
@@ -135,4 +140,9 @@ export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.GossamerBolt]: itemGossamerBolt,
   [RangedWeaponsBlueprint.SunflareArrow]: itemSunflareArrow,
   [RangedWeaponsBlueprint.WardenArrow]: itemWardenArrow,
+  [RangedWeaponsBlueprint.TempestTalonTautBow]: itemTempestTalonTautBow,
+  [RangedWeaponsBlueprint.ChordedCataclysmBow]: itemChordedCataclysmBow,
+  [RangedWeaponsBlueprint.ParallelPrecisionBow]: itemParallelPrecisionBow,
+  [RangedWeaponsBlueprint.GorgonGazeGuardianBow]: itemGorgonGazeGuardianBow,
+  [RangedWeaponsBlueprint.GaleGuardianGripCrossbow]: itemGaleGuardianGripCrossbow,
 };

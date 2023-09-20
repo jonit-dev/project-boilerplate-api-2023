@@ -6,6 +6,7 @@ import {
   BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
+  GlovesBlueprint,
   HammersBlueprint,
   HelmetsBlueprint,
   MacesBlueprint,
@@ -104,6 +105,10 @@ export const npcStoneGolem: Partial<INPC> = {
     {
       itemBlueprintKey: MacesBlueprint.SkullCrusherMace,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: GlovesBlueprint.PyroclasmGloves,
+      chance: 1,
     },
   ],
 };

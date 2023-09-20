@@ -165,6 +165,10 @@ export const npcYeti: Partial<INPC> = {
       chance: 2,
       quantityRange: [10, 20],
     },
+    {
+      itemBlueprintKey: GlovesBlueprint.FrostwardenGloves,
+      chance: 1,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
 };

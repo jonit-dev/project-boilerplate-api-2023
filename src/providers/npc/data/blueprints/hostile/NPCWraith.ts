@@ -113,6 +113,10 @@ export const npcWraith: Partial<INPC> = {
       itemBlueprintKey: AxesBlueprint.SerpentDanceAxe,
       chance: 1,
     },
+    {
+      itemBlueprintKey: GlovesBlueprint.GleamingGauntlets,
+      chance: 1,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
 };

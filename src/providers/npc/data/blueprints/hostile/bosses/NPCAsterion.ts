@@ -101,5 +101,9 @@ export const npcAsterion = {
       itemBlueprintKey: StaffsBlueprint.TartarusStaff,
       chance: 1,
     },
+    {
+      itemBlueprintKey: GlovesBlueprint.JadeclaspGloves,
+      chance: 1,
+    },
   ],
 } as Partial<INPC>;

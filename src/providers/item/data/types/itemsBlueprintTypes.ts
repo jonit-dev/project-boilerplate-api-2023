@@ -70,6 +70,8 @@ export enum SwordsBlueprint {
   VioletVenomSword = "violet-venom-sword",
   NemesisSword = "nemesis-sword",
   PixieCutSword = "pixie-cut-sword",
+  TitanTetherTachiSword = "titan-tether-tachi-sword",
+  YggdrasilBroadsword = "yggdrasil-broadsword",
 }
 
 export enum HelmetsBlueprint {
@@ -442,6 +444,11 @@ export enum RangedWeaponsBlueprint {
   GossamerBolt = "gossamer-bolt",
   SunflareArrow = "sunflare-arrow",
   WardenArrow = "warden-arrow",
+  TempestTalonTautBow = "tempest-talon-taut-bow",
+  ChordedCataclysmBow = "chorded-cataclysm-bow",
+  ParallelPrecisionBow = "parallel-precision-bow",
+  GorgonGazeGuardianBow = "gorgon-gaze-guardian-bow",
+  GaleGuardianGripCrossbow = "gale-guardian-grip-crossbow",
 }
 
 export enum GlovesBlueprint {
@@ -449,6 +456,19 @@ export enum GlovesBlueprint {
   StuddedGloves = "studded-gloves",
   ChainGloves = "chain-gloves",
   PlateGloves = "plate-gloves",
+  FrostwardenGloves = "frostwarden-gloves",
+  PyroclasmGloves = "pyroclasm-gloves",
+  ShadowlordGloves = "shadowlord-gloves",
+  OraclegripGloves = "oraclegrip-gloves",
+  GlovesOfGrace = "gloves-of-grace",
+  EtherealEmbrace = "ethereal-embrace",
+  GleamingGauntlets = "gleaming-gauntlets",
+  RoyalDecreeGloves = "royal-decree-gloves",
+  OsirisGloves = "osiris-gloves",
+  CrimsonCrestWraps = "crimson-crest-wraps",
+  RunicRadianceGloves = "runic-radiance-gloves",
+  JadeclaspGloves = "jadeclasp-gloves",
+  GenesisGloves = "genesis-gloves",
 }
 
 export enum MacesBlueprint {
