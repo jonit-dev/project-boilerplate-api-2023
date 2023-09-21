@@ -27,7 +27,7 @@ import {
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { CharacterClass } from "@rpg-engine/shared";
+import { CharacterClass, CharacterFactions } from "@rpg-engine/shared";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
 import { UpdateCharacterDTO } from "@useCases/ModuleCharacter/character/update/UpdateCharacterDTO";
 import { provide } from "inversify-binding-decorators";
@@ -48,10 +48,21 @@ export class CharacterRepository extends CRUD {
     const skills = new Skill({ ownerType: "Character" });
     await skills.save();
 
+    let extraProps: Partial<ICharacter> = {};
+
+    if (newCharacter.faction === CharacterFactions.ShadowWalker) {
+      extraProps = {
+        scene: "shadowlands",
+        x: 2576,
+        y: 2176,
+      };
+    }
+
     const createdCharacter = await this.create(
       Character,
       {
         ...newCharacter,
+        ...extraProps,
         owner: ownerId,
         skills: skills._id,
       },

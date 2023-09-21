@@ -31,9 +31,11 @@ export class CreateCharacterUseCase {
         })
       );
     }
+
     if (!isAlphanumeric(newCharacter.name)) {
       throw new BadRequestError("Sorry, your character name must use only letters or numbers (alphanumeric)!");
     }
+
     const createdCharacter = await this.characterRepository.createCharacter(newCharacter, ownerId);
 
     user.characters?.push(createdCharacter._id);
