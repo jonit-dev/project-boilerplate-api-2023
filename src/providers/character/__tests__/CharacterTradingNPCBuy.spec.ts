@@ -204,7 +204,7 @@ describe("CharacterTradingValidation.ts", () => {
       transactionItems = [
         {
           key: FoodsBlueprint.Apple,
-          qty: 999,
+          qty: 9999,
         },
       ];
 

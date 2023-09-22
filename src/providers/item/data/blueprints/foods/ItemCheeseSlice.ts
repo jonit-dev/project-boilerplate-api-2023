@@ -12,7 +12,7 @@ export const itemCheeseSlice: IConsumableItemBlueprint = {
   name: "Cheese Slice",
   description: "A thick slice of yellow cheese.",
   weight: 0.1,
-  maxStackSize: 50,
+  maxStackSize: 999,
   basePrice: 3,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,

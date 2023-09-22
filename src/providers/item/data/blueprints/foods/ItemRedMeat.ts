@@ -11,7 +11,7 @@ export const itemRedMeat: IConsumableItemBlueprint = {
   name: "Red meat",
   description: "This is a red meat from an animal. You can eat it to restore your health.",
   weight: 2,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 10,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.StrongEatingEffect,

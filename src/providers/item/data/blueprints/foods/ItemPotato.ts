@@ -13,7 +13,7 @@ export const itemPotato: IConsumableItemBlueprint = {
   description:
     "The Potato is a vegetable that grows underground in the form of a tuber. It comes in a variety of colors, sizes, and shapes, depending on the type of potato.",
   weight: 1,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 6,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,

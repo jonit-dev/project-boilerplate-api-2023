@@ -12,7 +12,7 @@ export const itemCookie: IConsumableItemBlueprint = {
   name: "Cookie",
   description: "A baked cookie.",
   weight: 0.05,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 2,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.MinorEatingEffect,

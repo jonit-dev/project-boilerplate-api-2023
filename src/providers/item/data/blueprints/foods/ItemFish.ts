@@ -11,7 +11,7 @@ export const itemFish: IConsumableItemBlueprint = {
   name: "Fish",
   description: "A dull fish.",
   weight: 0.2,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 3,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,

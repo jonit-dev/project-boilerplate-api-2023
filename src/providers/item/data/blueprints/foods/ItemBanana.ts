@@ -12,7 +12,7 @@ export const itemBanana: IConsumableItemBlueprint = {
   name: "Banana",
   description: "A ripe banana.",
   weight: 0.05,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 3,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.MinorEatingEffect,

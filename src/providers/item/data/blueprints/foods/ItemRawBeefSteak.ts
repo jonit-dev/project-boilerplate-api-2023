@@ -11,7 +11,7 @@ export const itemRawBeefSteak: IConsumableItemBlueprint = {
   name: "Raw Beef Steak",
   description: "A raw beef steak that can be used for cooking, but shouldn't be consumed raw.",
   weight: 3,
-  maxStackSize: 50,
+  maxStackSize: 999,
   basePrice: 20,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.PoisonEatingEffect,

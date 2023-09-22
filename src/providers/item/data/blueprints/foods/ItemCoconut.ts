@@ -11,7 +11,7 @@ export const itemCoconut: IConsumableItemBlueprint = {
   name: "Coconut",
   description: "A fruit that can be found in tropical areas.",
   weight: 0.5,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 4,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,

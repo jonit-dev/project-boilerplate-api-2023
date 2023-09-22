@@ -12,7 +12,7 @@ export const itemBananaBunch: IConsumableItemBlueprint = {
   name: "Banana Bunch",
   description: "A bundle of ripe bananas.",
   weight: 0.03,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 5,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.StrongEatingEffect,

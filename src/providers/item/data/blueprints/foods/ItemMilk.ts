@@ -11,7 +11,7 @@ export const itemMilk: IConsumableItemBlueprint = {
   name: "Milk",
   description: "A milk bottle.",
   weight: 0.05,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 4,
   canSell: true,
   usableEffectKey: UsableEffectsBlueprint.SuperStrongEatingEffect,

@@ -11,7 +11,7 @@ export const itemPineapple: IConsumableItemBlueprint = {
   name: "Pineapple",
   description: "A pineapple that can be found in tropical areas.",
   weight: 1,
-  maxStackSize: 50,
+  maxStackSize: 999,
   basePrice: 9,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.StrongEatingEffect,

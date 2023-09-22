@@ -3,20 +3,20 @@ import { CharacterClass, LifeBringerRaces, Modes, ShadowWalkerRaces } from "@rpg
 export const DAMAGE_ATTRIBUTE_WEIGHT = 1;
 export const DAMAGE_COMBAT_SKILL_WEIGHT = 1.5;
 
-export const EXP_RATIO = 1.5;
+export const EXP_RATIO = 1.75;
 
-export const SP_INCREASE_RATIO = 0.7;
-export const SP_CRAFTING_INCREASE_RATIO = SP_INCREASE_RATIO * 15;
+export const SP_INCREASE_RATIO = 1;
+export const SP_CRAFTING_INCREASE_RATIO = SP_INCREASE_RATIO * 25;
 
-export const SP_MAGIC_INCREASE_TIMES_MANA = 0.15;
+export const SP_MAGIC_INCREASE_TIMES_MANA = 0.17;
 
 export const INCREASE_BONUS_FACTION = 0.1;
 
 export const SP_INCREASE_SECONDS_COOLDOWN = 8;
 
-export const HEALTH_MANA_BASE_INCREASE_RATE = 10;
+export const HEALTH_MANA_BASE_INCREASE_RATE = 15;
 
-export const ML_INCREASE_RATIO = 0.75;
+export const ML_INCREASE_RATIO = 0.8;
 
 export const SPELL_CALCULATOR_DEFAULT_MIN_SKILL_MULTIPLIER = 0.5;
 export const SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER = 1.5;
@@ -463,6 +463,6 @@ export const RACE_BONUS_OR_PENALTIES = [
 // Mode
 export const MODE_EXP_MULTIPLIER: { [key in Modes]: number } = {
   [Modes.SoftMode]: 0.8,
-  [Modes.HardcoreMode]: 1.25,
-  [Modes.PermadeathMode]: 1.7,
+  [Modes.HardcoreMode]: 1.35,
+  [Modes.PermadeathMode]: 1.8,
 };

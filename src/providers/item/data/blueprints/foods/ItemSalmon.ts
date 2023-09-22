@@ -12,7 +12,7 @@ export const itemSalmon: IConsumableItemBlueprint = {
   name: "Salmon",
   description: "A fresh salmon fish.",
   weight: 0.2,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 7,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.SuperStrongEatingEffect,

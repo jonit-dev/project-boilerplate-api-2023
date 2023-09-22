@@ -11,7 +11,7 @@ export const itemTuna: IConsumableItemBlueprint = {
   name: "Tuna",
   description: "Tuna is widely consumed by humans, and is one of the most popular seafoods in the world.",
   weight: 0.25,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 4,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.ModerateEatingEffect,

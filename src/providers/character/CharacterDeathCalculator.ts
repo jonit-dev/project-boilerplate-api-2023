@@ -1,4 +1,5 @@
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { INVENTORY_DROP_CHANCE_MULTIPLIER, SKILL_LOSS_ON_DEATH_MULTIPLIER } from "@providers/constants/DeathConstants";
 import { provide } from "inversify-binding-decorators";
 
 @provide(CharacterDeathCalculator)
@@ -20,11 +21,11 @@ export class CharacterDeathCalculator {
 
     for (const [threshold, xpLoss] of Object.entries(skillLossPercentageLevel)) {
       if (level <= Number(threshold)) {
-        return xpLoss * multiply;
+        return xpLoss * multiply * SKILL_LOSS_ON_DEATH_MULTIPLIER;
       }
     }
 
-    return 10;
+    return 10 * SKILL_LOSS_ON_DEATH_MULTIPLIER;
   }
 
   public calculateInventoryDropChance(skills: ISkill): number {
@@ -52,11 +53,11 @@ export class CharacterDeathCalculator {
     for (const [threshold, chance] of Object.entries(chancesByLevel)) {
       // Return the chance of dropping inventory if the character's level is below the current threshold
       if (level <= Number(threshold)) {
-        return chance;
+        return chance * INVENTORY_DROP_CHANCE_MULTIPLIER;
       }
     }
 
     // Return the maximum chance of dropping inventory if the character's level is above the highest threshold
-    return 100;
+    return 100 * INVENTORY_DROP_CHANCE_MULTIPLIER;
   }
 }

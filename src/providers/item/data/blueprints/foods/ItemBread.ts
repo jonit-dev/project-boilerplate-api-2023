@@ -12,7 +12,7 @@ export const itemBread: IConsumableItemBlueprint = {
   name: "Bread",
   description: "A loaf of bread.",
   weight: 0.5,
-  maxStackSize: 50,
+  maxStackSize: 999,
   basePrice: 13,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.SuperStrongEatingEffect,

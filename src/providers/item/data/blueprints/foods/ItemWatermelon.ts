@@ -11,7 +11,7 @@ export const itemWatermelon: IConsumableItemBlueprint = {
   name: "Watermelon",
   description: "A fruit that can be found in tropical areas.",
   weight: 0.5,
-  maxStackSize: 100,
+  maxStackSize: 999,
   basePrice: 4,
   canSell: false,
 

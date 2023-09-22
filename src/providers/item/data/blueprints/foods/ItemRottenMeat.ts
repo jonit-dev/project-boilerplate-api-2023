@@ -11,7 +11,7 @@ export const itemRottenMeat: IConsumableItemBlueprint = {
   name: "Rotten Meat",
   description: "A piece of rotten meat. Don't eat it!",
   weight: 0.25,
-  maxStackSize: 50,
+  maxStackSize: 999,
   basePrice: 1,
   canSell: false,
   usableEffectKey: UsableEffectsBlueprint.PoisonEatingEffect,
