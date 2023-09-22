@@ -41,11 +41,6 @@ export class DiscordBot {
         return;
       }
 
-      if (!appEnv.general.DISCORD_TOKEN!) {
-        console.log("🤖 Failed to initialize Discord bot. DISCORD_TOKEN is not set.");
-        return;
-      }
-
       console.log("🤖 Initializing Discord bot...");
 
       if (this.token && this.client) {
