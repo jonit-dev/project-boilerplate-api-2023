@@ -104,11 +104,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-    healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"] # Check if MongoDB is responsive using 'ping'
-      interval: 10s
-      timeout: 5s
-      retries: 3
     networks:
       - rpg-network
 
@@ -127,7 +122,7 @@ services:
         constraints:
           - node.role == manager
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"] # Check if Redis is responsive using 'ping'
+      test: ["CMD", "redis-cli", "-p", "6380", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -140,7 +135,6 @@ services:
     volumes:
       - "/:/host:ro"
       - "/var/run/docker.sock:/var/run/docker.sock"
-    network_mode: host
     deploy:
       mode: global
       resources:
