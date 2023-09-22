@@ -101,7 +101,7 @@ export class CharacterCrons {
       const diff = now.diff(lastActivity, "minute");
 
       if (diff >= 10) {
-        console.log(`🚪: Character id ${character.id} has disconnected due to inactivity...`);
+        console.log(`🚪: Character id ${character._id} (${character.name}) has disconnected due to inactivity...`);
         this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
           reason: "You have were disconnected due to inactivity!",
         });

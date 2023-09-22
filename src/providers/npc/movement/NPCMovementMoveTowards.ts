@@ -268,6 +268,11 @@ export class NPCMovementMoveTowards {
 
             const targetCharacter = result[1] as ICharacter;
 
+            if (!targetCharacter) {
+              await this.npcTarget.clearTarget(npc);
+              return;
+            }
+
             const characterSkills = (await Skill.findOne({
               _id: targetCharacter.skills,
             })
