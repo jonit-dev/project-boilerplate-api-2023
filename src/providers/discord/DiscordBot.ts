@@ -113,7 +113,7 @@ export class DiscordBot {
       throw new Error(`Channel ID for ${channelName} not found`);
     }
 
-    const channel = (await this.client.channels.fetch(channelId)) as TextChannel;
+    const channel = (await this.client?.channels?.fetch(channelId)) as TextChannel;
     await channel.send({ embeds: [embed] });
   }
 
