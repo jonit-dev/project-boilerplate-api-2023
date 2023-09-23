@@ -1,6 +1,6 @@
 import { AccessoriesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
-import { CraftingSkill, MagicsBlueprint } from "@rpg-engine/shared";
+import { CraftingSkill } from "@rpg-engine/shared";
 
 export const recipeAmuletOfDeath: IUseWithCraftingRecipe = {
   outputKey: AccessoriesBlueprint.AmuletOfDeath,
@@ -8,14 +8,10 @@ export const recipeAmuletOfDeath: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Rope,
-      qty: 10,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 100,
-    },
-    {
-      key: MagicsBlueprint.CorruptionRune,
       qty: 100,
     },
     {
@@ -28,15 +24,15 @@ export const recipeAmuletOfDeath: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 100,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 100,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.CorruptionOre,
-      qty: 100,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [CraftingSkill.Blacksmithing, 30],

@@ -90,11 +90,13 @@ export class CharacterDeath {
       // try to avoid concurrency issues. Dont remove this for now, because in prod sometimes this method is executed twice.
       await this.time.waitForMilliseconds(random(1, 50));
 
-      const canProceed = await this.locker.lock(`character-death-${character.id}`);
+      const isLocked = await this.locker.hasLock(`character-death-${character.id}`);
 
-      if (!canProceed) {
+      if (isLocked) {
         return;
       }
+
+      await this.locker.lock(`character-death-${character.id}`, 3);
 
       if (killer) {
         await this.clearAttackerTarget(killer);
@@ -163,8 +165,8 @@ export class CharacterDeath {
       await this.sendRefreshEquipmentEvent(character);
 
       await this.sendBattleDeathEvents(character);
-    } catch {
-      await this.locker.unlock(`character-death-${character.id}`);
+    } catch (err) {
+      console.error(err);
     } finally {
       await entityEffectUse.clearAllEntityEffects(character); // make sure to clear all entity effects before respawn
 
@@ -207,8 +209,6 @@ export class CharacterDeath {
         },
       }
     );
-
-    await this.locker.unlock(`character-death-${character.id}`);
   }
 
   private async sendBattleDeathEvents(character: ICharacter): Promise<void> {

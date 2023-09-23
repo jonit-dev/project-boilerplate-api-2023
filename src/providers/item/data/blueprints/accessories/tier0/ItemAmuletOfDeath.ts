@@ -9,8 +9,7 @@ export const itemAmuletOfDeath: IEquippableAccessoryTier0Blueprint = {
   textureAtlas: "items",
   texturePath: "accessories/amulet-of-death.png",
   name: "Amulet Of Death",
-  description:
-    "The amulet is made from a dark and mysterious material, its surface covered in intricate and ominous engravings that seem to pulse with a malevolent energy. It is said that those who wear the Amulet of Death are granted heightened abilities and supernatural powers, but at a terrible cost.",
+  description: "This amulet prevents equipment, items and skill loss on death.",
   attack: 3,
   defense: 3,
   tier: 0,

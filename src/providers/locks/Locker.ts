@@ -5,9 +5,14 @@ import { provide } from "inversify-binding-decorators";
 export class Locker {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
-  public async lock(key: string): Promise<boolean> {
+  public async lock(key: string, ttlSeconds?: number): Promise<boolean> {
     //* atomic setNx operation. If the key already exists, it will return false.
     const result = await this.inMemoryHashTable.setNx("locks", key, true);
+
+    if (result && ttlSeconds) {
+      await this.inMemoryHashTable.expire("locks", ttlSeconds, "NX");
+    }
+
     return result;
   }
 

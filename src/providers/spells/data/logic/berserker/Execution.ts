@@ -46,6 +46,7 @@ export class Execution {
         }
       }
     } catch (error) {
+      console.error(error);
       throw new Error(`Error executing attack: ${error.message}`);
     }
   }

@@ -90,7 +90,7 @@ describe("SpellCast.ts", () => {
 
     targetCharacter = await unitTestHelper.createMockCharacter(
       { health: 100 },
-      { hasEquipment: false, hasInventory: false, hasSkills: true }
+      { hasEquipment: true, hasInventory: true, hasSkills: true }
     );
 
     sendEventToUser = jest.spyOn(SocketMessaging.prototype, "sendEventToUser");
