@@ -14,7 +14,7 @@ import { ItemRarity } from "@providers/item/ItemRarity";
 import { AvailableBlueprints, OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { INPCLoot, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { random } from "lodash";
+import { random, round } from "lodash";
 import { calculateGold } from "./NPCGold";
 
 @provide(NPCLoot)
@@ -44,8 +44,11 @@ export class NPCLoot {
     const bulkOps: any[] = [];
 
     for (const loot of loots) {
-      const rand = Math.round(random(0, 100));
-      const lootChance = await this.calculateLootChance(loot, wasNpcInGiantForm ? NPC_GIANT_FORM_LOOT_MULTIPLIER : 1);
+      const rand = round(random(0, 100, true), 2);
+      const lootChance = round(
+        await this.calculateLootChance(loot, wasNpcInGiantForm ? NPC_GIANT_FORM_LOOT_MULTIPLIER : 1),
+        2
+      );
 
       if (rand <= lootChance) {
         const lootQuantity = this.getLootQuantity(loot);
@@ -150,7 +153,9 @@ export class NPCLoot {
 
       const finalMultiplier = lootMultiplier * baseMultiplier;
 
-      return loot.chance * finalMultiplier;
+      const result = loot.chance * finalMultiplier;
+
+      return result;
     } catch (error) {
       console.error(error);
       return 0;
