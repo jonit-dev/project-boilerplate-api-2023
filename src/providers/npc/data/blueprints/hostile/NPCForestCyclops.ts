@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  AccessoriesBlueprint,
   HelmetsBlueprint,
   LegsBlueprint,
   MacesBlueprint,
@@ -57,10 +58,13 @@ export const npcForestCyclops = {
       itemBlueprintKey: ShieldsBlueprint.BanditShield,
       chance: 15,
     },
-
     {
       itemBlueprintKey: SwordsBlueprint.BasiliskSword,
       chance: 15,
+    },
+    {
+      itemBlueprintKey: AccessoriesBlueprint.ForestHeartPendant,
+      chance: 2,
     },
     {
       itemBlueprintKey: LegsBlueprint.AzureFrostLegs,

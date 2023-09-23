@@ -19,6 +19,54 @@ export type AccessoryTier1Defense = AccessoryTier0Defense | 4 | 5 | 6;
 export type AccessoryTier2Attack = AccessoryTier1Attack | 7 | 8 | 9;
 export type AccessoryTier2Defense = AccessoryTier1Defense | 7 | 8 | 9;
 
+export type AccessoryTier3Attack = AccessoryTier2Attack | 10 | 11 | 12;
+export type AccessoryTier3Defense = AccessoryTier2Defense | 10 | 11 | 12;
+
+export type AccessoryTier4Attack = AccessoryTier3Attack | 13 | 14 | 15;
+export type AccessoryTier4Defense = AccessoryTier3Defense | 13 | 14 | 15;
+
+export type AccessoryTier5Attack = AccessoryTier4Attack | 16 | 17 | 18;
+export type AccessoryTier5Defense = AccessoryTier4Defense | 16 | 17 | 18;
+
+export type AccessoryTier6Attack = AccessoryTier5Attack | 19 | 20 | 21;
+export type AccessoryTier6Defense = AccessoryTier5Defense | 19 | 20 | 21;
+
+export type AccessoryTier7Attack = AccessoryTier6Attack | 22 | 23 | 24;
+export type AccessoryTier7Defense = AccessoryTier6Defense | 22 | 23 | 24;
+
+export type AccessoryTier8Attack = AccessoryTier7Attack | 25 | 26 | 27;
+export type AccessoryTier8Defense = AccessoryTier7Defense | 25 | 26 | 27;
+
+export type AccessoryTier9Attack = AccessoryTier8Attack | 28 | 29 | 30;
+export type AccessoryTier9Defense = AccessoryTier8Defense | 28 | 29 | 30;
+
+export type AccessoryTier10Attack = AccessoryTier9Attack | 31 | 32 | 33;
+export type AccessoryTier10Defense = AccessoryTier9Defense | 31 | 32 | 33;
+
+export type AccessoryTier11Attack = AccessoryTier10Attack | 34 | 35 | 36;
+export type AccessoryTier11Defense = AccessoryTier10Defense | 34 | 35 | 36;
+
+export type AccessoryTier12Attack = AccessoryTier11Attack | 37 | 38 | 39;
+export type AccessoryTier12Defense = AccessoryTier11Defense | 37 | 38 | 39;
+
+export type AccessoryTier13Attack = AccessoryTier12Attack | 40 | 41 | 42;
+export type AccessoryTier13Defense = AccessoryTier12Defense | 40 | 41 | 42;
+
+export type AccessoryTier14Attack = AccessoryTier13Attack | 43 | 44 | 45;
+export type AccessoryTier14Defense = AccessoryTier13Defense | 43 | 44 | 45;
+
+export type AccessoryTier15Attack = AccessoryTier14Attack | 46 | 47 | 48;
+export type AccessoryTier15Defense = AccessoryTier14Defense | 46 | 47 | 48;
+
+export type AccessoryTier16Attack = AccessoryTier15Attack | 49 | 50 | 51;
+export type AccessoryTier16Defense = AccessoryTier15Defense | 49 | 50 | 51;
+
+export type AccessoryTier17Attack = AccessoryTier16Attack | 52 | 53 | 54;
+export type AccessoryTier17Defense = AccessoryTier16Defense | 52 | 53 | 54;
+
+export type AccessoryTier18Attack = AccessoryTier17Attack | 55 | 56 | 57;
+export type AccessoryTier18Defense = AccessoryTier17Defense | 55 | 56 | 57;
+
 export interface IEquippableAccessoryTier0Blueprint extends IEquippableItemBlueprint {
   tier: 0;
   attack: AccessoryTier0Attack;
@@ -35,6 +83,95 @@ export interface IEquippableAccessoryTier2Blueprint extends IEquippableItemBluep
   tier: 2;
   attack: AccessoryTier2Attack;
   defense: AccessoryTier2Defense;
+}
+
+export interface IEquippableAccessoryTier3Blueprint extends IEquippableItemBlueprint {
+  tier: 3;
+  attack: AccessoryTier3Attack;
+  defense: AccessoryTier3Defense;
+}
+
+export interface IEquippableAccessoryTier4Blueprint extends IEquippableItemBlueprint {
+  tier: 4;
+  attack: AccessoryTier4Attack;
+  defense: AccessoryTier4Defense;
+}
+
+export interface IEquippableAccessoryTier5Blueprint extends IEquippableItemBlueprint {
+  tier: 5;
+  attack: AccessoryTier5Attack;
+  defense: AccessoryTier5Defense;
+}
+
+export interface IEquippableAccessoryTier6Blueprint extends IEquippableItemBlueprint {
+  tier: 6;
+  attack: AccessoryTier6Attack;
+  defense: AccessoryTier6Defense;
+}
+
+export interface IEquippableAccessoryTier7Blueprint extends IEquippableItemBlueprint {
+  tier: 7;
+  attack: AccessoryTier7Attack;
+  defense: AccessoryTier7Defense;
+}
+
+export interface IEquippableAccessoryTier8Blueprint extends IEquippableItemBlueprint {
+  tier: 8;
+  attack: AccessoryTier8Attack;
+  defense: AccessoryTier8Defense;
+}
+
+export interface IEquippableAccessoryTier9Blueprint extends IEquippableItemBlueprint {
+  tier: 9;
+  attack: AccessoryTier9Attack;
+  defense: AccessoryTier9Defense;
+}
+
+export interface IEquippableAccessoryTier10Blueprint extends IEquippableItemBlueprint {
+  tier: 10;
+  attack: AccessoryTier10Attack;
+  defense: AccessoryTier10Defense;
+}
+
+export interface IEquippableAccessoryTier11Blueprint extends IEquippableItemBlueprint {
+  tier: 11;
+  attack: AccessoryTier11Attack;
+  defense: AccessoryTier11Defense;
+}
+export interface IEquippableAccessoryTier12Blueprint extends IEquippableItemBlueprint {
+  tier: 12;
+  attack: AccessoryTier12Attack;
+  defense: AccessoryTier12Defense;
+}
+export interface IEquippableAccessoryTier13Blueprint extends IEquippableItemBlueprint {
+  tier: 13;
+  attack: AccessoryTier13Attack;
+  defense: AccessoryTier13Defense;
+}
+export interface IEquippableAccessoryTier14Blueprint extends IEquippableItemBlueprint {
+  tier: 14;
+  attack: AccessoryTier14Attack;
+  defense: AccessoryTier14Defense;
+}
+export interface IEquippableAccessoryTier15Blueprint extends IEquippableItemBlueprint {
+  tier: 15;
+  attack: AccessoryTier15Attack;
+  defense: AccessoryTier15Defense;
+}
+export interface IEquippableAccessoryTier16Blueprint extends IEquippableItemBlueprint {
+  tier: 16;
+  attack: AccessoryTier16Attack;
+  defense: AccessoryTier16Defense;
+}
+export interface IEquippableAccessoryTier17Blueprint extends IEquippableItemBlueprint {
+  tier: 17;
+  attack: AccessoryTier17Attack;
+  defense: AccessoryTier17Defense;
+}
+export interface IEquippableAccessoryTier18Blueprint extends IEquippableItemBlueprint {
+  tier: 18;
+  attack: AccessoryTier18Attack;
+  defense: AccessoryTier18Defense;
 }
 
 // Melee ========================================
@@ -464,7 +601,8 @@ type Tier11AmmoKeys =
       RangedWeaponsBlueprint.SilvermoonArrow,
       RangedWeaponsBlueprint.HeartseekerArrow,
       RangedWeaponsBlueprint.SeekerArrow,
-      RangedWeaponsBlueprint.CrystallineArrow
+      RangedWeaponsBlueprint.CrystallineArrow,
+      RangedWeaponsBlueprint.MysticMeadowArrow
     ]
   | [
       RangedWeaponsBlueprint.Bolt,
@@ -490,7 +628,9 @@ type Tier12AmmoKeys =
       RangedWeaponsBlueprint.SilvermoonArrow,
       RangedWeaponsBlueprint.HeartseekerArrow,
       RangedWeaponsBlueprint.SeekerArrow,
-      RangedWeaponsBlueprint.CrystallineArrow
+      RangedWeaponsBlueprint.CrystallineArrow,
+      RangedWeaponsBlueprint.MysticMeadowArrow,
+      RangedWeaponsBlueprint.PlasmaPierceArrow
     ]
   | [
       RangedWeaponsBlueprint.Bolt,

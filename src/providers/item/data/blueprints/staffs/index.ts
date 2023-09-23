@@ -15,6 +15,7 @@ import { itemHellishBronzeStaff } from "./tier14/ItemHellishBronzeStaff";
 import { itemGaleforceStaff } from "./tier15/ItemGaleforceStaff";
 import { itemGravityStaff } from "./tier15/ItemGravityStaff";
 import { itemDoomStaff } from "./tier16/ItemDoomStaff";
+import { itemElysianEyeStaff } from "./tier16/ItemElysianEyeStaff";
 import { itemAquaStaff } from "./tier2/ItemAquaStaff";
 import { itemCorruptionStaff } from "./tier2/ItemCorruptionStaff";
 import { itemSoulStaff } from "./tier2/ItemSoulStaff";
@@ -71,4 +72,5 @@ export const staffsBlueprintIndex = {
   [StaffsBlueprint.SerpentWand]: itemSerpentWand,
   [StaffsBlueprint.EagleEyeWand]: itemEagleEyeWand,
   [StaffsBlueprint.FrostbiteWand]: itemFrostbiteWand,
+  [StaffsBlueprint.ElysianEyeStaff]: itemElysianEyeStaff,
 };

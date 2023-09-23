@@ -19,6 +19,7 @@ import { itemRoyalGuardianSword } from "./tier10/ItemRoyalGuardianSword";
 import { itemTitaniumBroadsword } from "./tier10/ItemTitaniumBroadsword";
 import { itemVioletVenomSword } from "./tier10/ItemVioletVenomSword";
 import { itemAngelicSword } from "./tier11/ItemAngelicSword";
+import { itemEonGuardianSword } from "./tier11/ItemEonGuardianSword";
 import { itemHellfireEdgeSword } from "./tier11/ItemHellfireEdgeSword";
 import { itemInfernoEdgeSword } from "./tier11/ItemInfernoEdgeSword";
 import { itemMinotaurSword } from "./tier11/ItemMinotaurSword";
@@ -147,4 +148,5 @@ export const swordsBlueprintIndex = {
   [SwordsBlueprint.PixieCutSword]: itemPixieCutSword,
   [SwordsBlueprint.TitanTetherTachiSword]: itemTitanTetherTachiSword,
   [SwordsBlueprint.YggdrasilBroadsword]: itemYggdrasilBroadsword,
+  [SwordsBlueprint.EonGuardianSword]: itemEonGuardianSword,
 };

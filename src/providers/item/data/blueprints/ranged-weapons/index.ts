@@ -14,6 +14,8 @@ import { itemGoldenArrow } from "./ammo/ItemGoldenArrow";
 import { itemGossamerBolt } from "./ammo/ItemGossamerBolt";
 import { itemHeartseekerArrow } from "./ammo/ItemHeartseekerArrow";
 import { itemIronArrow } from "./ammo/ItemIronArrow";
+import { itemMysticMeadowArrow } from "./ammo/ItemMysticMeadowArrow";
+import { itemPlasmaPierceArrow } from "./ammo/ItemPlasmaPierceArrow";
 import { itemPoisonArrow } from "./ammo/ItemPoisonArrow";
 import { itemSeekerArrow } from "./ammo/ItemSeekerArrow";
 import { itemShockArrow } from "./ammo/ItemShockArrow";
@@ -145,4 +147,6 @@ export const rangedWeaponsBlueprintIndex = {
   [RangedWeaponsBlueprint.ParallelPrecisionBow]: itemParallelPrecisionBow,
   [RangedWeaponsBlueprint.GorgonGazeGuardianBow]: itemGorgonGazeGuardianBow,
   [RangedWeaponsBlueprint.GaleGuardianGripCrossbow]: itemGaleGuardianGripCrossbow,
+  [RangedWeaponsBlueprint.MysticMeadowArrow]: itemMysticMeadowArrow,
+  [RangedWeaponsBlueprint.PlasmaPierceArrow]: itemPlasmaPierceArrow,
 };

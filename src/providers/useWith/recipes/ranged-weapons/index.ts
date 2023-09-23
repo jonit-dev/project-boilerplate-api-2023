@@ -22,8 +22,10 @@ import { recipeHadesBow } from "./recipeHadesBow";
 import { recipeIronArrow } from "./recipeIronArrow";
 import { recipeIronBarkBow } from "./recipeIronBarkBow";
 import { recipeLightingCrossbow } from "./recipeLightingCrossbow";
+import { recipeMysticMeadowArrow } from "./recipeMysticMeadowArrow";
 import { recipeParallelPrecisionBow } from "./recipeParallelPrecisionBow";
 import { recipePhoenixBow } from "./recipePhoenixBow";
+import { recipePlasmaPierceArrow } from "./recipePlasmaPierceArrow";
 import { recipePoisonArrow } from "./recipePoisonArrow";
 import { recipeRedwoodLongbow } from "./recipeRedwoodLongbow";
 import { recipeRoyalBow } from "./recipeRoyalBow";
@@ -76,4 +78,6 @@ export const recipeRangedIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [RangedWeaponsBlueprint.ChordedCataclysmBow]: [recipeChordedCataclysmBow],
   [RangedWeaponsBlueprint.GaleGuardianGripCrossbow]: [recipeGaleGuardianGripCrossbow],
   [RangedWeaponsBlueprint.ParallelPrecisionBow]: [recipeParallelPrecisionBow],
+  [RangedWeaponsBlueprint.MysticMeadowArrow]: [recipeMysticMeadowArrow],
+  [RangedWeaponsBlueprint.PlasmaPierceArrow]: [recipePlasmaPierceArrow],
 };

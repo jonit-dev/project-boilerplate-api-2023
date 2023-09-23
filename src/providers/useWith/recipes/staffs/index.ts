@@ -2,6 +2,7 @@ import { StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes"
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { recipeCorruptionStaff } from "./recipeCorruptionStaff";
 import { recipeDoomStaff } from "./recipeDoomStaff";
+import { recipeElysianEyeStaff } from "./recipeElysianEyeStaff";
 import { recipeEnchantedStaff } from "./recipeEnchantedStaff";
 import { recipeFireStaff } from "./recipeFireStaff";
 import { recipeFireWand } from "./recipeFireWand";
@@ -44,4 +45,5 @@ export const recipeStaffsIndex: Record<string, IUseWithCraftingRecipe[]> = {
   [StaffsBlueprint.SpellbinderWand]: [recipeSpellbinderWand],
   [StaffsBlueprint.VortexStaff]: [recipeVortexStaff],
   [StaffsBlueprint.WinterspireStaff]: [recipeWinterspireStaff],
+  [StaffsBlueprint.ElysianEyeStaff]: [recipeElysianEyeStaff],
 };

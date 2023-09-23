@@ -31,6 +31,7 @@ export const itemStarsHooterBow: IEquippableRangedTier11WeaponBlueprint = {
     RangedWeaponsBlueprint.HeartseekerArrow,
     RangedWeaponsBlueprint.SeekerArrow,
     RangedWeaponsBlueprint.CrystallineArrow,
+    RangedWeaponsBlueprint.MysticMeadowArrow,
   ],
   tier: 11,
   isTwoHanded: true,

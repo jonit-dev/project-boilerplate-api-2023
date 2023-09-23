@@ -1,5 +1,4 @@
 import { AccessoriesBlueprint } from "../../types/itemsBlueprintTypes";
-
 import { itemSilverKey } from "./itemSilverKey";
 import { itemAmazonsNecklace } from "./tier0/ItemAmazonsNecklace";
 import { itemAmuletOfDeath } from "./tier0/ItemAmuletOfDeath";
@@ -19,6 +18,9 @@ import { itemHasteRing } from "./tier1/ItemHasteRing";
 import { itemIronRing } from "./tier1/ItemIronRing";
 import { itemOrcRing } from "./tier1/ItemOrcRing";
 import { itemSoldiersRing } from "./tier1/ItemSoldiersRing";
+import { itemBloodstoneAmulet } from "./tier13/ItemBloodstoneAmulet";
+import { itemForestHeartPendant } from "./tier15/ItemForestHeartPendant";
+import { itemEmeraldEleganceNecklace } from "./tier17/ItemEmeraldEleganceNecklace";
 import { itemGoldenRing } from "./tier2/ItemGoldenRing";
 import { itemJadeRing } from "./tier2/ItemJadeRing";
 import { itemRubyRing } from "./tier2/ItemRubyRing";
@@ -48,4 +50,7 @@ export const accessoriesBlueprintIndex = {
   [AccessoriesBlueprint.PendantOfLife]: itemPendantOfLife,
   [AccessoriesBlueprint.FalconsRing]: itemFalconsRing,
   [AccessoriesBlueprint.GlacialRing]: itemGlacialRing,
+  [AccessoriesBlueprint.BloodstoneAmulet]: itemBloodstoneAmulet,
+  [AccessoriesBlueprint.ForestHeartPendant]: itemForestHeartPendant,
+  [AccessoriesBlueprint.EmeraldEleganceNecklace]: itemEmeraldEleganceNecklace,
 };

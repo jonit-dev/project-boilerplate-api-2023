@@ -31,6 +31,8 @@ export const itemUmbralBow: IEquippableRangedTier12WeaponBlueprint = {
     RangedWeaponsBlueprint.HeartseekerArrow,
     RangedWeaponsBlueprint.SeekerArrow,
     RangedWeaponsBlueprint.CrystallineArrow,
+    RangedWeaponsBlueprint.MysticMeadowArrow,
+    RangedWeaponsBlueprint.PlasmaPierceArrow,
   ],
   tier: 12,
   isTwoHanded: true,

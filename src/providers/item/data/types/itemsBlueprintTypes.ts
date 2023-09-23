@@ -72,6 +72,7 @@ export enum SwordsBlueprint {
   PixieCutSword = "pixie-cut-sword",
   TitanTetherTachiSword = "titan-tether-tachi-sword",
   YggdrasilBroadsword = "yggdrasil-broadsword",
+  EonGuardianSword = "eon-guardian-sword",
 }
 
 export enum HelmetsBlueprint {
@@ -357,6 +358,7 @@ export enum SpearsBlueprint {
   CopperDoubleVoulge = "copper-double-voulge",
   RustedDoubleVoulge = "rusted-double-voulge",
   PoseidonTrident = "poseidon-trident",
+  GuardianGlaive = "guardian-glaive",
 }
 
 export enum PotionsBlueprint {
@@ -449,6 +451,8 @@ export enum RangedWeaponsBlueprint {
   ParallelPrecisionBow = "parallel-precision-bow",
   GorgonGazeGuardianBow = "gorgon-gaze-guardian-bow",
   GaleGuardianGripCrossbow = "gale-guardian-grip-crossbow",
+  MysticMeadowArrow = "mystic-meadow-arrow",
+  PlasmaPierceArrow = "plasma-pierce-arrow",
 }
 
 export enum GlovesBlueprint {
@@ -554,6 +558,7 @@ export enum StaffsBlueprint {
   SerpentWand = "serpent-wand",
   EagleEyeWand = "eagle-eye-wand",
   FrostbiteWand = "frostbite-wand",
+  ElysianEyeStaff = "elysian-eye-staff",
 }
 
 export enum ShieldsBlueprint {
@@ -638,6 +643,9 @@ export enum AccessoriesBlueprint {
   PendantOfMana = "pendant-of-mana",
   FalconsRing = "falcons-ring",
   GlacialRing = "glacial-ring",
+  BloodstoneAmulet = "bloodstone-amulet",
+  ForestHeartPendant = "forest-heart-pendant",
+  EmeraldEleganceNecklace = "emerald-elegance-necklace",
 }
 
 export enum HammersBlueprint {

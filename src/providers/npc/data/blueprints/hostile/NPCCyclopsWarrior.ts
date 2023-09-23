@@ -53,11 +53,6 @@ export const npcCyclopsWarrior = {
       itemBlueprintKey: SwordsBlueprint.LongSword,
       chance: 20,
     },
-
-    {
-      itemBlueprintKey: SwordsBlueprint.LongSword,
-      chance: 15,
-    },
     {
       itemBlueprintKey: ShieldsBlueprint.KiteShield,
       chance: 10,
@@ -65,6 +60,10 @@ export const npcCyclopsWarrior = {
     {
       itemBlueprintKey: PotionsBlueprint.LightEndurancePotion,
       chance: 20,
+    },
+    {
+      itemBlueprintKey: SwordsBlueprint.EonGuardianSword,
+      chance: 2,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

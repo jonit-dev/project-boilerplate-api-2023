@@ -14,6 +14,7 @@ import { itemPoseidonTrident } from "./tier4/ItemPoseidonTrident";
 import { itemRoyalSpear } from "./tier5/ItemRoyalSpear";
 import { itemRustedDoubleVoulge } from "./tier5/ItemRustedDoubleVoulge";
 import { itemWhiteDragonSpear } from "./tier5/ItemWhiteDragonSpear";
+import { itemGuardianGlaive } from "./tier6/ItemGuardianGlaive";
 
 export const spearsBlueprintsIndex = {
   [SpearsBlueprint.RoyalSpear]: itemRoyalSpear,
@@ -31,4 +32,5 @@ export const spearsBlueprintsIndex = {
   [SpearsBlueprint.CopperDoubleVoulge]: itemCopperDoubleVoulge,
   [SpearsBlueprint.RustedDoubleVoulge]: itemRustedDoubleVoulge,
   [SpearsBlueprint.PoseidonTrident]: itemPoseidonTrident,
+  [SpearsBlueprint.GuardianGlaive]: itemGuardianGlaive,
 };
