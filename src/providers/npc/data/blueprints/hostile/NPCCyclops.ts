@@ -6,6 +6,7 @@ import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entit
 import {
   DaggersBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   MacesBlueprint,
   ShieldsBlueprint,
   SwordsBlueprint,
@@ -62,6 +63,10 @@ export const npcCyclops = {
     {
       itemBlueprintKey: DaggersBlueprint.VerdantDagger,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.PlatinumTintLegs,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

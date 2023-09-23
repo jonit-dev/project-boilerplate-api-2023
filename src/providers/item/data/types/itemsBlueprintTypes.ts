@@ -597,6 +597,20 @@ export enum LegsBlueprint {
   BloodfireLegs = "bloodfire-legs",
   FalconsLegs = "falcons-legs",
   GlacialLegs = "glacial-legs",
+  BlueLegs = "blue-legs",
+  DragonScaleLegs = "dragon-scale-legs",
+  DwarvenLegs = "dwarven-legs",
+  SilvershadeLegs = "silvershade-legs",
+  TerraformLegs = "terraform-legs",
+  TempestLegs = "tempest-legs",
+  SolarflareLegs = "solarflare-legs",
+  IvoryMoonLegs = "ivory-moon-legs",
+  KingsGuardLegs = "kings-guard-legs",
+  AzureFrostLegs = "azure-frost-legs",
+  HoneyGlowLegs = "honey-glow-legs",
+  RustedIronLegs = "rusted-iron-legs",
+  PlatinumTintLegs = "platinum-tint-legs",
+  PridelandsLegs = "pridelands-legs",
 }
 
 export enum AccessoriesBlueprint {

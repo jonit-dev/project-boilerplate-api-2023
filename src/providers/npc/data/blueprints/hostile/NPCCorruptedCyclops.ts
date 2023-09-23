@@ -7,6 +7,7 @@ import {
   BootsBlueprint,
   DaggersBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -70,6 +71,10 @@ export const npcCorruptedCyclops = {
     {
       itemBlueprintKey: HelmetsBlueprint.RoyalHelmet,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.PridelandsLegs,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Corruption],

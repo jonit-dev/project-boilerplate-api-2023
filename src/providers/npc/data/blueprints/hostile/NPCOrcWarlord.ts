@@ -7,6 +7,7 @@ import {
   DaggersBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   SwordsBlueprint,
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
@@ -63,6 +64,10 @@ export const npcOrcWarlord: Partial<INPC> = {
     {
       itemBlueprintKey: AccessoriesBlueprint.RubyRing,
       chance: 10,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.KingsGuardLegs,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],

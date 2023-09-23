@@ -194,6 +194,10 @@ export const npcDarkKnight: Partial<INPC> = {
       itemBlueprintKey: SwordsBlueprint.TitanTetherTachiSword,
       chance: 1,
     },
+    {
+      itemBlueprintKey: LegsBlueprint.TerraformLegs,
+      chance: 3,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Freezing],
   areaSpells: [

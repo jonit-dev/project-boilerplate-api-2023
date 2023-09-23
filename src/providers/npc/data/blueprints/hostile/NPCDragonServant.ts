@@ -8,6 +8,7 @@ import {
   CraftingResourcesBlueprint,
   GlovesBlueprint,
   HelmetsBlueprint,
+  LegsBlueprint,
   OthersBlueprint,
   ShieldsBlueprint,
   StaffsBlueprint,
@@ -117,6 +118,10 @@ export const npcDragonServant: Partial<INPC> = {
     {
       itemBlueprintKey: GlovesBlueprint.GenesisGloves,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: LegsBlueprint.DragonScaleLegs,
+      chance: 5,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding, EntityEffectBlueprint.Burning],
