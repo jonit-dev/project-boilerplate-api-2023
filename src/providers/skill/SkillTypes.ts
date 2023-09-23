@@ -23,3 +23,9 @@ export const SKILLS_LIST = [
   "alchemy",
   "blacksmithing",
 ];
+
+export enum SkillTimeoutDifficulty {
+  Easy = 5,
+  Medium = 6,
+  Hard = 8,
+}

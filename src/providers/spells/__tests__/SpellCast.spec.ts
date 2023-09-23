@@ -3,11 +3,7 @@ import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import {
-  ML_INCREASE_RATIO,
-  SP_INCREASE_RATIO,
-  SP_MAGIC_INCREASE_TIMES_MANA,
-} from "@providers/constants/SkillConstants";
+import { ML_INCREASE_RATIO, SP_INCREASE_BASE, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -310,8 +306,9 @@ describe("SpellCast.ts", () => {
     const updatedSkills: ISkill = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
     // formulate is now:  const manaSp = Math.round((spellPower * ML_INCREASE_RATIO + power) * SP_MAGIC_INCREASE_TIMES_MANA * 100) / 100;
+
     const skillPoints =
-      SP_INCREASE_RATIO +
+      SP_INCREASE_BASE +
       SP_MAGIC_INCREASE_TIMES_MANA *
         (Math.round(spellSelfHealing.manaCost! * ML_INCREASE_RATIO) + (spellSelfHealing.manaCost ?? 0));
 

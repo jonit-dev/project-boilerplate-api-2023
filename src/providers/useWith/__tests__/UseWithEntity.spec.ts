@@ -6,11 +6,7 @@ import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { OnTargetHit } from "@providers/battle/OnTargetHit";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import {
-  ML_INCREASE_RATIO,
-  SP_INCREASE_RATIO,
-  SP_MAGIC_INCREASE_TIMES_MANA,
-} from "@providers/constants/SkillConstants";
+import { ML_INCREASE_RATIO, SP_INCREASE_BASE, SP_MAGIC_INCREASE_TIMES_MANA } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { itemDarkRune } from "@providers/item/data/blueprints/magics/ItemDarkRune";
 import { FoodsBlueprint, MagicsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
@@ -916,7 +912,7 @@ describe("UseWithEntityValidation.ts", () => {
     itemDarkRune.power = MagicPower.High;
 
     const skillPoints =
-      SP_INCREASE_RATIO +
+      SP_INCREASE_BASE +
       SP_MAGIC_INCREASE_TIMES_MANA * (Math.round(itemDarkRune.power * ML_INCREASE_RATIO) + (itemDarkRune.power ?? 0));
     const lowerBound = skillPoints - 1.5;
     const upperBound = skillPoints + 1.5;

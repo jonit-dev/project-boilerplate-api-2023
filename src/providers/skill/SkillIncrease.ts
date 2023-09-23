@@ -7,12 +7,14 @@ import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { CharacterBonusPenalties } from "@providers/character/characterBonusPenalties/CharacterBonusPenalties";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import {
+  LOW_SKILL_LEVEL_SP_INCREASE_BONUS,
   ML_INCREASE_RATIO,
   SP_CRAFTING_INCREASE_RATIO,
-  SP_INCREASE_RATIO,
+  SP_INCREASE_BASE,
   SP_MAGIC_INCREASE_TIMES_MANA,
 } from "@providers/constants/SkillConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
+import { DiscordBot } from "@providers/discord/DiscordBot";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
@@ -30,7 +32,6 @@ import { SkillCraftingMapper } from "./SkillCraftingMapper";
 import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
-import { DiscordBot } from "@providers/discord/DiscordBot";
 
 @provide(SkillIncrease)
 export class SkillIncrease {
@@ -337,7 +338,13 @@ export class SkillIncrease {
   }
 
   private calculateNewSP(skillDetails: ISkillDetails, bonus?: number): number {
-    let spIncreaseRatio = SP_INCREASE_RATIO;
+    let spIncreaseRatio = SP_INCREASE_BASE;
+
+    // increase combat related skills faster
+    if (skillDetails.level < 10) {
+      spIncreaseRatio += LOW_SKILL_LEVEL_SP_INCREASE_BONUS;
+    }
+
     if (typeof bonus === "number") {
       spIncreaseRatio += bonus;
     }

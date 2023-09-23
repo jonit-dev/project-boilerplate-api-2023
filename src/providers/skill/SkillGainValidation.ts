@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { CUSTOM_SKILL_COOLDOWNS, SP_INCREASE_SECONDS_COOLDOWN } from "@providers/constants/SkillConstants";
+import { CUSTOM_SKILL_INCREASE_TIMEOUT, SP_INCREASE_SECONDS_TIMEOUT } from "@providers/constants/SkillConstants";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
 
@@ -27,7 +27,7 @@ export class SkillGainValidation {
 
     const diff = now.diff(lastSkillGainDate, "seconds");
 
-    if (diff <= (CUSTOM_SKILL_COOLDOWNS?.[skillName] || SP_INCREASE_SECONDS_COOLDOWN)) {
+    if (diff <= (CUSTOM_SKILL_INCREASE_TIMEOUT?.[skillName] || SP_INCREASE_SECONDS_TIMEOUT)) {
       return false;
     }
 

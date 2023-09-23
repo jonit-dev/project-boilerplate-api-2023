@@ -6,6 +6,7 @@ import {
   CharacterBuffType,
   ICharacterTemporaryBuff,
 } from "@rpg-engine/shared";
+import { round } from "lodash";
 import { CharacterBuffAttribute } from "../CharacterBuffAttribute";
 import { CharacterBuffTracker } from "../CharacterBuffTracker";
 
@@ -43,13 +44,13 @@ describe("CharacterBuffAttribute", () => {
 
     const buffedSpeed = updatedCharacter?.baseSpeed;
 
-    expect(buffedSpeed).toBe(2.64);
+    expect(buffedSpeed).toBe(2.86);
 
     if (!updatedCharacter) throw new Error("Character not found");
 
     const updatedTraitValue = updatedCharacter[testBuff.trait];
 
-    expect(updatedTraitValue).toBe(testCharacter[testBuff.trait] * (1 + testBuff.buffPercentage / 100));
+    expect(updatedTraitValue).toBe(round(testCharacter[testBuff.trait] * (1 + testBuff.buffPercentage / 100), 2));
   });
 
   it("should disable a buff and rollback character attribute to the previous value", async () => {
@@ -59,7 +60,7 @@ describe("CharacterBuffAttribute", () => {
 
     testCharacter = (await Character.findById(testCharacter._id!)) as ICharacter;
 
-    expect(testCharacter.baseSpeed).toBe(2.64); // first 10% buff
+    expect(testCharacter.baseSpeed).toBe(2.86); // first 10% buff
 
     const hasDisabledBuff = await characterBuffAttribute.disableBuff(testCharacter, enabledBuff._id!);
 
@@ -67,7 +68,7 @@ describe("CharacterBuffAttribute", () => {
 
     testCharacter = (await Character.findById(testCharacter._id!)) as ICharacter;
 
-    expect(testCharacter.baseSpeed).toBe(2.4); // original value
+    expect(testCharacter.baseSpeed).toBe(2.6); // original value
   });
 
   it("should handle multiple buffs and debuff them gradually", async () => {
@@ -85,7 +86,7 @@ describe("CharacterBuffAttribute", () => {
 
     expect(buffQty).toBe(2);
 
-    expect(updatedCharacter?.baseSpeed).toBe(2.88); // 2.4 + 20% = 2.88
+    expect(updatedCharacter?.baseSpeed).toBe(3.12); // 2.4 + 20% = 2.88
 
     // now lets disable the first buff
 
@@ -95,7 +96,7 @@ describe("CharacterBuffAttribute", () => {
 
     const buffedSpeed = updatedCharacter?.baseSpeed;
 
-    expect(buffedSpeed).toBe(2.64); // 2.88 - 0.24 = 2.64
+    expect(buffedSpeed).toBe(2.86); // 2.88 - 0.24 = 2.64
 
     // finally, disable the last buff
 
@@ -105,7 +106,7 @@ describe("CharacterBuffAttribute", () => {
 
     const finalSpeed = updatedCharacter?.baseSpeed;
 
-    expect(finalSpeed).toBe(2.4); // 2.64 - 0.24 = 2.4
+    expect(finalSpeed).toBe(2.6); // 2.64 - 0.24 = 2.4
   });
   it("should update health and mana if they are greater than maxHealth and maxMana after disabling a buff", async () => {
     // Create a buff that increases health and mana

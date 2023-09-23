@@ -6,6 +6,7 @@ import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
+import { INITIAL_STARTING_POINTS } from "@providers/constants/CharacterConstants";
 import { blueprintManager } from "@providers/inversify/container";
 import {
   AccessoriesBlueprint,
@@ -27,7 +28,7 @@ import {
 } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { SpellLearn } from "@providers/spells/SpellLearn";
-import { CharacterClass, CharacterFactions } from "@rpg-engine/shared";
+import { CharacterClass, FromGridX, FromGridY } from "@rpg-engine/shared";
 import { CreateCharacterDTO } from "@useCases/ModuleCharacter/character/create/CreateCharacterDTO";
 import { UpdateCharacterDTO } from "@useCases/ModuleCharacter/character/update/UpdateCharacterDTO";
 import { provide } from "inversify-binding-decorators";
@@ -50,13 +51,13 @@ export class CharacterRepository extends CRUD {
 
     let extraProps: Partial<ICharacter> = {};
 
-    if (newCharacter.faction === CharacterFactions.ShadowWalker) {
-      extraProps = {
-        scene: "shadowlands",
-        x: 2576,
-        y: 2176,
-      };
-    }
+    const startingPoint = INITIAL_STARTING_POINTS[newCharacter.faction];
+
+    extraProps = {
+      x: FromGridX(startingPoint.gridX),
+      y: FromGridY(startingPoint.gridY),
+      scene: startingPoint.scene,
+    };
 
     const createdCharacter = await this.create(
       Character,

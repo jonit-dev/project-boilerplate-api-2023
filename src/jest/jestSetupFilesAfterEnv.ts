@@ -39,7 +39,8 @@ mongoose.Query.prototype.cacheQuery = function () {
 
 // mock skill constants to always the same, to avoid having to adjust all tests whenever we change them
 jest.mock("@providers/constants/SkillConstants", () => ({
-  SP_INCREASE_RATIO: 0.2,
+  SP_INCREASE_BASE: 0.2,
+  LOW_SKILL_LEVEL_SP_INCREASE_BONUS: 0,
   SP_MAGIC_INCREASE_TIMES_MANA: 0.4,
   INCREASE_BONUS_FACTION: 0.1,
   EXP_RATIO: 1,

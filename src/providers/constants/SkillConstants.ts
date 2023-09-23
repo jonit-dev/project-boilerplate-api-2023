@@ -1,3 +1,4 @@
+import { SkillTimeoutDifficulty } from "@providers/skill/SkillTypes";
 import { CharacterClass, LifeBringerRaces, Modes, ShadowWalkerRaces } from "@rpg-engine/shared";
 
 export const DAMAGE_ATTRIBUTE_WEIGHT = 1;
@@ -5,14 +6,17 @@ export const DAMAGE_COMBAT_SKILL_WEIGHT = 1.5;
 
 export const EXP_RATIO = 1.75;
 
-export const SP_INCREASE_RATIO = 1;
-export const SP_CRAFTING_INCREASE_RATIO = SP_INCREASE_RATIO * 25;
+export const SP_INCREASE_BASE = 1;
+
+export const LOW_SKILL_LEVEL_SP_INCREASE_BONUS = 5;
+
+export const SP_CRAFTING_INCREASE_RATIO = SP_INCREASE_BASE * 25;
 
 export const SP_MAGIC_INCREASE_TIMES_MANA = 0.17;
 
 export const INCREASE_BONUS_FACTION = 0.1;
 
-export const SP_INCREASE_SECONDS_COOLDOWN = 8;
+export const SP_INCREASE_SECONDS_TIMEOUT = SkillTimeoutDifficulty.Medium;
 
 export const HEALTH_MANA_BASE_INCREASE_RATE = 15;
 
@@ -21,17 +25,22 @@ export const ML_INCREASE_RATIO = 0.8;
 export const SPELL_CALCULATOR_DEFAULT_MIN_SKILL_MULTIPLIER = 0.5;
 export const SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER = 1.5;
 
-export const CUSTOM_SKILL_COOLDOWNS = {
-  resistance: 10,
-  distance: 8,
-  magic: 7,
+export const CUSTOM_SKILL_INCREASE_TIMEOUT = {
+  // Should be difficult because you can be stopped and training with a mob (afk).
+  resistance: SkillTimeoutDifficulty.Hard,
+  dexterity: SkillTimeoutDifficulty.Hard,
+  shielding: SkillTimeoutDifficulty.Hard,
 
-  shielding: 10,
-  first: 10,
-  club: 10,
-  sword: 10,
-  axe: 10,
-  dagger: 10,
+  // Distance and magic easier because there's resource spending involved.
+  distance: SkillTimeoutDifficulty.Easy,
+  magic: SkillTimeoutDifficulty.Easy,
+
+  // Medium because there's no resource spending, but you have to spend time chasing mobs.
+  first: SkillTimeoutDifficulty.Medium,
+  club: SkillTimeoutDifficulty.Medium,
+  sword: SkillTimeoutDifficulty.Medium,
+  axe: SkillTimeoutDifficulty.Medium,
+  dagger: SkillTimeoutDifficulty.Medium,
 };
 
 export const CLASS_BONUS_OR_PENALTIES = [
