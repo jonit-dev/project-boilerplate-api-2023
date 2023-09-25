@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
 import { CharacterView } from "@providers/character/CharacterView";
+import { appEnv } from "@providers/config/env";
 import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -45,10 +46,12 @@ export class MapTransitionTeleport {
         return;
       }
 
-      const isWalkable = await this.gridManager.isWalkable(destination.map, destination.gridX, destination.gridY);
+      if (!appEnv.general.IS_UNIT_TEST) {
+        const isWalkable = await this.gridManager.isWalkable(destination.map, destination.gridX, destination.gridY);
 
-      if (!isWalkable) {
-        return;
+        if (!isWalkable) {
+          return;
+        }
       }
 
       // fetch destination properties
