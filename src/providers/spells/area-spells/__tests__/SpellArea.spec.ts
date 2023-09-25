@@ -65,6 +65,7 @@ describe("SpellArea", () => {
       // place target inside spellAreaGrid
       testNPC.y = FromGridY(1);
       testNPC.x = FromGridX(2);
+      testNPC.alignment = "Hostile";
       await testNPC.save();
 
       await spellArea.cast(testCharacter, testCharacterTarget, MagicPower.High, {

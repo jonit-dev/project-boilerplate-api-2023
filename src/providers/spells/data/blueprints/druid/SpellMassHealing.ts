@@ -38,6 +38,7 @@ export const spellMassHealing: Partial<ISpell> = {
       effectAnimationKey: AnimationEffectKeys.Heal,
       spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
       includeCaster: true,
+      isAttackSpell: false,
       excludeEntityTypes: [EntityType.NPC],
       customFn: async (target: ICharacter | INPC) => {
         const spellHeal = container.get(SpellHeal);

@@ -7,6 +7,8 @@ import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { IEntityEffect } from "@providers/entityEffects/data/blueprints/entityEffect";
 import { IPosition } from "@providers/movement/MovementHelper";
+import { PVP_MIN_REQUIRED_LV } from "@providers/constants/PVPConstants";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import {
   AnimationEffectKeys,
   EntityType,
@@ -15,9 +17,15 @@ import {
   MagicPower,
   ToGridX,
   ToGridY,
+  NPCAlignment,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { HitTarget } from "../../battle/HitTarget";
+import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { CharacterSkull } from "@providers/character/CharacterSkull";
+import { RaidManager } from "@providers/raid/RaidManager";
+import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 
 interface IAffectedTarget {
   target: ICharacter[] | INPC[];
@@ -37,6 +45,8 @@ interface ISpellAreaCalculateEffectOptions {
 interface ISpellAreaCastOptions {
   effectAnimationKey: AnimationEffectKeys;
   entityEffect?: IEntityEffect;
+  isAttackSpell?: boolean;
+  noCastInNonPvP?: boolean;
   spellAreaGrid: number[][];
   customFn?: (target: ICharacter | INPC, intensity: number) => Promise<void> | void; // use case is for example for healing targets, instead of killing them
   includeCaster?: boolean;
@@ -48,7 +58,11 @@ export class SpellArea {
   constructor(
     private entityEffectUse: EntityEffectUse,
     private hitTarget: HitTarget,
-    private animationEffect: AnimationEffect
+    private animationEffect: AnimationEffect,
+    private mapNonPVPZone: MapNonPVPZone,
+    private socketMessaging: SocketMessaging,
+    private characterSkull: CharacterSkull,
+    private raidManager: RaidManager
   ) {}
 
   @TrackNewRelicTransaction()
@@ -59,6 +73,8 @@ export class SpellArea {
     options: ISpellAreaCastOptions
   ): Promise<void> {
     const { spellAreaGrid, effectAnimationKey } = options;
+    options.isAttackSpell = "isAttackSpell" in options ? options.isAttackSpell : true;
+    options.noCastInNonPvP = "noCastInNonPvP" in options ? options.noCastInNonPvP : false;
 
     const calculateEffectOptions: ISpellAreaCalculateEffectOptions = {
       includeCaster: options.includeCaster,
@@ -75,12 +91,110 @@ export class SpellArea {
       calculateEffectOptions
     );
 
+    if (
+      caster.type === EntityType.Character &&
+      options.noCastInNonPvP === true &&
+      this.mapNonPVPZone.isNonPVPZoneAtXY(caster.scene, caster.x, caster.y)
+    ) {
+      // Checks if the caster is a Character, if the noCastInNonPvP option is active, and if the caster is in a non-PvP zone
+      const errorMessage = "This spell cannot be cast in a non-PvP zone";
+      this.socketMessaging.sendErrorMessageToCharacter(caster as ICharacter, errorMessage);
+      return;
+    }
+
     const hitPromises = targets.map(async (target) => {
       const targetToHit = target.target as unknown as ICharacter | INPC;
       const targetIntensity = target.intensity;
 
       if (caster.type === EntityType.NPC && targetToHit.type === EntityType.NPC) {
         return; // avoid NPCs hitting each other
+      }
+
+      if (
+        caster.type === EntityType.Character &&
+        targetToHit.type === EntityType.NPC &&
+        (targetToHit as INPC).alignment === NPCAlignment.Friendly
+      ) {
+        return; // avoid Characters hitting friendly NPCs
+      }
+
+      if (targetToHit.type === EntityType.NPC) {
+        const npcTarget = targetToHit as INPC;
+        if (npcTarget.raidKey) {
+          const isRaidActive = await this.raidManager.isRaidActive(npcTarget.raidKey);
+          if (!isRaidActive) {
+            return; // avoid Characters hitting Raid NPCs
+          }
+        }
+      }
+
+      if (options?.isAttackSpell !== false) {
+        // Checks if the option isAttackSpell is not equal to false
+        if (caster.type === EntityType.Character && targetToHit.type === EntityType.Character) {
+          async function getLevel(targetToHit: ICharacter | INPC): Promise<number | null> {
+            try {
+              if ("skills" in targetToHit && targetToHit.skills) {
+                const skills = await Skill.findById(targetToHit.skills);
+                if (skills) {
+                  return skills.level;
+                } else {
+                  return null;
+                }
+              } else {
+                return null;
+              }
+            } catch (error) {
+              return null;
+            }
+          }
+
+          const targetLevel = await getLevel(targetToHit);
+          if (targetLevel !== null) {
+            if (targetLevel < PVP_MIN_REQUIRED_LV) {
+              // If the level is lower than PVP_MIN_REQUIRED_LV, it avoids the attack
+              return;
+            }
+          }
+
+          // Checks if the caster and the target are Characters and are within a non-PvP zone
+          if (
+            this.mapNonPVPZone.isNonPVPZoneAtXY(targetToHit.scene, targetToHit.x, targetToHit.y) ||
+            this.mapNonPVPZone.isNonPVPZoneAtXY(caster.scene, caster.x, caster.y)
+          ) {
+            return;
+          }
+
+          // Check if the caster is in a party
+          const casterParty: ICharacterParty | null = await CharacterParty.findOne({
+            $or: [{ "leader._id": caster.id }, { "members._id": caster.id }],
+          }).lean();
+
+          if (casterParty) {
+            // The caster is in a party, check if the target is as well
+            const partyId = casterParty._id.toString();
+            const targetParty: ICharacterParty | null = await CharacterParty.findOne({
+              $or: [{ "leader._id": targetToHit.id }, { "members._id": targetToHit.id }],
+            }).lean();
+            if (targetParty) {
+              const targetPartyId = targetParty._id.toString();
+              // "Check if the party is the same
+              if (partyId === targetPartyId) {
+                return;
+              }
+            }
+          }
+        }
+
+        // Checks if the attack is justified
+        const isAttackUnjustified = this.characterSkull.checkForUnjustifiedAttack(
+          caster as ICharacter,
+          targetToHit as ICharacter
+        );
+
+        if (isAttackUnjustified) {
+          // If the attack is not justified, the caster gains a 'skull'
+          await this.characterSkull.updateWhiteSkull(caster.id, targetToHit.id);
+        }
       }
 
       if (options?.customFn) {
