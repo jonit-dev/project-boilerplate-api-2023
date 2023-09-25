@@ -115,7 +115,7 @@ export class CharacterNetworkLogout {
         const spellLeveling = await this.spellLearn.levelingSpells(character._id, character.skills!);
 
         if (spellLeveling) {
-          console.log(`- Spells have been updated in Character: ${character._id}`);
+          console.log(`- Spells have been updated in Character: ${character._id} - channel(${character.channelId!})`);
         }
 
         await this.skillStatsIncrease.increaseMaxManaMaxHealth(character._id);
