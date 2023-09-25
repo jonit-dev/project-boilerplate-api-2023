@@ -16,6 +16,7 @@ import {
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
+import { GridManager } from "../GridManager";
 import { MapSolids } from "../MapSolids";
 
 type TransitionDestination = {
@@ -31,7 +32,8 @@ export class MapTransitionTeleport {
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private characterView: CharacterView,
     private locker: Locker,
-    private mapSolids: MapSolids
+    private mapSolids: MapSolids,
+    private gridManager: GridManager
   ) {}
 
   @TrackNewRelicTransaction()
@@ -43,15 +45,9 @@ export class MapTransitionTeleport {
         return;
       }
 
-      const isSolid = this.mapSolids.isTileSolid(
-        destination.map,
-        destination.gridX,
-        destination.gridY,
-        MapLayers.Character,
-        "CHECK_SINGLE_LAYER"
-      );
+      const isWalkable = await this.gridManager.isWalkable(destination.map, destination.gridX, destination.gridY);
 
-      if (isSolid) {
+      if (!isWalkable) {
         return;
       }
 
