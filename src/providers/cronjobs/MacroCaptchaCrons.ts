@@ -22,7 +22,7 @@ export class MacroCaptchaCrons {
       });
     });
 
-    nodeCron.schedule("*/5 * * * *", async () => {
+    nodeCron.schedule("0 */2 * * *", async () => {
       await this.newRelic.trackTransaction(
         NewRelicTransactionCategory.CronJob,
         "SendMacroCaptchaToActiveCharacters",
