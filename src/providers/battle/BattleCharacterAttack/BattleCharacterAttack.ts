@@ -95,6 +95,11 @@ export class BattleCharacterAttack {
         defaults: true,
       });
 
+      if (!updatedTarget) {
+        this.battleCycle.stop(character._id);
+        return;
+      }
+
       const updatedNPCSkills = await Skill.findOne({ owner: target._id, ownerType: "NPC" })
         .lean({
           virtuals: true,
