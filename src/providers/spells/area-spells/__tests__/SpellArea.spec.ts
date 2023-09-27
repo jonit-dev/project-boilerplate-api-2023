@@ -98,6 +98,7 @@ describe("SpellArea", () => {
       testNPC.x = FromGridX(2);
       await testNPC.save();
 
+      // @ts-ignore
       const { cells, targets } = await spellArea.calculateEffect(testCharacter, spellAreaOrigin, spellAreaGrid);
 
       expect(targets).toHaveLength(1);
@@ -141,6 +142,7 @@ describe("SpellArea", () => {
       testCharacterTarget.x = FromGridX(5);
       await testCharacterTarget.save();
 
+      // @ts-ignore
       const { cells, targets } = await spellArea.calculateEffect(testCharacter, spellAreaOrigin, spellAreaGrid);
 
       expect(targets).toHaveLength(2);
@@ -186,6 +188,7 @@ describe("SpellArea", () => {
       const spellAreaOrigin = { x: 1, y: 1 };
       const spellAreaGrid: number[][] = [[]];
 
+      // @ts-ignore
       const { cells, targets } = await spellArea.calculateEffect(testCharacter, spellAreaOrigin, spellAreaGrid);
 
       // Expected animation cells: []
@@ -197,6 +200,7 @@ describe("SpellArea", () => {
       const spellAreaOrigin = { x: 0, y: 0 };
       const spellAreaGrid = [[1]];
 
+      // @ts-ignore
       const { cells, targets } = await spellArea.calculateEffect(testCharacter, spellAreaOrigin, spellAreaGrid);
 
       expect(cells).toEqual([{ x: 0, y: 0 }]);
@@ -204,7 +208,7 @@ describe("SpellArea", () => {
     });
   });
 
-  describe("Edge cases", () => {
+  describe("Validations", () => {
     let testNPC: INPC;
     let hitTargetSpy: jest.SpyInstance;
 
