@@ -64,10 +64,6 @@ export const npcOrcRaider = {
       quantityRange: [1, 3],
     },
     {
-      itemBlueprintKey: DaggersBlueprint.AzureDagger,
-      chance: 20,
-    },
-    {
       itemBlueprintKey: HammersBlueprint.WarHammer,
       chance: 10,
     },

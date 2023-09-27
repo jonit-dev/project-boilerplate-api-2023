@@ -68,10 +68,6 @@ export const npcOrcBerserker = {
       chance: 10,
     },
     {
-      itemBlueprintKey: DaggersBlueprint.AzureDagger,
-      chance: 20,
-    },
-    {
       itemBlueprintKey: HammersBlueprint.WarHammer,
       chance: 10,
     },
