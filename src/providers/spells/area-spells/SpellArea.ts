@@ -102,6 +102,16 @@ export class SpellArea {
         return; // avoid Characters hitting friendly NPCs
       }
 
+      if (targetToHit.type === EntityType.NPC) {
+        const npcTarget = targetToHit as INPC;
+        if (npcTarget.raidKey) {
+          const isRaidActive = await this.raidManager.isRaidActive(npcTarget.raidKey);
+          if (!isRaidActive) {
+            return; // avoid hitting NPCs from raids that are NOT active.
+          }
+        }
+      }
+
       if (isAttackSpell) {
         // Checks if the option isAttackSpell is not equal to false
         if (caster.type === EntityType.Character && targetToHit.type === EntityType.Character) {
