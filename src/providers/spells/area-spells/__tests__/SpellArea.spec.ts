@@ -1,10 +1,18 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { SPELL_AREA_MEDIUM_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { AnimationEffectKeys, FromGridX, FromGridY, MagicPower, NPCAlignment } from "@rpg-engine/shared";
+import {
+  AnimationEffectKeys,
+  CharacterClass,
+  FromGridX,
+  FromGridY,
+  MagicPower,
+  NPCAlignment,
+} from "@rpg-engine/shared";
 import { SpellArea } from "../SpellArea";
 
 describe("SpellArea", () => {
@@ -278,12 +286,15 @@ describe("SpellArea", () => {
       };
 
       beforeEach(async () => {
-        jest.clearAllMocks();
-
         await NPC.deleteMany({}); // its a PVP testing, so remove all NPCs
 
         testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
         testAnotherCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
+      });
+
+      afterEach(() => {
+        jest.clearAllMocks();
+        jest.restoreAllMocks();
       });
 
       it("should block a NonPVP zone attack", async () => {
@@ -299,6 +310,30 @@ describe("SpellArea", () => {
       });
 
       it("If the level is lower than PVP_MIN_REQUIRED_LV, it avoids the attack", async () => {
+        const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
+
+        expect(result).toBe(undefined);
+      });
+
+      it("should prevent a character from attacking another one that's on the same party", async () => {
+        const party = new CharacterParty({
+          leader: {
+            _id: testCharacter._id,
+            class: CharacterClass.Druid,
+            name: "Test Character",
+          },
+          members: [
+            {
+              _id: testAnotherCharacter._id,
+              class: CharacterClass.Berserker,
+              name: "Test Another Character",
+            },
+          ],
+          maxSize: 2,
+          benefits: [],
+        });
+        await party.save();
+
         const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
 
         expect(result).toBe(undefined);

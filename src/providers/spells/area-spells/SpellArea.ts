@@ -105,17 +105,6 @@ export class SpellArea {
       if (isAttackSpell) {
         // Checks if the option isAttackSpell is not equal to false
         if (caster.type === EntityType.Character && targetToHit.type === EntityType.Character) {
-          const targetLevel = await this.getEntityLevel(targetToHit);
-
-          if (!targetLevel) {
-            throw new Error("Target level not found");
-          }
-
-          if (targetLevel < PVP_MIN_REQUIRED_LV) {
-            // If the level is lower than PVP_MIN_REQUIRED_LV, it avoids the attack
-            return;
-          }
-
           // Checks if the caster and the target are Characters and are within a non-PvP zone
           if (
             this.mapNonPVPZone.isNonPVPZoneAtXY(targetToHit.scene, targetToHit.x, targetToHit.y) ||
@@ -130,12 +119,25 @@ export class SpellArea {
             targetToHit as ICharacter
           );
 
+          console.log("isCasterAndTargetInParty", isCasterAndTargetInParty);
+
           if (isCasterAndTargetInParty) {
             return;
           }
-        }
 
-        await this.handleSkullGain(caster as ICharacter, targetToHit as ICharacter);
+          const targetLevel = await this.getEntityLevel(targetToHit);
+
+          if (!targetLevel) {
+            throw new Error("Target level not found");
+          }
+
+          if (targetLevel < PVP_MIN_REQUIRED_LV) {
+            // If the level is lower than PVP_MIN_REQUIRED_LV, it avoids the attack
+            return;
+          }
+
+          await this.handleSkullGain(caster as ICharacter, targetToHit as ICharacter);
+        }
       }
 
       if (customFn) {
@@ -176,23 +178,19 @@ export class SpellArea {
   }
 
   private async isCasterAndTargetInAParty(caster: ICharacter, target: ICharacter): Promise<boolean> {
-    const casterParty: ICharacterParty | null = await CharacterParty.findOne({
-      $or: [{ "leader._id": caster.id }, { "members._id": caster.id }],
+    const partyWithBoth: ICharacterParty | null = await CharacterParty.findOne({
+      $or: [{ "leader._id": { $in: [caster.id, target.id] } }, { "members._id": { $in: [caster.id, target.id] } }],
     }).lean();
 
-    if (casterParty) {
-      // The caster is in a party, check if the target is as well
-      const partyId = casterParty._id.toString();
-      const targetParty: ICharacterParty | null = await CharacterParty.findOne({
-        $or: [{ "leader._id": target.id }, { "members._id": target.id }],
-      }).lean();
-      if (targetParty) {
-        const targetPartyId = targetParty._id.toString();
-        // "Check if the party is the same
-        if (partyId === targetPartyId) {
-          return true;
-        }
-      }
+    if (partyWithBoth) {
+      const isCasterInParty =
+        partyWithBoth.leader._id.toString() === caster._id.toString() ||
+        partyWithBoth.members.some((member) => member._id.toString() === caster._id.toString());
+      const isTargetInParty =
+        partyWithBoth.leader._id.toString() === target._id.toString() ||
+        partyWithBoth.members.some((member) => member._id.toString() === target._id.toString());
+
+      return isCasterInParty && isTargetInParty;
     }
 
     return false;
