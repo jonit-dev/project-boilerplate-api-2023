@@ -119,8 +119,6 @@ export class SpellArea {
             targetToHit as ICharacter
           );
 
-          console.log("isCasterAndTargetInParty", isCasterAndTargetInParty);
-
           if (isCasterAndTargetInParty) {
             return;
           }
@@ -182,18 +180,7 @@ export class SpellArea {
       $or: [{ "leader._id": { $in: [caster.id, target.id] } }, { "members._id": { $in: [caster.id, target.id] } }],
     }).lean();
 
-    if (partyWithBoth) {
-      const isCasterInParty =
-        partyWithBoth.leader._id.toString() === caster._id.toString() ||
-        partyWithBoth.members.some((member) => member._id.toString() === caster._id.toString());
-      const isTargetInParty =
-        partyWithBoth.leader._id.toString() === target._id.toString() ||
-        partyWithBoth.members.some((member) => member._id.toString() === target._id.toString());
-
-      return isCasterInParty && isTargetInParty;
-    }
-
-    return false;
+    return !!partyWithBoth;
   }
 
   private async getEntityLevel(entity: ICharacter | INPC): Promise<number | null> {
