@@ -21,9 +21,6 @@ describe("MapTransitionTeleport", () => {
     mapTransitionTeleport = container.get<MapTransitionTeleport>(MapTransitionTeleport);
 
     await unitTestHelper.initializeMapLoader();
-
-    // @ts-ignore
-    jest.spyOn(mapTransitionTeleport.mapSolids, "isTileSolid").mockReturnValue(false);
   });
   afterEach(() => {
     jest.clearAllMocks();
