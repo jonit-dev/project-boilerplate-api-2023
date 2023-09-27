@@ -106,8 +106,8 @@ services:
           - node.role == manager
     healthcheck:
       test: ["CMD", "mongosh", "--port", "${MONGO_PORT}", "--eval", "db.runCommand({ ping: 1 })"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 15s
       retries: 3
     networks:
       - rpg-network
@@ -128,8 +128,8 @@ services:
           - node.role == manager
     healthcheck:
       test: ["CMD", "redis-cli", "-p", "6380", "ping"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 15s
       retries: 3
 
   newrelic-infra:
