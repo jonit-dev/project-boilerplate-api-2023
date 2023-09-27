@@ -23,7 +23,7 @@ export interface ISpellAreaCastOptions {
   effectAnimationKey: AnimationEffectKeys;
   entityEffect?: IEntityEffect;
   isAttackSpell?: boolean;
-  noCastInNonPvP?: boolean;
+  noCastInNonPvPZone?: boolean;
   spellAreaGrid: number[][];
   customFn?: (target: ICharacter | INPC, intensity: number) => Promise<void> | void; // use case is for example for healing targets, instead of killing them
   includeCaster?: boolean;

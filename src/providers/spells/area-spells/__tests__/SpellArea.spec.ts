@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { SPELL_AREA_MEDIUM_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container, unitTestHelper } from "@providers/inversify/container";
-import { HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
-import { AnimationEffectKeys, FromGridX, FromGridY, MagicPower } from "@rpg-engine/shared";
+import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data/types/npcsBlueprintTypes";
+import { AnimationEffectKeys, FromGridX, FromGridY, MagicPower, NPCAlignment } from "@rpg-engine/shared";
 import { SpellArea } from "../SpellArea";
 
 describe("SpellArea", () => {
@@ -45,10 +45,10 @@ describe("SpellArea", () => {
         hasSkills: true,
       }
     );
+    await testNPC.populate("skills").execPopulate();
 
     await testCharacter.populate("skills").execPopulate();
     await testCharacterTarget.populate("skills").execPopulate();
-    await testNPC.populate("skills").execPopulate();
   });
 
   describe("Casting", () => {
@@ -211,6 +211,13 @@ describe("SpellArea", () => {
   describe("Validations", () => {
     let testNPC: INPC;
     let hitTargetSpy: jest.SpyInstance;
+    let testCharacter: ICharacter;
+
+    const testSpellAreaOptions = {
+      effectAnimationKey: AnimationEffectKeys.HitFire,
+      entityEffect: entityEffectBurning,
+      spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
+    };
 
     beforeEach(async () => {
       jest.clearAllMocks();
@@ -226,6 +233,8 @@ describe("SpellArea", () => {
 
       // @ts-ignore
       hitTargetSpy = jest.spyOn(spellArea.hitTarget, "hit");
+
+      testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
     });
 
     it("when an NPC cast area spell into another NPC, it should not be hit", async () => {
@@ -238,13 +247,62 @@ describe("SpellArea", () => {
         { hasSkills: true }
       );
 
-      await spellArea.cast(testNPC, testNPC2, MagicPower.High, {
+      await spellArea.cast(testNPC, testNPC2, MagicPower.High, testSpellAreaOptions);
+
+      expect(hitTargetSpy).not.toHaveBeenCalled();
+    });
+
+    it("characters should not hit friendly NPCs", async () => {
+      const testFriendlyNPC = await unitTestHelper.createMockNPC(
+        {
+          alignment: NPCAlignment.Friendly,
+          key: FriendlyNPCsBlueprint.Agatha,
+          x: FromGridX(1),
+          y: FromGridX(1),
+        },
+        { hasSkills: true }
+      );
+
+      const result = await spellArea.cast(testCharacter, testFriendlyNPC, MagicPower.High, testSpellAreaOptions);
+
+      expect(result).toBe(undefined);
+    });
+
+    describe("PVP", () => {
+      let testAnotherCharacter: ICharacter;
+
+      const testSpellAreaOptions = {
         effectAnimationKey: AnimationEffectKeys.HitFire,
         entityEffect: entityEffectBurning,
         spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
+      };
+
+      beforeEach(async () => {
+        jest.clearAllMocks();
+
+        await NPC.deleteMany({}); // its a PVP testing, so remove all NPCs
+
+        testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
+        testAnotherCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
       });
 
-      expect(hitTargetSpy).not.toHaveBeenCalled();
+      it("should block a NonPVP zone attack", async () => {
+        // @ts-ignore
+        jest.spyOn(spellArea.mapNonPVPZone, "isNonPVPZoneAtXY").mockReturnValue(true);
+
+        const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, {
+          ...testSpellAreaOptions,
+          noCastInNonPvPZone: true,
+        });
+
+        expect(result).toBe(undefined);
+      });
+
+      it("If the level is lower than PVP_MIN_REQUIRED_LV, it avoids the attack", async () => {
+        const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
+
+        expect(result).toBe(undefined);
+      });
     });
   });
 });

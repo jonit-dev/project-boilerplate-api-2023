@@ -42,13 +42,28 @@ export class SpellArea {
     magicPower: MagicPower,
     options: ISpellAreaCastOptions
   ): Promise<void> {
-    const { spellAreaGrid, effectAnimationKey } = options;
-    options.isAttackSpell = "isAttackSpell" in options ? options.isAttackSpell : true;
-    options.noCastInNonPvP = "noCastInNonPvP" in options ? options.noCastInNonPvP : false;
+    let {
+      spellAreaGrid,
+      effectAnimationKey,
+      isAttackSpell,
+      noCastInNonPvPZone,
+      customFn,
+      includeCaster,
+      excludeEntityTypes,
+      entityEffect,
+    } = options;
+
+    if (!isAttackSpell) {
+      isAttackSpell = true;
+    }
+
+    if (!noCastInNonPvPZone) {
+      noCastInNonPvPZone = false;
+    }
 
     const calculateEffectOptions: ISpellAreaCalculateEffectOptions = {
-      includeCaster: options.includeCaster,
-      excludeEntityTypes: options.excludeEntityTypes || [],
+      includeCaster: includeCaster,
+      excludeEntityTypes: excludeEntityTypes || [],
     };
 
     const { cells: animationCells, targets } = await this.calculateEffect(
@@ -61,7 +76,11 @@ export class SpellArea {
       calculateEffectOptions
     );
 
-    const shouldBlockNonPVPZoneAttack = this.shouldBlockNonPVPZoneAttack(caster as ICharacter, options);
+    const shouldBlockNonPVPZoneAttack = this.shouldBlockNonPVPZoneAttack(
+      caster as ICharacter,
+      target,
+      noCastInNonPvPZone
+    );
 
     if (shouldBlockNonPVPZoneAttack) {
       return;
@@ -83,17 +102,7 @@ export class SpellArea {
         return; // avoid Characters hitting friendly NPCs
       }
 
-      if (targetToHit.type === EntityType.NPC) {
-        const npcTarget = targetToHit as INPC;
-        if (npcTarget.raidKey) {
-          const isRaidActive = await this.raidManager.isRaidActive(npcTarget.raidKey);
-          if (!isRaidActive) {
-            return; // avoid Characters hitting Raid NPCs
-          }
-        }
-      }
-
-      if (options?.isAttackSpell !== false) {
+      if (isAttackSpell) {
         // Checks if the option isAttackSpell is not equal to false
         if (caster.type === EntityType.Character && targetToHit.type === EntityType.Character) {
           const targetLevel = await this.getEntityLevel(targetToHit);
@@ -129,14 +138,14 @@ export class SpellArea {
         await this.handleSkullGain(caster as ICharacter, targetToHit as ICharacter);
       }
 
-      if (options?.customFn) {
-        await options.customFn(targetToHit, targetIntensity);
+      if (customFn) {
+        await customFn(targetToHit, targetIntensity);
       } else {
         await this.hitTarget.hit(caster, targetToHit, true, magicPower + targetIntensity, true);
       }
 
-      if (options?.entityEffect) {
-        await this.entityEffectUse.applyEntityEffects(targetToHit, caster, options.entityEffect);
+      if (entityEffect) {
+        await this.entityEffectUse.applyEntityEffects(targetToHit, caster, entityEffect);
       }
     });
 
@@ -191,7 +200,7 @@ export class SpellArea {
 
   private async getEntityLevel(entity: ICharacter | INPC): Promise<number | null> {
     try {
-      const skills = (await Skill.find({ _id: entity.skills })
+      const skills = (await Skill.findOne({ owner: entity._id })
         .lean()
         .cacheQuery({
           cacheKey: `${entity._id}-skills`,
@@ -272,12 +281,19 @@ export class SpellArea {
     }
   }
 
-  private shouldBlockNonPVPZoneAttack(caster: ICharacter, options: ISpellAreaCastOptions): boolean {
-    if (
-      caster.type === EntityType.Character &&
-      options.noCastInNonPvP === true &&
-      this.mapNonPVPZone.isNonPVPZoneAtXY(caster.scene, caster.x, caster.y)
-    ) {
+  private shouldBlockNonPVPZoneAttack(
+    caster: ICharacter,
+    target: ICharacter | INPC,
+    noCastInNonPvPZone: boolean
+  ): boolean {
+    // if caster is Character nad target is NPC, do not block
+    if (caster.type === EntityType.Character && target.type === EntityType.NPC) {
+      return false;
+    }
+
+    const isNonPVPZoneAtXY = this.mapNonPVPZone.isNonPVPZoneAtXY(caster.scene, caster.x, caster.y);
+
+    if (caster.type === EntityType.Character && noCastInNonPvPZone && isNonPVPZoneAtXY) {
       // Checks if the caster is a Character, if the noCastInNonPvP option is active, and if the caster is in a non-PvP zone
       const errorMessage = "This spell cannot be cast in a non-PvP zone";
       this.socketMessaging.sendErrorMessageToCharacter(caster as ICharacter, errorMessage);
