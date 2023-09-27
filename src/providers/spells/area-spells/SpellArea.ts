@@ -1,7 +1,7 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { CharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
+import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
@@ -186,30 +186,11 @@ export class SpellArea {
   }
 
   private async isCasterAndTargetInAParty(caster: ICharacter, target: ICharacter): Promise<boolean> {
-    const pipeline = [
-      {
-        $match: {
-          $or: [
-            { "leader._id": caster._id },
-            { "members._id": caster._id },
-            { "leader._id": target._id },
-            { "members._id": target._id },
-          ],
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          uniqueParties: { $addToSet: "$_id" },
-        },
-      },
-    ];
+    const partyWithBoth: ICharacterParty | null = await CharacterParty.findOne({
+      $or: [{ "leader._id": { $in: [caster.id, target.id] } }, { "members._id": { $in: [caster.id, target.id] } }],
+    }).lean();
 
-    const result = await CharacterParty.aggregate(pipeline);
-
-    if (result.length === 0) return false;
-
-    return result[0].uniqueParties.length === 1;
+    return !!partyWithBoth;
   }
 
   private async getEntityLevel(entity: ICharacter | INPC): Promise<number | null> {
