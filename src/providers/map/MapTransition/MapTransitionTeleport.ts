@@ -10,13 +10,11 @@ import {
   IBattleCancelTargeting,
   IMapTransitionChangeMapPayload,
   IViewDestroyElementPayload,
-  MapLayers,
   MapSocketEvents,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
 import { EntityType } from "@rpg-engine/shared/dist/types/entity.types";
 import { provide } from "inversify-binding-decorators";
-import { MapSolids } from "../MapSolids";
 
 type TransitionDestination = {
   map: string;
@@ -30,28 +28,15 @@ export class MapTransitionTeleport {
     private socketMessaging: SocketMessaging,
     private battleNetworkStopTargeting: BattleNetworkStopTargeting,
     private characterView: CharacterView,
-    private locker: Locker,
-    private mapSolids: MapSolids
+    private locker: Locker
   ) {}
 
   @TrackNewRelicTransaction()
   public async changeCharacterScene(character: ICharacter, destination: TransitionDestination): Promise<void> {
     try {
-      const canProceed = await this.locker.lock(`character-changing-scene-${character._id}`);
+      const canProceed = await this.locker.lock(`character-changing-scene-${character._id}`, 1);
 
       if (!canProceed) {
-        return;
-      }
-
-      const isSolid = this.mapSolids.isTileSolid(
-        destination.map,
-        destination.gridX,
-        destination.gridY,
-        MapLayers.Character,
-        "CHECK_SINGLE_LAYER"
-      );
-
-      if (isSolid) {
         return;
       }
 
@@ -97,29 +82,15 @@ export class MapTransitionTeleport {
       );
     } catch (error) {
       console.error(error);
-      await this.locker.unlock(`character-changing-scene-${character._id}`);
-    } finally {
-      await this.locker.unlock(`character-changing-scene-${character._id}`);
     }
   }
 
   @TrackNewRelicTransaction()
   public async sameMapTeleport(character: ICharacter, destination: TransitionDestination): Promise<void> {
     try {
-      const canProceed = await this.locker.lock(`character-changing-scene-${character._id}`);
+      const canProceed = await this.locker.lock(`character-changing-scene-${character._id}`, 1);
 
       if (!canProceed) {
-        return;
-      }
-
-      const isSolid = this.mapSolids.isTileSolid(
-        destination.map,
-        destination.gridX,
-        destination.gridY,
-        MapLayers.Character
-      );
-
-      if (isSolid) {
         return;
       }
 
@@ -159,9 +130,6 @@ export class MapTransitionTeleport {
       );
     } catch (error) {
       console.error(error);
-      await this.locker.unlock(`character-changing-scene-${character._id}`);
-    } finally {
-      await this.locker.unlock(`character-changing-scene-${character._id}`);
     }
   }
 

@@ -16,13 +16,13 @@ export class MacroCaptchaCrons {
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/2 * * * *", async () => {
+    nodeCron.schedule("0 * * * *", async () => {
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "BanMacroCharacters", async () => {
         await this.banMacroCharacters();
       });
     });
 
-    nodeCron.schedule("*/5 * * * *", async () => {
+    nodeCron.schedule("0 */2 * * *", async () => {
       await this.newRelic.trackTransaction(
         NewRelicTransactionCategory.CronJob,
         "SendMacroCaptchaToActiveCharacters",

@@ -12,3 +12,8 @@ Content-Type: application/json
 GET {{baseUrl}}/scripts/cleanup/items HTTP/1.1
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
+
+### Scripts :: Adjust base speed
+GET {{baseUrl}}/scripts/adjust-speed HTTP/1.1
+Authorization: Bearer {{authToken}}
+Content-Type: application/json

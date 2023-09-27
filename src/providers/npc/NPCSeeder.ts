@@ -62,9 +62,6 @@ export class NPCSeeder {
               $set: {
                 ...updateData,
               },
-            },
-            {
-              upsert: true,
             }
           );
         }
@@ -169,11 +166,10 @@ export class NPCSeeder {
 
       skills.owner = newNPC._id;
 
-      await Promise.all([
-        skills.save(),
-        this.npcGiantForm.resetNPCToNormalForm(newNPC),
-        this.npcGiantForm.randomlyTransformNPCIntoGiantForm(newNPC),
-      ]);
+      await skills.save();
+
+      await this.npcGiantForm.resetNPCToNormalForm(newNPC);
+      await this.npcGiantForm.randomlyTransformNPCIntoGiantForm(newNPC);
     } catch (error) {
       console.log(`❌ Failed to spawn NPC ${NPCData.key}. Is the blueprint for this NPC missing?`);
       console.log(NPCData);

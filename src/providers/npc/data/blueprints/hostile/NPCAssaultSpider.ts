@@ -68,6 +68,11 @@ export const npcAssaultSpider: Partial<INPC> = {
       chance: 6,
     },
     {
+      itemBlueprintKey: CraftingResourcesBlueprint.SewingThread,
+      chance: 10,
+      quantityRange: [3, 5],
+    },
+    {
       itemBlueprintKey: CraftingResourcesBlueprint.MagicRecipe,
       chance: 10,
       quantityRange: [1, 5],

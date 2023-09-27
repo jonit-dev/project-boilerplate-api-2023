@@ -78,7 +78,7 @@ export const npcCaveSpider: Partial<INPC> = {
     {
       itemBlueprintKey: CraftingResourcesBlueprint.SewingThread,
       chance: 10,
-      quantityRange: [1, 3],
+      quantityRange: [3, 5],
     },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],

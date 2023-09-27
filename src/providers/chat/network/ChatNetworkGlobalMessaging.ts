@@ -6,8 +6,8 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
+import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import { SpellCast } from "@providers/spells/SpellCast";
 import {
   ChatMessageType,
