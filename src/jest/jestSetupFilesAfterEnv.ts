@@ -101,6 +101,7 @@ jest.mock("@providers/constants/ItemConstants", () => ({
   ITEM_USE_WITH_BASE_EFFECT: 1,
   ITEM_USE_WITH_BASE_SCALING_FACTOR: 0.008,
   ITEM_CLEANUP_THRESHOLD: 100,
+  ITEM_PICKUP_DISTANCE_THRESHOLD: 2,
 }));
 
 jest.mock("@providers/constants/NPCConstants", () => ({

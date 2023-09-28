@@ -7,6 +7,7 @@ import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterItems } from "@providers/character/characterItems/CharacterItems";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
+import { ITEM_PICKUP_DISTANCE_THRESHOLD } from "@providers/constants/ItemConstants";
 import { EquipmentEquip } from "@providers/equipment/EquipmentEquip";
 import { MapHelper } from "@providers/map/MapHelper";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -160,7 +161,7 @@ export class ItemPickupValidator {
         character.y,
         itemPickupData.x,
         itemPickupData.y,
-        2
+        ITEM_PICKUP_DISTANCE_THRESHOLD
       );
       if (!underRange) {
         this.sendErrorMessage(character, "Sorry, you are too far away to pick up this item.");

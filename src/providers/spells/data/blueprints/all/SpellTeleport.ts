@@ -12,7 +12,7 @@ export const spellTeleport: Partial<ISpell> = {
   manaCost: 0,
   minLevelRequired: 2,
   minMagicLevelRequired: 1,
-  cooldown: 60 * 60 * 24,
+  cooldown: 60 * 60,
   castingAnimationKey: AnimationEffectKeys.Holy,
 
   usableEffect: async (character: ICharacter) => {
