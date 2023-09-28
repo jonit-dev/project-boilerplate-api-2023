@@ -27,6 +27,7 @@ import { provide } from "inversify-binding-decorators";
 
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { MAX_PING_TRACKING_THRESHOLD } from "@providers/constants/ServerConstants";
 import { Locker } from "@providers/locks/Locker";
 import { MapTransitionInfo } from "@providers/map/MapTransition/MapTransitionInfo";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
@@ -86,7 +87,7 @@ export class CharacterNetworkUpdate {
                 // 10% chance tracking ping
                 const ping = dayjs().diff(dayjs(timestamp), "ms");
 
-                if (ping < 0) {
+                if (ping < 0 || ping > MAX_PING_TRACKING_THRESHOLD) {
                   return; // invalid ping
                 }
 
