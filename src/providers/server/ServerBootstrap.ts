@@ -99,7 +99,7 @@ export class ServerBootstrap {
     // Firebase-admin setup, that push notification requires.
     PushNotificationHelper.initialize();
 
-    this.heapMonitor.monitor();
+    // this.heapMonitor.monitor();
 
     await this.seeder.start();
 
