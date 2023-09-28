@@ -1,5 +1,6 @@
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { OthersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import {
   NewRelicMetricCategory,
   NewRelicSubCategory,
@@ -15,14 +16,17 @@ export class TotalAvailableGold {
   public schedule(): void {
     nodeCron.schedule("0 4 * * *", async () => {
       let totalGold = 0;
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "TotalAvaliableGold", async () => {
-        const allItems = (await Item.find({ canSell: true })
-          .lean()
-          .select("_id maxStackSize basePrice stackQty")) as IItem[];
 
-        for (const { basePrice, maxStackSize, stackQty } of allItems) {
-          if (basePrice && maxStackSize) {
-            totalGold += (stackQty || 1) * basePrice;
+      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "TotalAvailableGold", async () => {
+        const allGoldCoins = (await Item.find({ key: OthersBlueprint.GoldCoin })
+          .lean()
+          .select("_id stackQty")) as IItem[];
+
+        for (const goldCoin of allGoldCoins) {
+          const { stackQty } = goldCoin;
+
+          if (stackQty) {
+            totalGold += stackQty;
           }
         }
       });
