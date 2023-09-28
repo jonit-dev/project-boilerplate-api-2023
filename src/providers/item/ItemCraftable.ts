@@ -214,7 +214,7 @@ export class ItemCraftable {
         "You failed to craft the item. You should try again!",
       ]);
 
-      await this.skillIncrease.increaseCraftingSP(character, recipe.outputKey, false);
+      // await this.skillIncrease.increaseCraftingSP(character, recipe.outputKey, false);
 
       this.socketMessaging.sendErrorMessageToCharacter(character, failureMessages[0]);
 
