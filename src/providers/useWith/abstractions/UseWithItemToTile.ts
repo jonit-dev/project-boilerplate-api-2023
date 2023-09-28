@@ -12,7 +12,6 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   AnimationEffectKeys,
   IEquipmentAndInventoryUpdatePayload,
-  IItem,
   IItemContainer,
   ItemSocketEvents,
 } from "@rpg-engine/shared";
@@ -168,7 +167,7 @@ export class UseWithItemToTile {
 
     // update crafting skills if corresponds
     for (const r of reward) {
-      await skillIncrease.increaseCraftingSP(character, r.key);
+      await skillIncrease.increaseCraftingSP(character, r.key, true);
     }
 
     if (successMessages) {

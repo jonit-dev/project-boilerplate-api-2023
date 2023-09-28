@@ -509,7 +509,7 @@ describe("SkillIncrease.spec.ts | increaseShieldingSP, increaseSkillsOnBattle & 
 
   CraftingSkillsMap.forEach((skill, itemKey) => {
     it(`item ${itemKey} should increase character's ${skill} skill`, async () => {
-      await skillIncrease.increaseCraftingSP(testCharacter, itemKey);
+      await skillIncrease.increaseCraftingSP(testCharacter, itemKey, true);
 
       const updatedSkills = (await Skill.findById(testCharacter.skills).lean()) as ISkill;
 
