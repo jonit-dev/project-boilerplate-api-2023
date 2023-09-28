@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
+import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SPELL_AREA_MEDIUM_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
@@ -8,6 +9,7 @@ import { FriendlyNPCsBlueprint, HostileNPCsBlueprint } from "@providers/npc/data
 import {
   AnimationEffectKeys,
   CharacterClass,
+  EntityType,
   FromGridX,
   FromGridY,
   MagicPower,
@@ -215,66 +217,115 @@ describe("SpellArea", () => {
       expect(targets).toHaveLength(0);
     });
   });
+});
 
-  describe("Validations", () => {
-    let testNPC: INPC;
-    let hitTargetSpy: jest.SpyInstance;
-    let testCharacter: ICharacter;
+describe("SpellArea - Validations", () => {
+  let testNPC: INPC;
+  let hitTargetSpy: jest.SpyInstance;
+  let testCharacter: ICharacter;
+  let skullGainSpy: jest.SpyInstance;
+  let spellArea: SpellArea;
 
-    const testSpellAreaOptions = {
-      effectAnimationKey: AnimationEffectKeys.HitFire,
-      entityEffect: entityEffectBurning,
+  const testSpellAreaOptions = {
+    effectAnimationKey: AnimationEffectKeys.HitFire,
+    entityEffect: entityEffectBurning,
+    spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
+  };
+
+  beforeAll(() => {
+    spellArea = container.get(SpellArea);
+  });
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+
+    testNPC = await unitTestHelper.createMockNPC(
+      {
+        key: HostileNPCsBlueprint.OrcMage,
+        x: FromGridX(0),
+        y: FromGridX(0),
+      },
+      { hasSkills: true }
+    );
+
+    // @ts-ignore
+    hitTargetSpy = jest.spyOn(spellArea.hitTarget, "hit");
+
+    testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
+  });
+
+  it("when an NPC cast area spell into another NPC, it should not be hit", async () => {
+    const testNPC2 = await unitTestHelper.createMockNPC(
+      {
+        key: HostileNPCsBlueprint.Orc,
+        x: FromGridX(1),
+        y: FromGridX(1),
+      },
+      { hasSkills: true }
+    );
+
+    await spellArea.cast(testNPC, testNPC2, MagicPower.High, testSpellAreaOptions);
+
+    expect(hitTargetSpy).not.toHaveBeenCalled();
+  });
+
+  it("character should NOT gain a Skull if throwing a support spell in a NPC or another character", async () => {
+    // @ts-ignore
+    skullGainSpy = jest.spyOn(spellArea, "handleSkullGain");
+
+    const result = await spellArea.cast(testCharacter, testNPC, MagicPower.High, {
+      effectAnimationKey: AnimationEffectKeys.Heal,
       spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
-    };
-
-    beforeEach(async () => {
-      jest.clearAllMocks();
-
-      testNPC = await unitTestHelper.createMockNPC(
-        {
-          key: HostileNPCsBlueprint.OrcMage,
-          x: FromGridX(0),
-          y: FromGridX(0),
-        },
-        { hasSkills: true }
-      );
-
-      // @ts-ignore
-      hitTargetSpy = jest.spyOn(spellArea.hitTarget, "hit");
-
-      testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
+      includeCaster: true,
+      isAttackSpell: false,
+      excludeEntityTypes: [EntityType.NPC],
+      customFn: async (target: ICharacter | INPC) => {},
     });
 
-    it("when an NPC cast area spell into another NPC, it should not be hit", async () => {
-      const testNPC2 = await unitTestHelper.createMockNPC(
-        {
-          key: HostileNPCsBlueprint.Orc,
-          x: FromGridX(1),
-          y: FromGridX(1),
-        },
-        { hasSkills: true }
-      );
+    expect(result).toBe(undefined);
 
-      await spellArea.cast(testNPC, testNPC2, MagicPower.High, testSpellAreaOptions);
+    expect(skullGainSpy).not.toHaveBeenCalled();
+  });
 
-      expect(hitTargetSpy).not.toHaveBeenCalled();
-    });
+  it("character should GAIN a Skull if throwing a attack spell in another character", async () => {
+    // @ts-ignore
+    skullGainSpy = jest.spyOn(spellArea, "handleSkullGain");
 
-    it("characters should not hit friendly NPCs", async () => {
-      const testFriendlyNPC = await unitTestHelper.createMockNPC(
-        {
-          alignment: NPCAlignment.Friendly,
-          key: FriendlyNPCsBlueprint.Agatha,
-          x: FromGridX(1),
-          y: FromGridX(1),
-        },
-        { hasSkills: true }
-      );
+    const testAnotherCharacter = await unitTestHelper.createMockCharacter(
+      {
+        x: FromGridX(1),
+        y: FromGridY(1),
+      },
+      { hasSkills: true }
+    );
 
-      const result = await spellArea.cast(testCharacter, testFriendlyNPC, MagicPower.High, testSpellAreaOptions);
+    await Skill.updateOne({ owner: testCharacter._id }, { $set: { level: 20 } });
+    await Skill.updateOne({ owner: testAnotherCharacter._id }, { $set: { level: 20 } });
 
-      expect(result).toBe(undefined);
-    });
+    const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
+
+    expect(result).toBe(undefined);
+
+    expect(skullGainSpy).toHaveBeenCalled();
+
+    const returnValue = await skullGainSpy.mock.results[0].value;
+    expect(returnValue).toBe(true);
+  });
+
+  it("characters should not hit friendly NPCs", async () => {
+    const testFriendlyNPC = await unitTestHelper.createMockNPC(
+      {
+        alignment: NPCAlignment.Friendly,
+        key: FriendlyNPCsBlueprint.Agatha,
+        x: FromGridX(1),
+        y: FromGridX(1),
+      },
+      { hasSkills: true }
+    );
+
+    const result = await spellArea.cast(testCharacter, testFriendlyNPC, MagicPower.High, testSpellAreaOptions);
+
+    expect(result).toBe(undefined);
   });
 });
 

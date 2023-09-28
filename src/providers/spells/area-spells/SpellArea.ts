@@ -53,11 +53,11 @@ export class SpellArea {
       entityEffect,
     } = options;
 
-    if (!isAttackSpell) {
+    if (isAttackSpell === undefined) {
       isAttackSpell = true;
     }
 
-    if (!noCastInNonPvPZone) {
+    if (noCastInNonPvPZone === undefined) {
       noCastInNonPvPZone = false;
     }
 
@@ -276,10 +276,10 @@ export class SpellArea {
     return { cells: animationCells, targets };
   }
 
-  private async handleSkullGain(caster: ICharacter, target: ICharacter): Promise<void> {
+  private async handleSkullGain(caster: ICharacter, target: ICharacter): Promise<boolean> {
     // Checks if the caster and the target are Characters
     if (caster.type !== EntityType.Character || target.type !== EntityType.Character) {
-      return;
+      return false;
     }
 
     // Checks if the attack is justified
@@ -291,7 +291,11 @@ export class SpellArea {
     if (isAttackUnjustified) {
       // If the attack is not justified, the caster gains a 'skull'
       await this.characterSkull.updateWhiteSkull(caster.id, target.id);
+
+      return true;
     }
+
+    return false;
   }
 
   private shouldBlockNonPVPZoneAttack(
