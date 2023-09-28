@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SPELL_AREA_MEDIUM_BLAST_RADIUS } from "@providers/constants/SpellConstants";
 import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container, unitTestHelper } from "@providers/inversify/container";
@@ -275,69 +275,146 @@ describe("SpellArea", () => {
 
       expect(result).toBe(undefined);
     });
+  });
+});
 
-    describe("PVP", () => {
-      let testAnotherCharacter: ICharacter;
+describe("SpellArea - PVP", () => {
+  let testCharacter: ICharacter;
+  let testAnotherCharacter: ICharacter;
+  let testAnotherCharacter2: ICharacter;
+  let isSamePartySpy: jest.SpyInstance;
+  let spellArea: SpellArea;
 
-      const testSpellAreaOptions = {
-        effectAnimationKey: AnimationEffectKeys.HitFire,
-        entityEffect: entityEffectBurning,
-        spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
-      };
+  const testSpellAreaOptions = {
+    effectAnimationKey: AnimationEffectKeys.HitFire,
+    entityEffect: entityEffectBurning,
+    spellAreaGrid: SPELL_AREA_MEDIUM_BLAST_RADIUS,
+  };
 
-      beforeEach(async () => {
-        await NPC.deleteMany({}); // its a PVP testing, so remove all NPCs
+  beforeAll(() => {
+    spellArea = container.get(SpellArea);
+  });
 
-        testCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
-        testAnotherCharacter = await unitTestHelper.createMockCharacter(null, { hasSkills: true });
-      });
+  beforeEach(async () => {
+    testCharacter = await unitTestHelper.createMockCharacter(
+      {
+        x: FromGridX(1),
+        y: FromGridY(1),
+      },
+      { hasSkills: true }
+    );
+    testAnotherCharacter = await unitTestHelper.createMockCharacter(
+      {
+        x: FromGridX(2),
+        y: FromGridY(2),
+      },
+      { hasSkills: true }
+    );
+    testAnotherCharacter2 = await unitTestHelper.createMockCharacter(
+      {
+        x: FromGridX(3),
+        y: FromGridY(3),
+      },
+      { hasSkills: true }
+    );
+  });
 
-      afterEach(() => {
-        jest.clearAllMocks();
-        jest.restoreAllMocks();
-      });
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
 
-      it("should block a NonPVP zone attack", async () => {
-        // @ts-ignore
-        jest.spyOn(spellArea.mapNonPVPZone, "isNonPVPZoneAtXY").mockReturnValue(true);
+  it("should block a NonPVP zone attack", async () => {
+    // @ts-ignore
+    jest.spyOn(spellArea.mapNonPVPZone, "isNonPVPZoneAtXY").mockReturnValue(true);
 
-        const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, {
-          ...testSpellAreaOptions,
-          noCastInNonPvPZone: true,
-        });
-
-        expect(result).toBe(undefined);
-      });
-
-      it("If the level is lower than PVP_MIN_REQUIRED_LV, it avoids the attack", async () => {
-        const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
-
-        expect(result).toBe(undefined);
-      });
-
-      it("should prevent a character from attacking another one that's on the same party", async () => {
-        const party = new CharacterParty({
-          leader: {
-            _id: testCharacter._id,
-            class: CharacterClass.Druid,
-            name: "Test Character",
-          },
-          members: [
-            {
-              _id: testAnotherCharacter._id,
-              class: CharacterClass.Berserker,
-              name: "Test Another Character",
-            },
-          ],
-          maxSize: 2,
-          benefits: [],
-        });
-        await party.save();
-
-        const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
-
-        expect(result).toBe(undefined);
-      });
+    const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, {
+      ...testSpellAreaOptions,
+      noCastInNonPvPZone: true,
     });
+
+    expect(result).toBe(undefined);
+  });
+
+  it("If the level is lower than PVP_MIN_REQUIRED_LV, it avoids the attack", async () => {
+    const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
+
+    expect(result).toBe(undefined);
+  });
+
+  it("should prevent a character from attacking another one that's on the same party", async () => {
+    // @ts-ignore
+    isSamePartySpy = jest.spyOn(spellArea, "isCasterAndTargetOnTheSameParty");
+
+    const party = new CharacterParty({
+      leader: {
+        _id: testCharacter._id,
+        class: CharacterClass.Druid,
+        name: "Test Character",
+      },
+      members: [
+        {
+          _id: testAnotherCharacter._id,
+          class: CharacterClass.Berserker,
+          name: "Test Another Character",
+        },
+        {
+          _id: testAnotherCharacter2._id,
+          class: CharacterClass.Berserker,
+          name: "Test Another Character 2",
+        },
+      ],
+      maxSize: 2,
+      benefits: [],
+    });
+    await party.save();
+
+    const result = await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
+
+    expect(result).toBe(undefined);
+
+    expect(isSamePartySpy).toHaveBeenCalled();
+    const returnValue = await isSamePartySpy.mock.results[0].value;
+    expect(returnValue).toBe(true);
+  });
+  it("should NOT prevent a character from attacking another one if they're not on the same party", async () => {
+    // @ts-ignore
+    isSamePartySpy = jest.spyOn(spellArea, "isCasterAndTargetOnTheSameParty");
+
+    const party1 = new CharacterParty({
+      leader: {
+        _id: testCharacter._id,
+        class: CharacterClass.Druid,
+        name: "Test Character",
+      },
+      members: [],
+      maxSize: 2,
+      benefits: [],
+    });
+    await party1.save();
+
+    const party2 = new CharacterParty({
+      leader: {
+        _id: testAnotherCharacter._id,
+        class: CharacterClass.Berserker,
+        name: "Test Another Character",
+      },
+      members: [
+        {
+          _id: testAnotherCharacter2._id,
+          class: CharacterClass.Berserker,
+          name: "Test Another Character 2",
+        },
+      ],
+      maxSize: 2,
+      benefits: [],
+    });
+    await party2.save();
+
+    await spellArea.cast(testCharacter, testAnotherCharacter, MagicPower.High, testSpellAreaOptions);
+
+    expect(isSamePartySpy).toHaveBeenCalled();
+    const returnValue = await isSamePartySpy.mock.results[0].value;
+    expect(returnValue).toBe(false);
   });
 });
