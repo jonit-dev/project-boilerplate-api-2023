@@ -198,7 +198,7 @@ export class ItemCraftable {
     if (proceed) {
       await this.createItems(recipe, character);
       // update crafting skills
-      await this.skillIncrease.increaseCraftingSP(character, recipe.outputKey);
+      await this.skillIncrease.increaseCraftingSP(character, recipe.outputKey, true);
 
       this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
         message: "You successfully crafted the item!",
@@ -208,10 +208,13 @@ export class ItemCraftable {
       await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.SkillLevelUp);
     } else {
       const failureMessages = shuffle([
-        "Sorry, you failed to craft the item.",
-        "Hmm... you couldn't get it right.",
+        "Sorry, you failed to craft the item. You gained some experience though!",
+        "Hmm... you couldn't get it right. At least you tried!",
         "You almost got the item correctly, but failed.",
+        "You failed to craft the item. You should try again!",
       ]);
+
+      await this.skillIncrease.increaseCraftingSP(character, recipe.outputKey, false);
 
       this.socketMessaging.sendErrorMessageToCharacter(character, failureMessages[0]);
 

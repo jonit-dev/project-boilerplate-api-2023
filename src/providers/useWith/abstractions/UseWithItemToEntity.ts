@@ -131,7 +131,7 @@ export class UseWithItemToEntity {
 
     // update crafting skills if corresponds
     for (const r of rewards) {
-      await skillIncrease.increaseCraftingSP(character, r.key);
+      await skillIncrease.increaseCraftingSP(character, r.key, true);
     }
 
     if (successMessages) {

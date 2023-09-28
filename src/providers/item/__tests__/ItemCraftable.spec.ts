@@ -357,6 +357,10 @@ describe("ItemCraftable.ts", () => {
 
   it("should not craft valid item due to crafting failure", async () => {
     const craftChanceMock = jest.spyOn(ItemCraftable.prototype as any, "isCraftSuccessful");
+
+    // @ts-ignore
+    const skillIncreaseSpy = jest.spyOn(craftableItem.skillIncrease, "increaseCraftingSP");
+
     craftChanceMock.mockImplementation(() => false);
 
     skill.alchemy.level = 10;
@@ -375,7 +379,7 @@ describe("ItemCraftable.ts", () => {
     expect(craftChanceMock).toBeCalledTimes(1);
     expect(craftChanceMock).toBeCalledWith(10, 75);
 
-    expect(sendEventToUser).toHaveBeenCalledTimes(4);
+    expect(skillIncreaseSpy).toBeCalledTimes(1);
 
     expect(sendEventToUser).toHaveBeenCalledWith(testCharacter.channelId, AnimationSocketEvents.ShowAnimation, {
       targetId: testCharacter._id,
