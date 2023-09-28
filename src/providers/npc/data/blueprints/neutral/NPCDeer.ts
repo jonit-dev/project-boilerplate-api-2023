@@ -32,7 +32,7 @@ export const npcDeer = {
   loots: [
     {
       itemBlueprintKey: FoodsBlueprint.RedMeat,
-      chance: 30,
+      chance: 10,
       quantityRange: [1, 2],
     },
     {
@@ -42,7 +42,7 @@ export const npcDeer = {
     },
     {
       itemBlueprintKey: FoodsBlueprint.RawBeefSteak,
-      chance: 5,
+      chance: 30,
       quantityRange: [1, 3],
     },
   ],
