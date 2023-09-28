@@ -111,7 +111,6 @@ export class SpellArea {
           }
         }
       }
-
       if (isAttackSpell) {
         // Checks if the option isAttackSpell is not equal to false
         if (caster.type === EntityType.Character && targetToHit.type === EntityType.Character) {
@@ -124,7 +123,7 @@ export class SpellArea {
           }
 
           // Check if the caster is in a party
-          const isCasterAndTargetInParty = await this.isCasterAndTargetInAParty(
+          const isCasterAndTargetInParty = await this.isCasterAndTargetOnTheSameParty(
             caster as ICharacter,
             targetToHit as ICharacter
           );
@@ -185,31 +184,31 @@ export class SpellArea {
     await Promise.all([...hitPromises, ...animationPromises]);
   }
 
-  private async isCasterAndTargetInAParty(caster: ICharacter, target: ICharacter): Promise<boolean> {
-    const pipeline = [
-      {
-        $match: {
-          $or: [
-            { "leader._id": caster._id },
-            { "members._id": caster._id },
-            { "leader._id": target._id },
-            { "members._id": target._id },
-          ],
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          uniqueParties: { $addToSet: "$_id" },
-        },
-      },
-    ];
+  private async isCasterAndTargetOnTheSameParty(caster: ICharacter, target: ICharacter): Promise<boolean> {
+    // First, find a party where the caster is the leader and target is a member
+    const partyWithCasterAsLeader = await CharacterParty.findOne({
+      "leader._id": caster._id,
+      "members._id": target._id,
+    }).lean();
 
-    const result = await CharacterParty.aggregate(pipeline);
+    // If found, it means they are in the same party
+    if (partyWithCasterAsLeader) {
+      return true;
+    }
 
-    if (result.length === 0) return false;
+    // Next, find a party where the target is the leader and caster is a member
+    const partyWithTargetAsLeader = await CharacterParty.findOne({
+      "leader._id": target._id,
+      "members._id": caster._id,
+    }).lean();
 
-    return result[0].uniqueParties.length === 1;
+    // If found, it means they are in the same party
+    if (partyWithTargetAsLeader) {
+      return true;
+    }
+
+    // If neither condition is met, then they are not in the same party
+    return false;
   }
 
   private async getEntityLevel(entity: ICharacter | INPC): Promise<number | null> {
