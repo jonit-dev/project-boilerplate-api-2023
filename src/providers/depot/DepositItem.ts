@@ -6,6 +6,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { ItemOwnership } from "@providers/item/ItemOwnership";
 import { ItemUpdater } from "@providers/item/ItemUpdater";
 import { ItemView } from "@providers/item/ItemView";
@@ -15,7 +16,6 @@ import { IDepotDepositItem, IEquipmentAndInventoryUpdatePayload, IItemContainer 
 import { provide } from "inversify-binding-decorators";
 import { DepotSystem } from "./DepotSystem";
 import { OpenDepot } from "./OpenDepot";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 
 @provide(DepositItem)
 export class DepositItem {

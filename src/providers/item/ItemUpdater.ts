@@ -18,6 +18,9 @@ export class ItemUpdater {
   @TrackNewRelicTransaction()
   public async updateItemRecursivelyIfNeeded(item: IItem, updateQuery: IUpdateQuery): Promise<void> {
     if (item.type === ItemType.Container) {
+      // first, update the item itself
+      await Item.updateOne({ _id: item._id }, updateQuery);
+
       const itemContainer = (await ItemContainer.findById(item.itemContainer)) as unknown as IItemContainer;
 
       const processedItems = new Set<string>();
