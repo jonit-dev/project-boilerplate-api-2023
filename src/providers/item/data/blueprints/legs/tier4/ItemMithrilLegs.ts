@@ -8,7 +8,7 @@ export const itemMithrilLegs: IEquippableLightArmorTier4Blueprint = {
   subType: ItemSubType.Legs,
   textureAtlas: "items",
   texturePath: "legs/mithril-legs.png",
-  name: "Mithril Leg",
+  name: "Mithril Legs",
   description: "A leg armor made of a rare, incredibly strong metal known as mithril",
   weight: 0.5,
   defense: 20,
