@@ -55,6 +55,10 @@ jest.mock("@providers/constants/SkillConstants", () => ({
   SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER: 1.5,
 }));
 
+jest.mock("@providers/constants/PartyConstants", () => ({
+  PARTY_BONUS_RATIO: 1,
+}));
+
 jest.mock("@providers/constants/DeathConstants", () => ({
   DROP_EQUIPMENT_CHANCE: 15,
   SKILL_LOSS_ON_DEATH_MULTIPLIER: 1,

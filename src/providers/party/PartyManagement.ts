@@ -3,6 +3,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
+import { PARTY_BONUS_RATIO } from "@providers/constants/PartyConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   BasicAttribute,
@@ -385,19 +386,19 @@ export default class PartyManagement {
     return [
       {
         benefit: CharacterPartyBenefits.Distribution,
-        value: distributionBonus,
+        value: distributionBonus * PARTY_BONUS_RATIO,
       },
       {
         benefit: CharacterPartyBenefits.Experience,
-        value: experienceBonus,
+        value: experienceBonus * PARTY_BONUS_RATIO,
       },
       {
         benefit: CharacterPartyBenefits.DropRatio,
-        value: dropRatioBonus,
+        value: dropRatioBonus * PARTY_BONUS_RATIO,
       },
       {
         benefit: CharacterPartyBenefits.Skill,
-        value: skillBonus,
+        value: skillBonus * PARTY_BONUS_RATIO,
       },
     ];
   }
