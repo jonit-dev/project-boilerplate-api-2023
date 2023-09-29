@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { User } from "@entities/ModuleSystem/UserModel";
+import { ACCOUNT_MAX_CHAR_LIMIT } from "@providers/constants/AccountConstants";
 import { isAlphanumeric } from "@providers/constants/AlphanumericConstants";
 import { BadRequestError } from "@providers/errors/BadRequestError";
 import { TS } from "@providers/translation/TranslationHelper";
@@ -19,7 +20,7 @@ export class CreateCharacterUseCase {
       throw new BadRequestError("Character creation error: User not found!");
     }
 
-    if (user.characters && user.characters.length >= 7) {
+    if (user.characters && user.characters.length >= ACCOUNT_MAX_CHAR_LIMIT) {
       throw new BadRequestError("Maximum character limit reached");
     }
 
