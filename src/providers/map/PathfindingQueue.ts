@@ -58,6 +58,18 @@ export class PathfindingQueue {
     this.worker.on("failed", (job, err) => {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });
+
+    process.on("SIGTERM", async () => {
+      console.log("Received SIGTERM. Gracefully shutting down...");
+      await this.shutdown();
+      process.exit(0);
+    });
+
+    process.on("SIGINT", async () => {
+      console.log("Received SIGINT. Gracefully shutting down...");
+      await this.shutdown();
+      process.exit(0);
+    });
   }
 
   public async clearAllJobs(): Promise<void> {
@@ -81,7 +93,20 @@ export class PathfindingQueue {
     return await this.queue.add(
       "pathfindingJob",
       { npc, target, startGridX, startGridY, endGridX, endGridY },
-      { removeOnComplete: true }
+      {
+        removeOnComplete: true,
+        removeOnFail: true,
+        attempts: 3,
+        backoff: {
+          type: "exponential",
+          delay: 200,
+        },
+      }
     );
+  }
+
+  private async shutdown(): Promise<void> {
+    await this.queue.close();
+    await this.worker.close();
   }
 }
