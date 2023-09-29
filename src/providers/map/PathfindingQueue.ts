@@ -99,7 +99,7 @@ export class PathfindingQueue {
         attempts: 3,
         backoff: {
           type: "exponential",
-          delay: 1000,
+          delay: 200,
         },
       }
     );
