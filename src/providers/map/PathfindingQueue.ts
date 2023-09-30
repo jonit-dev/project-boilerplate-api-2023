@@ -79,7 +79,7 @@ export class PathfindingQueue {
     const jobs = await this.queue.getJobs(["waiting", "active", "delayed", "paused"]);
     for (const job of jobs) {
       try {
-        await job.remove();
+        await job?.remove();
       } catch (err) {
         console.error(`Error removing job ${job?.id}:`, err.message);
       }
