@@ -59,6 +59,10 @@ export class PathfindingQueue {
       console.log(`Job ${job?.id} failed with error ${err.message}`);
     });
 
+    this.queue.on("error", (error) => {
+      console.error("Error in the queue:", error);
+    });
+
     process.on("SIGTERM", async () => {
       console.log("Received SIGTERM. Gracefully shutting down...");
       await this.shutdown();
@@ -75,7 +79,11 @@ export class PathfindingQueue {
   public async clearAllJobs(): Promise<void> {
     const jobs = await this.queue.getJobs(["waiting", "active", "delayed", "paused"]);
     for (const job of jobs) {
-      await job.remove();
+      try {
+        await job.remove();
+      } catch (err) {
+        console.error(`Error removing job ${job?.id}:`, err.message);
+      }
     }
   }
 
