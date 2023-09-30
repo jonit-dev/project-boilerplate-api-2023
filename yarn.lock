@@ -3014,7 +3014,7 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz#96116f2a912e0c02817345b3c10751069920d553"
   integrity sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==
 
-"@socket.io/pm2@^5.1.0":
+"@socket.io/pm2@^5.3.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@socket.io/pm2/-/pm2-5.3.0.tgz#79879475d06aa3a56bebbdb19e7f6bf59f5524ba"
   integrity sha512-A1KRxuTLDGVaf2x6tcDaF5ravNmMPBwdJCXhlqmqz5bwCR9EQS81ON0dFg1wTEqBBq2C5BJAoXl1T9X+aJcbNQ==
@@ -3053,7 +3053,7 @@
   optionalDependencies:
     pm2-sysmonit "^1.2.8"
 
-"@socket.io/redis-adapter@^8.0.1":
+"@socket.io/redis-adapter@^8.2.1":
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/@socket.io/redis-adapter/-/redis-adapter-8.2.1.tgz#36f75afc518d0e1fa4fa7c29e6d042f53ee7563b"
   integrity sha512-6Dt7EZgGSBP0qvXeOKGx7NnSr2tPMbVDfDyL97zerZo+v69hMfL99skMCL3RKZlWVqLyRme2T0wcy3udHhtOsg==
@@ -9664,7 +9664,7 @@ socket.io-parser@~4.2.4:
     "@socket.io/component-emitter" "~3.1.0"
     debug "~4.3.1"
 
-socket.io@^4.4.1:
+socket.io@^4.7.2:
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-4.7.2.tgz#22557d76c3f3ca48f82e73d68b7add36a22df002"
   integrity sha512-bvKVS29/I5fl2FGLNHuXlQaUH/BlzX1IN6S+NKLNZpBsPZIDH+90eQmCs2Railn4YUiww4SzUedJ6+uzwFnKLw==
