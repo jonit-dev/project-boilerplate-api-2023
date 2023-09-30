@@ -59,20 +59,22 @@ export class PathfindingQueue {
       console.log(`Pathfinding job ${job?.id} failed with error ${err.message}`);
     });
 
-    this.queue.on("error", (error) => {
-      console.error("Error in the pathfindingQueue:", error);
-    });
+    if (!appEnv.general.IS_UNIT_TEST) {
+      this.queue.on("error", (error) => {
+        console.error("Error in the pathfindingQueue:", error);
+      });
 
-    process.on("SIGTERM", async () => {
-      await this.shutdown();
-      process.exit(0);
-    });
+      process.on("SIGTERM", async () => {
+        await this.shutdown();
+        process.exit(0);
+      });
 
-    process.on("SIGINT", async () => {
-      console.log("Received SIGINT. Gracefully shutting down...");
-      await this.shutdown();
-      process.exit(0);
-    });
+      process.on("SIGINT", async () => {
+        console.log("Received SIGINT. Gracefully shutting down...");
+        await this.shutdown();
+        process.exit(0);
+      });
+    }
   }
 
   public async clearAllJobs(): Promise<void> {
