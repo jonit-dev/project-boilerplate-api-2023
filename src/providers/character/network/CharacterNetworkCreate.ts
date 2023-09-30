@@ -35,6 +35,7 @@ import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
+import { socketEventsBinderControl } from "@providers/inversify/container";
 import { ItemMissingReferenceCleaner } from "@providers/item/cleaner/ItemMissingReferenceCleaner";
 import { Locker } from "@providers/locks/Locker";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
@@ -205,6 +206,7 @@ export class CharacterNetworkCreate {
         await this.socketSessionControl.deleteSession(character._id);
         // @ts-ignore
         channel.removeAllListeners?.(); // make sure we leave no left overs
+        await socketEventsBinderControl.unbindEvents(channel);
       });
     }
   }

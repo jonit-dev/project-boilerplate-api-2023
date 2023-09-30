@@ -1,6 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
-import { socketEventsBinder } from "@providers/inversify/container";
+import { socketEventsBinderControl } from "@providers/inversify/container";
 import { CharacterSocketEvents, ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosIO } from "./GeckosIO";
@@ -86,11 +86,12 @@ export class SocketAdapter implements ISocket {
           if (previousChannel) {
             await previousChannel.leave();
             previousChannel.removeAllListeners();
+            await socketEventsBinderControl.unbindEvents(previousChannel);
           }
         }
       }
 
-      socketEventsBinder.bindEvents(channel);
+      await socketEventsBinderControl.bindEvents(channel);
     });
   }
 

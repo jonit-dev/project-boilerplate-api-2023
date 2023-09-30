@@ -20,6 +20,7 @@ import { ServerBootstrap } from "@providers/server/ServerBootstrap";
 import { SkillIncrease } from "@providers/skill/SkillIncrease";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
+import { SocketEventsBinderControl } from "@providers/sockets/SocketEventsBinderControl";
 import { SpellLearn } from "@providers/spells/SpellLearn";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
@@ -61,6 +62,8 @@ export const npcManager = container.get<NPCManager>(NPCManager);
 export const npcMetaDataLoader = container.get<NPCLoader>(NPCLoader);
 export const unitTestHelper = container.get<UnitTestHelper>(UnitTestHelper);
 export const socketEventsBinder = container.get<SocketEventsBinder>(SocketEventsBinder);
+
+export const socketEventsBinderControl = container.get<SocketEventsBinderControl>(SocketEventsBinderControl);
 
 export const characterConnection = container.get<CharacterConnection>(CharacterConnection);
 
