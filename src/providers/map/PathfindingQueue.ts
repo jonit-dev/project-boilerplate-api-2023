@@ -14,6 +14,10 @@ export class PathfindingQueue {
   private worker: Worker;
 
   constructor(private pathfinder: Pathfinder, private pathfindingResults: PathfindingResults, private time: Time) {
+    if (appEnv.general.IS_UNIT_TEST) {
+      return;
+    }
+
     this.queue = new Queue("pathfinding", {
       connection: {
         host: appEnv.database.REDIS_CONTAINER,
@@ -59,22 +63,20 @@ export class PathfindingQueue {
       console.log(`Pathfinding job ${job?.id} failed with error ${err.message}`);
     });
 
-    if (!appEnv.general.IS_UNIT_TEST) {
-      this.queue.on("error", (error) => {
-        console.error("Error in the pathfindingQueue:", error);
-      });
+    this.queue.on("error", (error) => {
+      console.error("Error in the pathfindingQueue:", error);
+    });
 
-      process.on("SIGTERM", async () => {
-        await this.shutdown();
-        process.exit(0);
-      });
+    process.on("SIGTERM", async () => {
+      await this.shutdown();
+      process.exit(0);
+    });
 
-      process.on("SIGINT", async () => {
-        console.log("Received SIGINT. Gracefully shutting down...");
-        await this.shutdown();
-        process.exit(0);
-      });
-    }
+    process.on("SIGINT", async () => {
+      console.log("Received SIGINT. Gracefully shutting down...");
+      await this.shutdown();
+      process.exit(0);
+    });
   }
 
   public async clearAllJobs(): Promise<void> {

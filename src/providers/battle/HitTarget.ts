@@ -54,6 +54,10 @@ export class HitTarget {
     private entityEffectUse: EntityEffectUse,
     private battleDamageCalculator: BattleDamageCalculator
   ) {
+    if (appEnv.general.IS_UNIT_TEST) {
+      return;
+    }
+
     this.npcQueue = new Queue("npc-hit", {
       connection: {
         host: appEnv.database.REDIS_CONTAINER,
@@ -96,31 +100,29 @@ export class HitTarget {
       }
     );
 
-    if (!appEnv.general.IS_UNIT_TEST) {
-      this.npcQueue.on("error", (error) => {
-        console.error("Error in the npcQueue:", error);
-      });
+    this.npcQueue.on("error", (error) => {
+      console.error("Error in the npcQueue:", error);
+    });
 
-      this.characterQueue.on("error", (error) => {
-        console.error("Error in the characterQueue:", error);
-      });
+    this.characterQueue.on("error", (error) => {
+      console.error("Error in the characterQueue:", error);
+    });
 
-      this.worker.on("failed", (job, err) => {
-        console.log(`HitTarget Job ${job?.id} failed with error ${err.message}`);
-        // log details
-        console.log(job);
-      });
+    this.worker.on("failed", (job, err) => {
+      console.log(`HitTarget Job ${job?.id} failed with error ${err.message}`);
+      // log details
+      console.log(job);
+    });
 
-      process.on("SIGTERM", async () => {
-        await this.shutdown();
-        process.exit(0);
-      });
+    process.on("SIGTERM", async () => {
+      await this.shutdown();
+      process.exit(0);
+    });
 
-      process.on("SIGINT", async () => {
-        await this.shutdown();
-        process.exit(0);
-      });
-    }
+    process.on("SIGINT", async () => {
+      await this.shutdown();
+      process.exit(0);
+    });
   }
 
   @TrackNewRelicTransaction()
