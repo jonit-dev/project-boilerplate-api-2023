@@ -56,15 +56,14 @@ export class PathfindingQueue {
     );
 
     this.worker.on("failed", (job, err) => {
-      console.log(`Job ${job?.id} failed with error ${err.message}`);
+      console.log(`Pathfinding job ${job?.id} failed with error ${err.message}`);
     });
 
     this.queue.on("error", (error) => {
-      console.error("Error in the queue:", error);
+      console.error("Error in the pathfindingQueue:", error);
     });
 
     process.on("SIGTERM", async () => {
-      console.log("Received SIGTERM. Gracefully shutting down...");
       await this.shutdown();
       process.exit(0);
     });

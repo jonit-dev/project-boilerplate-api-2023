@@ -96,8 +96,28 @@ export class HitTarget {
       }
     );
 
+    this.npcQueue.on("error", (error) => {
+      console.error("Error in the npcQueue:", error);
+    });
+
+    this.characterQueue.on("error", (error) => {
+      console.error("Error in the characterQueue:", error);
+    });
+
     this.worker.on("failed", (job, err) => {
-      console.log(`Job ${job?.id} failed with error ${err.message}`);
+      console.log(`HitTarget Job ${job?.id} failed with error ${err.message}`);
+      // log details
+      console.log(job);
+    });
+
+    process.on("SIGTERM", async () => {
+      await this.shutdown();
+      process.exit(0);
+    });
+
+    process.on("SIGINT", async () => {
+      await this.shutdown();
+      process.exit(0);
     });
   }
 
@@ -114,6 +134,10 @@ export class HitTarget {
       return;
     }
 
+    if (!attacker || !target) {
+      return;
+    }
+
     if (attacker.type === EntityType.Character) {
       await this.characterQueue.add(
         "character-hit",
@@ -121,6 +145,11 @@ export class HitTarget {
         {
           removeOnComplete: true,
           removeOnFail: true,
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 200,
+          },
         }
       );
     } else {
@@ -130,21 +159,32 @@ export class HitTarget {
         {
           removeOnComplete: true,
           removeOnFail: true,
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 200,
+          },
         }
       );
     }
+  }
+
+  private async shutdown(): Promise<void> {
+    await this.npcQueue.close();
+    await this.characterQueue.close();
+    await this.worker.close();
   }
 
   public async clearAllQueueJobs(): Promise<void> {
     try {
       const jobs = await this.npcQueue.getJobs(["waiting", "active", "delayed", "paused"]);
       for (const job of jobs) {
-        await job.remove();
+        await job?.remove();
       }
 
       const jobs2 = await this.characterQueue.getJobs(["waiting", "active", "delayed", "paused"]);
       for (const job of jobs2) {
-        await job.remove();
+        await job?.remove();
       }
     } catch (error) {
       console.error(error);
