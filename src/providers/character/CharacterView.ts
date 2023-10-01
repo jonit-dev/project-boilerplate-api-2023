@@ -32,16 +32,15 @@ export class CharacterView {
   ): Promise<void> {
     if (!characterId) return;
 
-    if (await this.isOnCharacterView(characterId, viewElement.id, type)) {
-      return;
+    const currentElements = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
+
+    // If the element doesn't exist or currentElements is undefined, set/override it
+    if (!currentElements || !currentElements[viewElement.id]) {
+      await this.inMemoryHashTable.set(`character-view-${type}`, characterId, {
+        ...currentElements,
+        [viewElement.id]: viewElement,
+      });
     }
-
-    const currentViewElements = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
-
-    await this.inMemoryHashTable.set(`character-view-${type}`, characterId, {
-      ...currentViewElements,
-      [viewElement.id]: viewElement,
-    });
   }
 
   public async isOnCharacterView(characterId: string, elementId: string, type: CharacterViewType): Promise<boolean> {
@@ -53,17 +52,12 @@ export class CharacterView {
   public isOutOfCharacterView(characterX: number, characterY: number, x: number, y: number): boolean {
     const viewWidth = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
     const viewHeight = SOCKET_TRANSMISSION_ZONE_WIDTH * 2;
-
-    if (
+    return (
       x < characterX - viewWidth / 2 ||
       x > characterX + viewWidth / 2 ||
       y < characterY - viewHeight / 2 ||
       y > characterY + viewHeight / 2
-    ) {
-      return true;
-    }
-
-    return false;
+    );
   }
 
   @TrackNewRelicTransaction()
