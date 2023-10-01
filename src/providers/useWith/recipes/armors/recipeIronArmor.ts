@@ -9,18 +9,18 @@ export const recipeIronArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 15,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 10,
+      qty: 15,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Leather, 15],
-      [CraftingResourcesBlueprint.IronIngot, 25],
+      [CraftingResourcesBlueprint.Leather, 25],
+      [CraftingResourcesBlueprint.IronIngot, 15],
     ]),
   ],
 };

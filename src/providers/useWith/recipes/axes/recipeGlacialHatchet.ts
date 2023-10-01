@@ -9,23 +9,23 @@ export const recipeGlacialHatchet: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 10,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 10,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 10,
+      qty: 3,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 10],
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
+      [CraftingResourcesBlueprint.SteelIngot, 5],
+      [CraftingResourcesBlueprint.BlueSapphire, 2],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
     ]),
   ],
 };

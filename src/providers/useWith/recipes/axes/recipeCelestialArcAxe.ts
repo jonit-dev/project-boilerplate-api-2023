@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AxesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,28 +8,20 @@ export const recipeCelestialArcAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 20,
-    },
-    {
-      key: CraftingResourcesBlueprint.BlueSapphire,
       qty: 50,
     },
     {
+      key: CraftingResourcesBlueprint.BlueSapphire,
+      qty: 40,
+    },
+    {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 20,
+      qty: 40,
     },
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 20,
+      qty: 40,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 20],
-      [CraftingResourcesBlueprint.BlueSapphire, 50],
-      [CraftingResourcesBlueprint.WoodenBoard, 20],
-      [CraftingResourcesBlueprint.GoldenIngot, 20],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 32],
 };

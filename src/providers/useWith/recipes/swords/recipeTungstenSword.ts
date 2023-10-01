@@ -9,33 +9,28 @@ export const recipeTungstenSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 3,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 3,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.WoodenSticks,
-      qty: 4,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 4,
-    },
-    {
-      key: CraftingResourcesBlueprint.DragonHead,
-      qty: 1,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 3],
-      [CraftingResourcesBlueprint.GreenIngot, 3],
-      [CraftingResourcesBlueprint.WoodenSticks, 4],
-      [CraftingResourcesBlueprint.PhoenixFeather, 4],
-      [CraftingResourcesBlueprint.DragonHead, 1],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 5],
+      [CraftingResourcesBlueprint.GreenIngot, 4],
+      [CraftingResourcesBlueprint.WoodenSticks, 10],
+      [CraftingResourcesBlueprint.PhoenixFeather, 10],
     ]),
   ],
 };

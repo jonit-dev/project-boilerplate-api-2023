@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -9,19 +8,19 @@ export const recipeEmeraldBroadsword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 50,
+      qty: 130,
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 160,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 80,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 90,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.ElvenLeaf,
@@ -29,18 +28,8 @@ export const recipeEmeraldBroadsword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 9,
+      qty: 15,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreenIngot, 50],
-      [CraftingResourcesBlueprint.Herb, 160],
-      [CraftingResourcesBlueprint.WoodenBoard, 80],
-      [CraftingResourcesBlueprint.Jade, 90],
-      [CraftingResourcesBlueprint.ElvenLeaf, 100],
-      [CraftingResourcesBlueprint.DragonTooth, 9],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 37],
 };

@@ -17,7 +17,11 @@ export const recipeMysticCape: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 10,
+      qty: 12,
+    },
+    {
+      key: CraftingResourcesBlueprint.Leather,
+      qty: 25,
     },
   ],
   minCraftingRequirements: [
@@ -25,7 +29,8 @@ export const recipeMysticCape: IUseWithCraftingRecipe = {
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Eye, 10],
       [CraftingResourcesBlueprint.BlueSilk, 10],
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
+      [CraftingResourcesBlueprint.BlueSapphire, 15],
+      [CraftingResourcesBlueprint.Leather, 25],
     ]),
   ],
 };

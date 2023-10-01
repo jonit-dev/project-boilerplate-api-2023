@@ -9,7 +9,7 @@ export const recipeGuardianHelmet: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 10,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
@@ -17,15 +17,15 @@ export const recipeGuardianHelmet: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 10,
+      qty: 8,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 10],
+      [CraftingResourcesBlueprint.GoldenIngot, 8],
       [CraftingResourcesBlueprint.Leather, 10],
-      [CraftingResourcesBlueprint.Jade, 10],
+      [CraftingResourcesBlueprint.Jade, 8],
     ]),
   ],
 };

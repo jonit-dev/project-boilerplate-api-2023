@@ -17,11 +17,11 @@ export const recipeDiamondSword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 80,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.Jade,
-      qty: 60,
+      qty: 90,
     },
   ],
   minCraftingRequirements: [
@@ -29,8 +29,8 @@ export const recipeDiamondSword: IUseWithCraftingRecipe = {
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Diamond, 100],
       [CraftingResourcesBlueprint.SteelIngot, 130],
-      [CraftingResourcesBlueprint.WoodenBoard, 80],
-      [CraftingResourcesBlueprint.Jade, 60],
+      [CraftingResourcesBlueprint.WoodenBoard, 120],
+      [CraftingResourcesBlueprint.Jade, 90],
     ]),
   ],
 };

@@ -9,7 +9,7 @@ export const recipeSilverBulbMace: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 2,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
@@ -23,7 +23,7 @@ export const recipeSilverBulbMace: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 2],
+      [CraftingResourcesBlueprint.SilverIngot, 4],
       [CraftingResourcesBlueprint.Diamond, 1],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 2],
     ]),

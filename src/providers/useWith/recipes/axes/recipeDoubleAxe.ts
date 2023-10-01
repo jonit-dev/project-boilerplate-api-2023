@@ -9,18 +9,23 @@ export const recipeDoubleAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 3,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.WoodenSticks,
-      qty: 2,
+      qty: 20,
+    },
+    {
+      key: CraftingResourcesBlueprint.Leather,
+      qty: 25,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 3],
-      [CraftingResourcesBlueprint.WoodenSticks, 2],
+      [CraftingResourcesBlueprint.IronIngot, 25],
+      [CraftingResourcesBlueprint.WoodenSticks, 20],
+      [CraftingResourcesBlueprint.Leather, 25],
     ]),
   ],
 };

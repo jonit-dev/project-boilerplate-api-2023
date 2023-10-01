@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -13,19 +12,12 @@ export const recipeVortexStaff: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 60,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 20,
+      qty: 120,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 130],
-      [CraftingResourcesBlueprint.BlueSapphire, 60],
-      [CraftingResourcesBlueprint.MagicRecipe, 20],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 36],
 };

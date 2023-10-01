@@ -8,8 +8,8 @@ export const recipeWoodenShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 5,
+      qty: 4,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Lumberjacking, 3],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 1],
 };

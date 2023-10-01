@@ -9,7 +9,7 @@ export const recipeCursedBolt: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 5,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
@@ -27,7 +27,7 @@ export const recipeCursedBolt: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CorruptionIngot, 5],
+      [CraftingResourcesBlueprint.CorruptionIngot, 8],
       [CraftingResourcesBlueprint.Skull, 10],
       [CraftingResourcesBlueprint.Bone, 20],
       [CraftingResourcesBlueprint.WoodenSticks, 20],

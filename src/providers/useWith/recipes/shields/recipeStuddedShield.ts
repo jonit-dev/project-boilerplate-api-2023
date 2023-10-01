@@ -9,11 +9,11 @@ export const recipeStuddedShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 15,
+      qty: 8,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([[CraftingResourcesBlueprint.WoodenBoard, 15]]),
+    calculateMinimumLevel([[CraftingResourcesBlueprint.WoodenBoard, 8]]),
   ],
 };

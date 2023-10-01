@@ -10,28 +10,28 @@ export const recipePlateShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 4,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 2,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 1,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 1,
+      qty: 2,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 4],
-      [CraftingResourcesBlueprint.PolishedStone, 2],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 1],
-      [CraftingResourcesBlueprint.SteelIngot, 1],
+      [CraftingResourcesBlueprint.IronIngot, 15],
+      [CraftingResourcesBlueprint.PolishedStone, 15],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 15],
+      [CraftingResourcesBlueprint.SteelIngot, 2],
     ]),
   ],
 };

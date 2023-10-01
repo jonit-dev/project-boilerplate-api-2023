@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -13,7 +12,7 @@ export const recipeBloodseekerBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 20,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
@@ -21,21 +20,12 @@ export const recipeBloodseekerBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 50,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 20,
+      qty: 80,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Bones, 100],
-      [CraftingResourcesBlueprint.Herb, 20],
-      [CraftingResourcesBlueprint.Skull, 100],
-      [CraftingResourcesBlueprint.WoodenBoard, 50],
-      [CraftingResourcesBlueprint.SteelIngot, 20],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 36],
 };

@@ -10,6 +10,10 @@ export const recipeFarmersBoots: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Leather,
       qty: 10,
     },
+    {
+      key: CraftingResourcesBlueprint.IronIngot,
+      qty: 5,
+    },
   ],
-  minCraftingRequirements: [CraftingSkill.Blacksmithing, 3],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 5],
 };

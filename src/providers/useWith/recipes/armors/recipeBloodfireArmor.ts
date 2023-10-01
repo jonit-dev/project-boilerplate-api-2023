@@ -9,28 +9,28 @@ export const recipeBloodfireArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 15,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 25,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 25,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 10,
+      qty: 75,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 15],
-      [CraftingResourcesBlueprint.SteelIngot, 25],
-      [CraftingResourcesBlueprint.GoldenIngot, 25],
-      [CraftingResourcesBlueprint.RedSapphire, 10],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 80],
+      [CraftingResourcesBlueprint.SteelIngot, 120],
+      [CraftingResourcesBlueprint.GoldenIngot, 100],
+      [CraftingResourcesBlueprint.RedSapphire, 75],
     ]),
   ],
 };

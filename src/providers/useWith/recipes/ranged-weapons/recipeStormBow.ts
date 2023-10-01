@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
@@ -13,23 +12,20 @@ export const recipeStormBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Rope,
-      qty: 3,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 5,
+      qty: 25,
     },
     {
       key: MagicsBlueprint.EnergyBoltRune,
       qty: 10,
     },
+    {
+      key: CraftingResourcesBlueprint.ObsidiumOre,
+      qty: 15,
+    },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Rope, 3],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
-      [CraftingResourcesBlueprint.MagicRecipe, 10],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 25],
 };

@@ -9,7 +9,7 @@ export const recipeSilverAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 6,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
@@ -17,15 +17,15 @@ export const recipeSilverAxe: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 2,
+      qty: 4,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 6],
+      [CraftingResourcesBlueprint.SilverIngot, 8],
       [CraftingResourcesBlueprint.Leather, 2],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 2],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 4],
     ]),
   ],
 };

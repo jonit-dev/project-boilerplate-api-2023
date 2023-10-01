@@ -13,23 +13,28 @@ export const recipeRuneBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Rope,
-      qty: 5,
+      qty: 10,
     },
     {
       key: MagicsBlueprint.CorruptionRune,
-      qty: 5,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 5,
+      qty: 10,
+    },
+    {
+      key: CraftingResourcesBlueprint.BlueSapphire,
+      qty: 15,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Rope, 5],
-      [CraftingResourcesBlueprint.MagicRecipe, 5],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.Rope, 10],
+      [CraftingResourcesBlueprint.MagicRecipe, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
+      [CraftingResourcesBlueprint.BlueSapphire, 15],
     ]),
   ],
 };

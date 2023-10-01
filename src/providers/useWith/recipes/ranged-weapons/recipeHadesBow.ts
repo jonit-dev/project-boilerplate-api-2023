@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
@@ -16,25 +15,17 @@ export const recipeHadesBow: IUseWithCraftingRecipe = {
       qty: 2,
     },
     {
-      key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 5,
+      key: CraftingResourcesBlueprint.GreaterWoodenLog,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 5,
+      qty: 7,
     },
     {
       key: MagicsBlueprint.DarkRune,
       qty: 5,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Rope, 2],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
-      [CraftingResourcesBlueprint.CorruptionIngot, 5],
-      [CraftingResourcesBlueprint.MagicRecipe, 5],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 17],
 };

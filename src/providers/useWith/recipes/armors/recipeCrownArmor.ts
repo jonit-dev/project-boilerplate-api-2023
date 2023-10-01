@@ -9,28 +9,28 @@ export const recipeCrownArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 25,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 25,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 20,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 20,
+      qty: 45,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 25],
-      [CraftingResourcesBlueprint.GoldenIngot, 25],
-      [CraftingResourcesBlueprint.PhoenixFeather, 20],
-      [CraftingResourcesBlueprint.RedSapphire, 20],
+      [CraftingResourcesBlueprint.SteelIngot, 60],
+      [CraftingResourcesBlueprint.GoldenIngot, 60],
+      [CraftingResourcesBlueprint.PhoenixFeather, 70],
+      [CraftingResourcesBlueprint.RedSapphire, 45],
     ]),
   ],
 };

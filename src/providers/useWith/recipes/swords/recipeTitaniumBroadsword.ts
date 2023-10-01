@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -13,7 +12,7 @@ export const recipeTitaniumBroadsword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 30,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.Rock,
@@ -21,16 +20,8 @@ export const recipeTitaniumBroadsword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 30,
+      qty: 80,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreenIngot, 80],
-      [CraftingResourcesBlueprint.SteelIngot, 30],
-      [CraftingResourcesBlueprint.Rock, 80],
-      [CraftingResourcesBlueprint.WoodenBoard, 30],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 32],
 };

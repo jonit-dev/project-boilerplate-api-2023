@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,7 +8,7 @@ export const recipeGaleGuardianGripCrossbow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 40,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.BlueFeather,
@@ -21,16 +20,8 @@ export const recipeGaleGuardianGripCrossbow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumOre,
-      qty: 30,
+      qty: 60,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 40],
-      [CraftingResourcesBlueprint.BlueFeather, 80],
-      [CraftingResourcesBlueprint.WoodenBoard, 90],
-      [CraftingResourcesBlueprint.ObsidiumOre, 30],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 32],
 };

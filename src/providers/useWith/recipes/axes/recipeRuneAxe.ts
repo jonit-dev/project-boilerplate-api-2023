@@ -13,23 +13,23 @@ export const recipeRuneAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 5,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 10,
+      qty: 5,
     },
     {
       key: MagicsBlueprint.DarkRune,
-      qty: 5,
+      qty: 1,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 5],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
-      [CraftingResourcesBlueprint.MagicRecipe, 5],
+      [CraftingResourcesBlueprint.SteelIngot, 4],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
+      [CraftingResourcesBlueprint.MagicRecipe, 1],
     ]),
   ],
 };

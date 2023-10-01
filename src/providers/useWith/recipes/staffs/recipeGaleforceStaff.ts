@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -17,20 +16,12 @@ export const recipeGaleforceStaff: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 50,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 10,
+      qty: 15,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ElvenWood, 160],
-      [CraftingResourcesBlueprint.BlueFeather, 150],
-      [CraftingResourcesBlueprint.MagicRecipe, 50],
-      [CraftingResourcesBlueprint.DragonTooth, 10],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 39],
 };

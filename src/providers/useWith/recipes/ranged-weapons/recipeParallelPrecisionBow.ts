@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,7 +8,7 @@ export const recipeParallelPrecisionBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.WoodenSticks,
-      qty: 30,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.Silk,
@@ -17,20 +16,12 @@ export const recipeParallelPrecisionBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 15,
+      qty: 40,
     },
     {
       key: CraftingResourcesBlueprint.SewingThread,
-      qty: 30,
+      qty: 40,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.WoodenSticks, 30],
-      [CraftingResourcesBlueprint.Silk, 80],
-      [CraftingResourcesBlueprint.ElvenWood, 15],
-      [CraftingResourcesBlueprint.SewingThread, 30],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 28],
 };

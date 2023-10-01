@@ -13,7 +13,7 @@ export const recipeLightingCrossbow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 10,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.Rope,
@@ -21,16 +21,16 @@ export const recipeLightingCrossbow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 10,
+      qty: 3,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
+      [CraftingResourcesBlueprint.BlueSapphire, 5],
       [CraftingResourcesBlueprint.Rope, 10],
-      [CraftingResourcesBlueprint.SteelIngot, 10],
+      [CraftingResourcesBlueprint.SteelIngot, 3],
     ]),
   ],
 };

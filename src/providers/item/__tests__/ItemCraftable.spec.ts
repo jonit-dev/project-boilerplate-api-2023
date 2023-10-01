@@ -132,7 +132,7 @@ describe("ItemCraftable.ts", () => {
     });
 
     await unitTestHelper.addItemsToContainer(inventoryContainer, 6, [
-      await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.IronNail, { stackQty: 20 }),
+      await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.IronNail, { stackQty: 10 }),
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.GreaterWoodenLog, { stackQty: 4 }),
       await unitTestHelper.createMockItemFromBlueprint(CraftingResourcesBlueprint.Skull, { stackQty: 1 }),
     ]);

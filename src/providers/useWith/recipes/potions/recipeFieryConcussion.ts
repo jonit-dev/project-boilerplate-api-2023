@@ -19,5 +19,5 @@ export const recipeFieryConcussion: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, 12],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 10],
 };

@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,7 +8,7 @@ export const recipeDragonWingBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 30,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
@@ -21,16 +20,8 @@ export const recipeDragonWingBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 20,
+      qty: 100,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 30],
-      [CraftingResourcesBlueprint.DragonTooth, 10],
-      [CraftingResourcesBlueprint.WoodenBoard, 100],
-      [CraftingResourcesBlueprint.CorruptionIngot, 20],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 38],
 };

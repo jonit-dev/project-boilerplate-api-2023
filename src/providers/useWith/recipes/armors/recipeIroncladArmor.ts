@@ -12,7 +12,7 @@ export const recipeIroncladArmor: IUseWithCraftingRecipe = {
       qty: 25,
     },
     {
-      key: CraftingResourcesBlueprint.GreenIngot,
+      key: CraftingResourcesBlueprint.GoldenIngot,
       qty: 10,
     },
     {

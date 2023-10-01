@@ -19,5 +19,5 @@ export const recipeLightEndurancePotion: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, 1],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 4],
 };

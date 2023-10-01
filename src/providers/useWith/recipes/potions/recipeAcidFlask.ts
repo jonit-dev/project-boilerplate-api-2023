@@ -19,5 +19,5 @@ export const recipeAcidFlask: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, 7],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 5],
 };

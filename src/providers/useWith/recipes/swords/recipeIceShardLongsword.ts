@@ -9,23 +9,23 @@ export const recipeIceShardLongsword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 8,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 3,
+      qty: 6,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 2,
+      qty: 3,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 8],
-      [CraftingResourcesBlueprint.BlueSapphire, 3],
-      [CraftingResourcesBlueprint.SteelIngot, 2],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
+      [CraftingResourcesBlueprint.BlueSapphire, 6],
+      [CraftingResourcesBlueprint.SteelIngot, 3],
     ]),
   ],
 };

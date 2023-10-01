@@ -9,18 +9,18 @@ export const recipeBrassArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 15,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 25,
+      qty: 18,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Leather, 15],
-      [CraftingResourcesBlueprint.CopperIngot, 25],
+      [CraftingResourcesBlueprint.Leather, 20],
+      [CraftingResourcesBlueprint.CopperIngot, 18],
     ]),
   ],
 };

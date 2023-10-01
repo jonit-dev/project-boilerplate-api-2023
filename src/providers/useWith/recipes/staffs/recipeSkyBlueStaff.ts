@@ -9,15 +9,15 @@ export const recipeBlueSkyStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 10,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.BlueFeather,
-      qty: 10,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 3,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.BlueSilk,
@@ -27,9 +27,9 @@ export const recipeBlueSkyStaff: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
-      [CraftingResourcesBlueprint.BlueFeather, 10],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
+      [CraftingResourcesBlueprint.BlueSapphire, 8],
+      [CraftingResourcesBlueprint.BlueFeather, 8],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 4],
       [CraftingResourcesBlueprint.BlueSilk, 3],
     ]),
   ],

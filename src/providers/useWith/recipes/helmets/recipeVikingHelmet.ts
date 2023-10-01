@@ -9,28 +9,28 @@ export const recipeVikingHelmet: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 3,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.WolfTooth,
-      qty: 2,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 2,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 2,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 3],
-      [CraftingResourcesBlueprint.WolfTooth, 2],
-      [CraftingResourcesBlueprint.Leather, 2],
-      [CraftingResourcesBlueprint.Skull, 2],
+      [CraftingResourcesBlueprint.IronIngot, 5],
+      [CraftingResourcesBlueprint.WolfTooth, 5],
+      [CraftingResourcesBlueprint.Leather, 10],
+      [CraftingResourcesBlueprint.Skull, 5],
     ]),
   ],
 };

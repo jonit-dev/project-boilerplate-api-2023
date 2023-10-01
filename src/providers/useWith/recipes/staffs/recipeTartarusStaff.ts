@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
@@ -13,40 +12,32 @@ export const recipeTartarusStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: MagicsBlueprint.CorruptionRune,
-      qty: 10,
+      qty: 5,
     },
     {
       key: MagicsBlueprint.DarkRune,
-      qty: 10,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 25,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 10,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 10,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 10,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 10,
+      qty: 5,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
-      [CraftingResourcesBlueprint.BlueFeather, 10],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
-      [CraftingResourcesBlueprint.BlueSilk, 3],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 24],
 };

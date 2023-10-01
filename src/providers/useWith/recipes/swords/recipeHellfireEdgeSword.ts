@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -9,28 +8,20 @@ export const recipeHellfireEdgeSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 70,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 100,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 100,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 50,
+      qty: 120,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CorruptionIngot, 70],
-      [CraftingResourcesBlueprint.RedSapphire, 100],
-      [CraftingResourcesBlueprint.BlueSapphire, 100],
-      [CraftingResourcesBlueprint.SteelIngot, 50],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 36],
 };

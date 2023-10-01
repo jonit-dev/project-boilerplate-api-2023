@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill, MagicsBlueprint } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -9,7 +8,7 @@ export const recipeThunderStrikeSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 50,
+      qty: 90,
     },
     {
       key: MagicsBlueprint.ThunderRune,
@@ -17,15 +16,8 @@ export const recipeThunderStrikeSword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 50,
+      qty: 100,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CorruptionIngot, 50],
-      [MagicsBlueprint.ThunderRune, 100],
-      [CraftingResourcesBlueprint.WoodenBoard, 50],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 30],
 };

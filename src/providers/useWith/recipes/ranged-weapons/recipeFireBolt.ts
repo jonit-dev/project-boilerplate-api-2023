@@ -9,7 +9,7 @@ export const recipeFireBolt: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 1,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
@@ -23,7 +23,7 @@ export const recipeFireBolt: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SmallWoodenStick, 1],
+      [CraftingResourcesBlueprint.ElvenWood, 4],
       [CraftingResourcesBlueprint.SteelIngot, 1],
       [CraftingResourcesBlueprint.RedSapphire, 1],
     ]),

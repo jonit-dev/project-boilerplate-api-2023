@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AxesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,23 +8,20 @@ export const recipeRustBreakerAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 100,
+      qty: 75,
+    },
+    {
+      key: CraftingResourcesBlueprint.SilverIngot,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 20,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 40,
+      qty: 70,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 100],
-      [CraftingResourcesBlueprint.CorruptionIngot, 20],
-      [CraftingResourcesBlueprint.WoodenBoard, 40],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 34],
 };

@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, ShieldsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,7 +8,7 @@ export const recipeTemporalRoundShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 60,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.SilverIngot,
@@ -20,12 +19,5 @@ export const recipeTemporalRoundShield: IUseWithCraftingRecipe = {
       qty: 20,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 60],
-      [CraftingResourcesBlueprint.SilverIngot, 140],
-      [CraftingResourcesBlueprint.MagicRecipe, 20],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 34],
 };

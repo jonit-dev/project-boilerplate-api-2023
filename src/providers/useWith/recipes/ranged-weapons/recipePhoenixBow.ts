@@ -13,7 +13,7 @@ export const recipePhoenixBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 15,
+      qty: 12,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
@@ -24,7 +24,7 @@ export const recipePhoenixBow: IUseWithCraftingRecipe = {
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.Rope, 2],
-      [CraftingResourcesBlueprint.PhoenixFeather, 15],
+      [CraftingResourcesBlueprint.PhoenixFeather, 12],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
     ]),
   ],

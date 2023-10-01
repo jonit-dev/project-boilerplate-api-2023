@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -9,23 +8,16 @@ export const recipeFireburstWand: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenOre,
-      qty: 50,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 70,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 20,
+      qty: 40,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenOre, 50],
-      [CraftingResourcesBlueprint.RedSapphire, 70],
-      [CraftingResourcesBlueprint.MagicRecipe, 20],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 33],
 };

@@ -9,23 +9,23 @@ export const recipeMoonshadeSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 40,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 50,
+      qty: 40,
     },
     {
       key: CraftingResourcesBlueprint.BlueSilk,
-      qty: 60,
+      qty: 50,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 40],
-      [CraftingResourcesBlueprint.BlueSapphire, 50],
-      [CraftingResourcesBlueprint.BlueSilk, 60],
+      [CraftingResourcesBlueprint.SilverIngot, 60],
+      [CraftingResourcesBlueprint.BlueSapphire, 40],
+      [CraftingResourcesBlueprint.BlueSilk, 50],
     ]),
   ],
 };

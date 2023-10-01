@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -13,7 +12,7 @@ export const recipeStoneBreakerBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 40,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
@@ -21,16 +20,8 @@ export const recipeStoneBreakerBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 80,
+      qty: 90,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 90],
-      [CraftingResourcesBlueprint.PolishedStone, 40],
-      [CraftingResourcesBlueprint.WoodenBoard, 80],
-      [CraftingResourcesBlueprint.PhoenixFeather, 80],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 34],
 };

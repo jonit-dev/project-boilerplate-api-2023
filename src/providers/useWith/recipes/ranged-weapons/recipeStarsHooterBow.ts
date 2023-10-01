@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,23 +8,16 @@ export const recipeStarsHooterBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 90,
+      qty: 110,
     },
     {
       key: CraftingResourcesBlueprint.Diamond,
-      qty: 80,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 40,
+      qty: 120,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 90],
-      [CraftingResourcesBlueprint.Diamond, 80],
-      [CraftingResourcesBlueprint.WoodenBoard, 40],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 39],
 };

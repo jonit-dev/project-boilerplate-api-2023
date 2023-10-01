@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,7 +8,7 @@ export const recipeIronBarkBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 30,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.IronNail,
@@ -17,20 +16,12 @@ export const recipeIronBarkBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 10,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.CorruptionIngot,
-      qty: 30,
+      qty: 40,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.WoodenBoard, 30],
-      [CraftingResourcesBlueprint.IronNail, 80],
-      [CraftingResourcesBlueprint.ElvenWood, 10],
-      [CraftingResourcesBlueprint.CorruptionIngot, 30],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 30],
 };

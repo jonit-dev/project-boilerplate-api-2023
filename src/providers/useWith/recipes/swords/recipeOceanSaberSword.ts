@@ -9,28 +9,28 @@ export const recipeOceanSaberSword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueSilk,
-      qty: 30,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 80,
+      qty: 7,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 50,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 50,
+      qty: 7,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueSilk, 30],
-      [CraftingResourcesBlueprint.BlueSapphire, 80],
-      [CraftingResourcesBlueprint.WoodenBoard, 50],
-      [CraftingResourcesBlueprint.SteelIngot, 50],
+      [CraftingResourcesBlueprint.BlueSilk, 8],
+      [CraftingResourcesBlueprint.BlueSapphire, 7],
+      [CraftingResourcesBlueprint.WoodenBoard, 8],
+      [CraftingResourcesBlueprint.SteelIngot, 7],
     ]),
   ],
 };

@@ -12,12 +12,12 @@ export const recipeCorrosiveElixir: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WaterBottle,
-      qty: 2,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.CorruptionOre,
-      qty: 1,
+      qty: 3,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, 5],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 20],
 };

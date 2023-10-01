@@ -9,33 +9,33 @@ export const recipeYggdrasilBroadsword: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 100,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.GoldenOre,
-      qty: 50,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.Bones,
-      qty: 40,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.WoodenSticks,
-      qty: 90,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 50,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ElvenWood, 100],
-      [CraftingResourcesBlueprint.GoldenOre, 50],
-      [CraftingResourcesBlueprint.Bones, 40],
-      [CraftingResourcesBlueprint.WoodenSticks, 90],
-      [CraftingResourcesBlueprint.IronIngot, 50],
+      [CraftingResourcesBlueprint.ElvenWood, 30],
+      [CraftingResourcesBlueprint.GoldenOre, 20],
+      [CraftingResourcesBlueprint.Bones, 20],
+      [CraftingResourcesBlueprint.WoodenSticks, 20],
+      [CraftingResourcesBlueprint.IronIngot, 20],
     ]),
   ],
 };
