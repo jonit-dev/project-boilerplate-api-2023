@@ -248,9 +248,9 @@ describe("CharacterView.ts", () => {
     const characterViewCharacters = await characterView.getAllElementsOnView(testCharacter, "characters");
 
     // match any object with { id: "testId1" }
-    expect(characterViewItems).toMatchObject({ testId1: viewElement1 });
-    expect(characterViewNpcs).toMatchObject({ testId2: viewElement2 });
-    expect(characterViewCharacters).toMatchObject({ testId3: viewElement3 });
+    expect(characterViewItems).toStrictEqual([viewElement1]);
+    expect(characterViewNpcs).toStrictEqual([viewElement2]);
+    expect(characterViewCharacters).toStrictEqual([viewElement3]);
 
     await characterView.clearAllOutOfViewElements(testCharacter._id, testCharacter.x, testCharacter.y);
 

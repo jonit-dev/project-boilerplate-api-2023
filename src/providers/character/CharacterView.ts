@@ -117,8 +117,17 @@ export class CharacterView {
   public async getAllElementsOnView(
     character: ICharacter,
     type: CharacterViewType
-  ): Promise<Record<string, IViewElement> | undefined> {
-    return await this.inMemoryHashTable.get(`character-view-${type}`, character._id);
+  ): Promise<IViewElement[] | undefined> {
+    const allElements = (await this.inMemoryHashTable.get(`character-view-${type}`, character._id)) as Record<
+      string,
+      IViewElement
+    >;
+
+    if (!allElements) {
+      return;
+    }
+
+    return Object.values(allElements);
   }
 
   @TrackNewRelicTransaction()
