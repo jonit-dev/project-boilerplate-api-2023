@@ -4,6 +4,7 @@ import { spellPhysicalShield } from "./SpellPhysicalShield";
 import { spellPowerStrike } from "./SpellPowerStrike";
 import { spellStunTarget } from "./SpellStunTarget";
 import { spellBleedingEdge } from "./SpellBleedingEdge";
+import { spellCleavingStomp } from "./SpellCleavingStomp";
 
 export const warriorSpellsIndex = {
   [SpellsBlueprint.SpellPhysicalShield]: spellPhysicalShield,
@@ -11,4 +12,5 @@ export const warriorSpellsIndex = {
   [SpellsBlueprint.FortifyDefense]: spellFortifyDefense,
   [SpellsBlueprint.PowerStrike]: spellPowerStrike,
   [SpellsBlueprint.BleedingEdge]: spellBleedingEdge,
+  [SpellsBlueprint.CleavingStomp]: spellCleavingStomp,
 };

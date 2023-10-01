@@ -49,6 +49,7 @@ export enum SpellsBlueprint {
   CurseOfWeakness = "curse-of-weakness",
   SpellPolymorph = "spell-polymorph",
   SorcererVeilofUndeath = "veil-of-undeath",
+  CleavingStomp = "cleaving-stomp",
 }
 
 export interface ISpell {
