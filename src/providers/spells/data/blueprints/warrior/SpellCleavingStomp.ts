@@ -35,11 +35,12 @@ export const spellCleavingStomp: Partial<ISpell> = {
     const spellArea = container.get(SpellArea);
     const spellCalculator = container.get(SpellCalculator);
 
-    const skillDamage = await spellCalculator.spellDamageCalculator(caster, BasicAttribute.Strength, {
-      level: true,
-      minLevelMultiplier: 0.5,
-      maxLevelMultiplier: 0.8,
-    });
+    const skillDamage =
+      (await spellCalculator.spellDamageCalculator(caster, BasicAttribute.Strength, {
+        level: true,
+        minLevelMultiplier: 0.5,
+        maxLevelMultiplier: 0.8,
+      })) / 3;
 
     await spellArea.cast(caster, caster, skillDamage, {
       effectAnimationKey: AnimationEffectKeys.HitEnergy,
