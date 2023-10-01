@@ -1,5 +1,7 @@
 import { BattleSocketEvents, ChatSocketEvents, ItemSocketEvents } from "@rpg-engine/shared";
 
+import os from "os";
+
 export const USER_CONTROL_ONLINE = {
   MAX_NUMBER_OF_PLAYERS: 30,
   MAX_NUMBER_ACC_PER_USER: 20,
@@ -42,6 +44,6 @@ export const DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT = 70;
 
 export const DEBOUNCEABLE_EVENTS = [ItemSocketEvents.LoadCraftBook, ItemSocketEvents.CraftItem] as string[];
 
-export const PROMISE_DEFAULT_CONCURRENCY = 100;
+export const PROMISE_DEFAULT_CONCURRENCY = os.cpus().length || 2;
 
 export const MAX_PING_TRACKING_THRESHOLD = 10000;

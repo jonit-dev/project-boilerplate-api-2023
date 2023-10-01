@@ -1,12 +1,16 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { PROMISE_DEFAULT_CONCURRENCY } from "@providers/constants/ServerConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { MathHelper } from "@providers/math/MathHelper";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, IViewElement, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
+import { Promise } from "bluebird";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { Model } from "mongoose";
+
 export interface ICharacterDistance {
   id: string;
   distance: number;
@@ -60,11 +64,18 @@ export class CharacterView {
     );
   }
 
+  @TrackExecutionTime()
   @TrackNewRelicTransaction()
   public async clearAllOutOfViewElements(characterId: string, characterX: number, characterY: number): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
-    const clearPromises = types.map((type) => this.clearOutOfViewElements(characterId, characterX, characterY, type));
-    await Promise.all(clearPromises);
+
+    await Promise.map(
+      types,
+      async (type) => {
+        await this.clearOutOfViewElements(characterId, characterX, characterY, type);
+      },
+      { concurrency: PROMISE_DEFAULT_CONCURRENCY }
+    );
   }
 
   @TrackNewRelicTransaction()
@@ -74,22 +85,22 @@ export class CharacterView {
     characterY: number,
     type: CharacterViewType
   ): Promise<void> {
-    const hasView = await this.inMemoryHashTable.has(`character-view-${type}`, characterId);
-    if (!hasView) {
-      return;
-    }
-
     const elementsOnView = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
+
     if (!elementsOnView) {
       return;
     }
 
-    for (const elementId in elementsOnView) {
-      const element = elementsOnView[elementId] as IViewElement;
-      if (this.isOutOfCharacterView(characterX, characterY, element.x, element.y)) {
-        await this.removeFromCharacterView(characterId, elementId, type);
-      }
-    }
+    await Promise.map(
+      Object.keys(elementsOnView),
+      async (elementId) => {
+        const element = elementsOnView[elementId] as IViewElement;
+        if (this.isOutOfCharacterView(characterX, characterY, element.x, element.y)) {
+          await this.removeFromCharacterView(characterId, elementId, type);
+        }
+      },
+      { concurrency: PROMISE_DEFAULT_CONCURRENCY }
+    );
   }
 
   @TrackNewRelicTransaction()

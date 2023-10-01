@@ -120,7 +120,7 @@ export class NPCMovement {
           await this.npcTarget.clearTarget(npc);
         }
 
-        const isOnCharView = this.characterView.isOnCharacterView(character._id, npc._id, "npcs");
+        const isOnCharView = await this.characterView.isOnCharacterView(character._id, npc._id, "npcs");
 
         if (!isOnCharView) {
           await this.npcWarn.warnCharacterAboutSingleNPCCreation(npc, character);
