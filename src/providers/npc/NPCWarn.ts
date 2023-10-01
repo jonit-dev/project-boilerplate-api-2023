@@ -33,10 +33,10 @@ export class NPCWarn {
   @TrackNewRelicTransaction()
   public async warnCharacterAboutNPCsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     // Fetch all NPCs in view first, before entering loop
-    const npcsInView = await this.npcView.getNPCsInView(character);
+    const npcsNearby = await this.npcView.getNPCsInView(character);
 
     const npcWarnings = Promise.map(
-      npcsInView,
+      npcsNearby,
       async (npc) => {
         if (!options?.always) {
           // Fetch all elements and proceed with object checks

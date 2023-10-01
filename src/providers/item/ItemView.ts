@@ -92,16 +92,14 @@ export class ItemView {
   public async warnCharacterAboutItemsInView(character: ICharacter, options?: IWarnOptions): Promise<void> {
     const itemsNearby = await this.getItemsInCharacterView(character);
 
-    const [itemsOnCharView] = await Promise.all([
-      Promise.map(itemsNearby, (item) => this.characterView.getElementOnView(character, item._id, "items")),
-    ]);
+    const itemsOnCharView = await this.characterView.getAllElementsOnView(character, "items");
 
     const itemsToUpdate: IItemUpdate[] = [];
     const addToViewPromises: Promise<void>[] = [];
 
     for (let i = 0; i < itemsNearby.length; i++) {
       const item = itemsNearby[i];
-      const itemOnCharView = itemsOnCharView[i];
+      const itemOnCharView = itemsOnCharView?.[i];
 
       const shouldSkip =
         !options?.always &&
