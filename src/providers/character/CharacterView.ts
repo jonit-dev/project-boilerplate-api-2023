@@ -1,5 +1,4 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { TrackExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { PROMISE_DEFAULT_CONCURRENCY } from "@providers/constants/ServerConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -64,7 +63,6 @@ export class CharacterView {
     );
   }
 
-  @TrackExecutionTime()
   @TrackNewRelicTransaction()
   public async clearAllOutOfViewElements(characterId: string, characterX: number, characterY: number): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
@@ -86,21 +84,16 @@ export class CharacterView {
     type: CharacterViewType
   ): Promise<void> {
     const elementsOnView = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
-
     if (!elementsOnView) {
       return;
     }
 
-    await Promise.map(
-      Object.keys(elementsOnView),
-      async (elementId) => {
-        const element = elementsOnView[elementId] as IViewElement;
-        if (this.isOutOfCharacterView(characterX, characterY, element.x, element.y)) {
-          await this.removeFromCharacterView(characterId, elementId, type);
-        }
-      },
-      { concurrency: PROMISE_DEFAULT_CONCURRENCY }
-    );
+    for (const elementId in elementsOnView) {
+      const element = elementsOnView[elementId] as IViewElement;
+      if (this.isOutOfCharacterView(characterX, characterY, element.x, element.y)) {
+        await this.removeFromCharacterView(characterId, elementId, type);
+      }
+    }
   }
 
   @TrackNewRelicTransaction()
