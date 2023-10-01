@@ -215,6 +215,29 @@ describe("CharacterView.ts", () => {
     expect(hasTestId2).toEqual(false);
   });
 
+  it("properly adds multiple elements in a view as a batch", async () => {
+    const viewElement1 = {
+      id: "testId1",
+      x: FromGridX(2),
+      y: FromGridY(2),
+      scene: "example",
+    };
+    const viewElement2 = {
+      id: "testId2",
+      x: FromGridX(3),
+      y: FromGridY(3),
+      scene: "example",
+    };
+
+    await characterView.batchAddToCharacterView(testCharacter._id, [viewElement1, viewElement2], "items");
+
+    const hasTestId1 = await characterView.hasElementOnView(testCharacter, "testId1", "items");
+    const hasTestId2 = await characterView.hasElementOnView(testCharacter, "testId2", "items");
+
+    expect(hasTestId1).toEqual(true);
+    expect(hasTestId2).toEqual(true);
+  });
+
   it("should clear elements of all types that are out of the character's view", async () => {
     const viewElement1 = {
       id: "testId1",

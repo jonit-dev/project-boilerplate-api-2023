@@ -46,6 +46,29 @@ export class CharacterView {
     }
   }
 
+  @TrackNewRelicTransaction()
+  public async batchAddToCharacterView(
+    characterId: string,
+    viewElements: IViewElement[],
+    type: CharacterViewType
+  ): Promise<void> {
+    if (!characterId || !viewElements.length) return;
+
+    const currentElements = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
+
+    const newElements = viewElements.reduce((acc, element) => {
+      if (!currentElements || !currentElements[element.id]) {
+        acc[element.id] = element;
+      }
+      return acc;
+    }, {} as Record<string, IViewElement>);
+
+    if (Object.keys(newElements).length > 0) {
+      const mergedElements = Object.assign({}, currentElements, newElements);
+      await this.inMemoryHashTable.set(`character-view-${type}`, characterId, mergedElements);
+    }
+  }
+
   public async isOnCharacterView(characterId: string, elementId: string, type: CharacterViewType): Promise<boolean> {
     const viewElements = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
 

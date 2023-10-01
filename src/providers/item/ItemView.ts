@@ -15,7 +15,6 @@ import {
   ItemType,
   ViewSocketEvents,
 } from "@rpg-engine/shared";
-import { Promise } from "bluebird";
 import { provide } from "inversify-binding-decorators";
 import { ItemCoordinates } from "./ItemCoordinates";
 
@@ -95,7 +94,7 @@ export class ItemView {
     const itemsOnCharView = await this.characterView.getAllElementsOnView(character, "items");
 
     const itemsToUpdate: IItemUpdate[] = [];
-    const addToViewPromises: Promise<void>[] = [];
+    const viewElementsToAdd: IViewElement[] = [];
 
     for (let i = 0; i < itemsNearby.length; i++) {
       const item = itemsNearby[i];
@@ -114,12 +113,10 @@ export class ItemView {
 
       itemsToUpdate.push(this.prepareItemToUpdate(item));
 
-      addToViewPromises.push(
-        this.characterView.addToCharacterView(character._id, this.prepareAddToView(item), "items")
-      );
+      viewElementsToAdd.push(this.prepareAddToView(item));
     }
 
-    await Promise.all(addToViewPromises);
+    await this.characterView.batchAddToCharacterView(character._id, viewElementsToAdd, "items");
 
     if (itemsToUpdate.length > 0) {
       this.socketMessaging.sendEventToUser<IItemUpdateAll>(character.channelId!, ItemSocketEvents.UpdateAll, {
