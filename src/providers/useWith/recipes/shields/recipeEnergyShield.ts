@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
@@ -13,7 +12,7 @@ export const recipeEnergyShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 20,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
@@ -28,13 +27,5 @@ export const recipeEnergyShield: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreenIngot, 20],
-      [CraftingResourcesBlueprint.PhoenixFeather, 10],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
-      [CraftingResourcesBlueprint.MagicRecipe, 5],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 20],
 };

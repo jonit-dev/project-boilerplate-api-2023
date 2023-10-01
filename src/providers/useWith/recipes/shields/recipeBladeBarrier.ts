@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, ShieldsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,23 +8,16 @@ export const recipeBladeBarrier: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 80,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.IronNail,
-      qty: 60,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 50,
+      qty: 120,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 80],
-      [CraftingResourcesBlueprint.IronNail, 60],
-      [CraftingResourcesBlueprint.WoodenBoard, 50],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 36],
 };

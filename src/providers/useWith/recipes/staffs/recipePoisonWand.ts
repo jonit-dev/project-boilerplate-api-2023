@@ -9,23 +9,23 @@ export const recipePoisonWand: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 4,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 2,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 4,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueSapphire, 4],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 2],
-      [CraftingResourcesBlueprint.CopperIngot, 4],
+      [CraftingResourcesBlueprint.BlueSapphire, 5],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 4],
+      [CraftingResourcesBlueprint.CopperIngot, 5],
     ]),
   ],
 };

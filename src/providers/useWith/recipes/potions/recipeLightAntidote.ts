@@ -8,12 +8,12 @@ export const recipeLightAntidote: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.WaterBottle,
-      qty: 1,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 1,
+      qty: 2,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, 1],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 4],
 };

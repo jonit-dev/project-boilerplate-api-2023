@@ -4,7 +4,7 @@ import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
 
 export const recipeRubyStaff: IUseWithCraftingRecipe = {
-  outputKey: StaffsBlueprint.FireStaff,
+  outputKey: StaffsBlueprint.RubyStaff,
   outputQtyRange: [1, 1],
   requiredItems: [
     {

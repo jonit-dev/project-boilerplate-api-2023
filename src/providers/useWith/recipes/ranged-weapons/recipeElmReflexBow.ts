@@ -13,24 +13,24 @@ export const recipeElmReflexBow: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.BlueFeather,
-      qty: 5,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 5,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.Silk,
-      qty: 3,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.SilverIngot, 5],
-      [CraftingResourcesBlueprint.BlueFeather, 5],
-      [CraftingResourcesBlueprint.ElvenWood, 5],
-      [CraftingResourcesBlueprint.Silk, 3],
+      [CraftingResourcesBlueprint.BlueFeather, 8],
+      [CraftingResourcesBlueprint.ElvenWood, 8],
+      [CraftingResourcesBlueprint.Silk, 5],
     ]),
   ],
 };

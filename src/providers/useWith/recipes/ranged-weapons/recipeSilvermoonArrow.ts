@@ -9,23 +9,23 @@ export const recipeSilvermoonArrow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 10,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.BlueFeather,
-      qty: 20,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 10,
+      qty: 8,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 10],
-      [CraftingResourcesBlueprint.BlueFeather, 20],
-      [CraftingResourcesBlueprint.ElvenWood, 10],
+      [CraftingResourcesBlueprint.SilverIngot, 5],
+      [CraftingResourcesBlueprint.BlueFeather, 10],
+      [CraftingResourcesBlueprint.ElvenWood, 8],
     ]),
   ],
 };

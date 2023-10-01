@@ -13,19 +13,19 @@ export const recipeMithrilSword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 4,
+      qty: 7,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 1,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.SilverIngot, 5],
-      [CraftingResourcesBlueprint.RedSapphire, 4],
-      [CraftingResourcesBlueprint.PhoenixFeather, 1],
+      [CraftingResourcesBlueprint.RedSapphire, 7],
+      [CraftingResourcesBlueprint.PhoenixFeather, 5],
     ]),
   ],
 };

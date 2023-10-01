@@ -13,24 +13,24 @@ export const recipeFalconsArmor: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 20,
+      qty: 45,
     },
     {
       key: CraftingResourcesBlueprint.BlueLeather,
-      qty: 40,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 20,
+      qty: 40,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreenIngot, 20],
+      [CraftingResourcesBlueprint.GreenIngot, 45],
       [CraftingResourcesBlueprint.SteelIngot, 40],
-      [CraftingResourcesBlueprint.BlueSapphire, 40],
-      [CraftingResourcesBlueprint.PhoenixFeather, 20],
+      [CraftingResourcesBlueprint.BlueSapphire, 50],
+      [CraftingResourcesBlueprint.PhoenixFeather, 40],
     ]),
   ],
 };

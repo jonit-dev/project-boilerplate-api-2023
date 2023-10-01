@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -9,28 +8,20 @@ export const recipeSangriaStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 10,
+      qty: 80,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 10,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 10,
+      qty: 60,
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 10,
+      qty: 60,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.RedSapphire, 10],
-      [CraftingResourcesBlueprint.PhoenixFeather, 10],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
-      [CraftingResourcesBlueprint.ObsidiumIngot, 10],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 31],
 };

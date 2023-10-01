@@ -9,23 +9,23 @@ export const recipeEnchantedStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueFeather,
-      qty: 4,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 3,
+      qty: 6,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 3,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueFeather, 4],
-      [CraftingResourcesBlueprint.ObsidiumIngot, 3],
-      [CraftingResourcesBlueprint.BlueSapphire, 3],
+      [CraftingResourcesBlueprint.BlueFeather, 8],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 6],
+      [CraftingResourcesBlueprint.BlueSapphire, 5],
     ]),
   ],
 };

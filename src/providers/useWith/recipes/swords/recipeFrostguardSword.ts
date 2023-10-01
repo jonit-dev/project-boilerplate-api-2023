@@ -13,19 +13,19 @@ export const recipeFrostguardSword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 3,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 4,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.SteelIngot, 3],
-      [CraftingResourcesBlueprint.BlueSapphire, 3],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 4],
+      [CraftingResourcesBlueprint.BlueSapphire, 4],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
     ]),
   ],
 };

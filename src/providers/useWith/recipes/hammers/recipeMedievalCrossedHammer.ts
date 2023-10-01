@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, HammersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -21,16 +20,8 @@ export const recipeMedievalCrossedHammer: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 30,
+      qty: 50,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 100],
-      [CraftingResourcesBlueprint.WoodenBoard, 80],
-      [CraftingResourcesBlueprint.ElvenWood, 50],
-      [CraftingResourcesBlueprint.SteelIngot, 30],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 34],
 };

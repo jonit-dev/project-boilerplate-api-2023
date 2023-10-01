@@ -12,12 +12,12 @@ export const recipeVenomousVial: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.WaterBottle,
-      qty: 2,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.CorruptionOre,
       qty: 1,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, 4],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 12],
 };

@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, MacesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,7 +8,7 @@ export const recipeBronzeFistMace: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 40,
+      qty: 30,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
@@ -21,16 +20,8 @@ export const recipeBronzeFistMace: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 80,
+      qty: 50,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 40],
-      [CraftingResourcesBlueprint.WoodenBoard, 30],
-      [CraftingResourcesBlueprint.SteelIngot, 30],
-      [CraftingResourcesBlueprint.IronIngot, 80],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 21],
 };

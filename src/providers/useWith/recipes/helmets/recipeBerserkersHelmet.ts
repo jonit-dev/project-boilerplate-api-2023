@@ -9,18 +9,18 @@ export const recipeBerserkersHelmet: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 10,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.BatsWing,
-      qty: 5,
+      qty: 15,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 10],
-      [CraftingResourcesBlueprint.BatsWing, 5],
+      [CraftingResourcesBlueprint.IronIngot, 15],
+      [CraftingResourcesBlueprint.BatsWing, 15],
     ]),
   ],
 };

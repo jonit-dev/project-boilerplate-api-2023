@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, GlovesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -21,16 +20,8 @@ export const recipeGlovesOfGrace: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 50,
+      qty: 40,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ElvenLeaf, 80],
-      [CraftingResourcesBlueprint.Silk, 50],
-      [CraftingResourcesBlueprint.GoldenOre, 40],
-      [CraftingResourcesBlueprint.PhoenixFeather, 50],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 29],
 };

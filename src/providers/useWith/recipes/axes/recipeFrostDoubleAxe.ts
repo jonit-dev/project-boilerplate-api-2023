@@ -9,23 +9,23 @@ export const recipeFrostDoubleAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 4,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 2,
+      qty: 6,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 2,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 4],
-      [CraftingResourcesBlueprint.BlueSapphire, 2],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 2],
+      [CraftingResourcesBlueprint.IronIngot, 25],
+      [CraftingResourcesBlueprint.BlueSapphire, 6],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 10],
     ]),
   ],
 };

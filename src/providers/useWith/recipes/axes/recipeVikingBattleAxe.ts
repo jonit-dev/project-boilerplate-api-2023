@@ -9,28 +9,28 @@ export const recipeVikingBattleAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 8,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 4,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.BatsWing,
-      qty: 2,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 1,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 8],
-      [CraftingResourcesBlueprint.Leather, 4],
-      [CraftingResourcesBlueprint.BatsWing, 2],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 1],
+      [CraftingResourcesBlueprint.IronIngot, 20],
+      [CraftingResourcesBlueprint.Leather, 15],
+      [CraftingResourcesBlueprint.BatsWing, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
     ]),
   ],
 };

@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AxesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,28 +8,20 @@ export const recipeGrandSanguineBattleaxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 40,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 50,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 30,
+      qty: 45,
     },
     {
-      key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 30,
+      key: CraftingResourcesBlueprint.GreenOre,
+      qty: 50,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 40],
-      [CraftingResourcesBlueprint.RedSapphire, 50],
-      [CraftingResourcesBlueprint.WoodenBoard, 30],
-      [CraftingResourcesBlueprint.GreenIngot, 30],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 36],
 };

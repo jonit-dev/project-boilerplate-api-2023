@@ -9,7 +9,7 @@ export const recipeKatana: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 2,
+      qty: 6,
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
@@ -23,7 +23,7 @@ export const recipeKatana: IUseWithCraftingRecipe = {
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SilverIngot, 2],
+      [CraftingResourcesBlueprint.SilverIngot, 6],
       [CraftingResourcesBlueprint.IronIngot, 5],
       [CraftingResourcesBlueprint.WoodenSticks, 2],
     ]),

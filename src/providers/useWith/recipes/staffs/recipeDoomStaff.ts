@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, StaffsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -9,7 +8,7 @@ export const recipeDoomStaff: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumOre,
-      qty: 150,
+      qty: 160,
     },
     {
       key: CraftingResourcesBlueprint.DragonHead,
@@ -17,20 +16,12 @@ export const recipeDoomStaff: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
-      qty: 10,
+      qty: 20,
     },
     {
       key: CraftingResourcesBlueprint.MagicRecipe,
-      qty: 80,
+      qty: 160,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumOre, 150],
-      [CraftingResourcesBlueprint.DragonHead, 5],
-      [CraftingResourcesBlueprint.DragonTooth, 10],
-      [CraftingResourcesBlueprint.MagicRecipe, 80],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 40],
 };

@@ -9,7 +9,7 @@ export const recipeFireWand: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 4,
+      qty: 2,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
@@ -17,15 +17,15 @@ export const recipeFireWand: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 5,
+      qty: 3,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Alchemy,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.RedSapphire, 4],
+      [CraftingResourcesBlueprint.RedSapphire, 2],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 3],
-      [CraftingResourcesBlueprint.IronIngot, 5],
+      [CraftingResourcesBlueprint.IronIngot, 3],
     ]),
   ],
 };

@@ -9,23 +9,23 @@ export const recipeGlacialArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.BlueLeather,
-      qty: 20,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 20,
+      qty: 15,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 25,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueLeather, 20],
-      [CraftingResourcesBlueprint.BlueSapphire, 20],
-      [CraftingResourcesBlueprint.SteelIngot, 25],
+      [CraftingResourcesBlueprint.BlueLeather, 15],
+      [CraftingResourcesBlueprint.BlueSapphire, 15],
+      [CraftingResourcesBlueprint.SteelIngot, 20],
     ]),
   ],
 };

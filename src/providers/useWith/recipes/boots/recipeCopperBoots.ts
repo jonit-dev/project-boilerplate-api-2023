@@ -9,18 +9,18 @@ export const recipeCopperBoots: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 3,
+      qty: 7,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 2,
+      qty: 10,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.CopperIngot, 3],
-      [CraftingResourcesBlueprint.Leather, 2],
+      [CraftingResourcesBlueprint.CopperIngot, 7],
+      [CraftingResourcesBlueprint.Leather, 10],
     ]),
   ],
 };

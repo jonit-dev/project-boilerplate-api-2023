@@ -19,5 +19,5 @@ export const recipeBlazingFirebomb: IUseWithCraftingRecipe = {
       qty: 5,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Alchemy, 15],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 7],
 };

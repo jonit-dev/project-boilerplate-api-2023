@@ -9,23 +9,23 @@ export const recipeGoldenArrow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Feather,
-      qty: 1,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.ElvenWood,
-      qty: 1,
+      qty: 7,
     },
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 1,
+      qty: 15,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Lumberjacking,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Feather, 1],
-      [CraftingResourcesBlueprint.SmallWoodenStick, 1],
-      [CraftingResourcesBlueprint.GoldenIngot, 1],
+      [CraftingResourcesBlueprint.Feather, 10],
+      [CraftingResourcesBlueprint.ElvenWood, 7],
+      [CraftingResourcesBlueprint.GoldenIngot, 15],
     ]),
   ],
 };

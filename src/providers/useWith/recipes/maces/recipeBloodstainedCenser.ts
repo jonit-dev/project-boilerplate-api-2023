@@ -9,11 +9,11 @@ export const recipeBloodstainedCenser: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 10,
+      qty: 4,
     },
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 10,
+      qty: 3,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
@@ -23,19 +23,14 @@ export const recipeBloodstainedCenser: IUseWithCraftingRecipe = {
       key: CraftingResourcesBlueprint.Bone,
       qty: 5,
     },
-    {
-      key: CraftingResourcesBlueprint.DragonHead,
-      qty: 3,
-    },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 10],
-      [CraftingResourcesBlueprint.ObsidiumIngot, 10],
+      [CraftingResourcesBlueprint.GoldenIngot, 4],
+      [CraftingResourcesBlueprint.ObsidiumIngot, 3],
       [CraftingResourcesBlueprint.GreaterWoodenLog, 1],
       [CraftingResourcesBlueprint.Bone, 5],
-      [CraftingResourcesBlueprint.DragonHead, 3],
     ]),
   ],
 };

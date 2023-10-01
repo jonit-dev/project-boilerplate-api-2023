@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, HammersBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -24,13 +23,5 @@ export const recipeSledgeHammer: IUseWithCraftingRecipe = {
       qty: 20,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 50],
-      [CraftingResourcesBlueprint.WoodenBoard, 50],
-      [CraftingResourcesBlueprint.IronNail, 20],
-      [CraftingResourcesBlueprint.GreenIngot, 20],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 25],
 };

@@ -9,11 +9,11 @@ export const recipeHuntersCap: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 10,
+      qty: 15,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([[CraftingResourcesBlueprint.Leather, 10]]),
+    calculateMinimumLevel([[CraftingResourcesBlueprint.Leather, 15]]),
   ],
 };

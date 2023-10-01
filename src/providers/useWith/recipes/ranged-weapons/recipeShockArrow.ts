@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import {
   CraftingResourcesBlueprint,
   MagicsBlueprint,
@@ -24,12 +23,5 @@ export const recipeShockArrow: IUseWithCraftingRecipe = {
       qty: 2,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Feather, 2],
-      [CraftingResourcesBlueprint.SmallWoodenStick, 2],
-      [MagicsBlueprint.EnergyBoltRune, 2],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 3],
 };

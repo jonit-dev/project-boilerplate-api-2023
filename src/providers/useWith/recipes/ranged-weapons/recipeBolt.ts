@@ -15,5 +15,5 @@ export const recipeBolt: IUseWithCraftingRecipe = {
       qty: 1,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Lumberjacking, 5],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 2],
 };

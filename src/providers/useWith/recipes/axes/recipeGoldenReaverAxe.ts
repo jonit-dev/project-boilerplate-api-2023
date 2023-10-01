@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AxesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,28 +8,32 @@ export const recipeGoldenReaverAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 50,
+      qty: 130,
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 30,
+      qty: 150,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 50,
+      qty: 150,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 50,
+      qty: 140,
+    },
+    {
+      key: CraftingResourcesBlueprint.BlueSapphire,
+      qty: 125,
+    },
+    {
+      key: CraftingResourcesBlueprint.RedSapphire,
+      qty: 125,
+    },
+    {
+      key: CraftingResourcesBlueprint.DragonTooth,
+      qty: 10,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 50],
-      [CraftingResourcesBlueprint.PolishedStone, 30],
-      [CraftingResourcesBlueprint.SteelIngot, 50],
-      [CraftingResourcesBlueprint.PhoenixFeather, 50],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 40],
 };

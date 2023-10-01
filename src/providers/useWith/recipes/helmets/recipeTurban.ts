@@ -9,18 +9,18 @@ export const recipeTurban: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.Silk,
-      qty: 20,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 4,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.Silk, 20],
-      [CraftingResourcesBlueprint.Leather, 4],
+      [CraftingResourcesBlueprint.Silk, 5],
+      [CraftingResourcesBlueprint.Leather, 5],
     ]),
   ],
 };

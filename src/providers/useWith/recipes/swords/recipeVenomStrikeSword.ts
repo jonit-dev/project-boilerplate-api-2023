@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, SwordsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill, MagicsBlueprint } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -13,7 +12,7 @@ export const recipeVenomStrikeSword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.Herb,
-      qty: 100,
+      qty: 50,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
@@ -21,16 +20,8 @@ export const recipeVenomStrikeSword: IUseWithCraftingRecipe = {
     },
     {
       key: MagicsBlueprint.PoisonRune,
-      qty: 100,
+      qty: 40,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GreenIngot, 50],
-      [CraftingResourcesBlueprint.Herb, 100],
-      [CraftingResourcesBlueprint.SteelIngot, 30],
-      [MagicsBlueprint.PoisonRune, 100],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 29],
 };

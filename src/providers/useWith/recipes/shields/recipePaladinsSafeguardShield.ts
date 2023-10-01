@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, ShieldsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,33 +8,24 @@ export const recipePaladinsSafeguardShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenIngot,
-      qty: 100,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 100,
+      qty: 140,
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 200,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.Bandage,
-      qty: 60,
+      qty: 90,
     },
     {
       key: CraftingResourcesBlueprint.PhoenixFeather,
-      qty: 80,
+      qty: 100,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 100],
-      [CraftingResourcesBlueprint.SteelIngot, 100],
-      [CraftingResourcesBlueprint.RedSapphire, 200],
-      [CraftingResourcesBlueprint.Bandage, 60],
-      [CraftingResourcesBlueprint.PhoenixFeather, 80],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 37],
 };

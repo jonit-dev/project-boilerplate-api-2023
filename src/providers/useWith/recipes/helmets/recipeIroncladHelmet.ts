@@ -9,7 +9,7 @@ export const recipeIroncladHelmet: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GreenIngot,
-      qty: 15,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
@@ -17,15 +17,15 @@ export const recipeIroncladHelmet: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 10,
+      qty: 8,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenIngot, 15],
+      [CraftingResourcesBlueprint.GoldenIngot, 10],
       [CraftingResourcesBlueprint.Leather, 10],
-      [CraftingResourcesBlueprint.RedSapphire, 10],
+      [CraftingResourcesBlueprint.RedSapphire, 8],
     ]),
   ],
 };

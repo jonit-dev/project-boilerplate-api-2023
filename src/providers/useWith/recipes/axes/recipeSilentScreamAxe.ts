@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { AxesBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,28 +8,20 @@ export const recipeSilentScreamAxe: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.ObsidiumIngot,
-      qty: 30,
+      qty: 120,
     },
     {
       key: CraftingResourcesBlueprint.Skull,
-      qty: 60,
+      qty: 130,
     },
     {
       key: CraftingResourcesBlueprint.BatsWing,
-      qty: 40,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.WoodenBoard,
-      qty: 50,
+      qty: 100,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 30],
-      [CraftingResourcesBlueprint.Skull, 60],
-      [CraftingResourcesBlueprint.BatsWing, 40],
-      [CraftingResourcesBlueprint.WoodenBoard, 50],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 39],
 };

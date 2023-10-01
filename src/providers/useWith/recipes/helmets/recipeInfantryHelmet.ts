@@ -9,18 +9,18 @@ export const recipeInfantryHelmet: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 3,
+      qty: 5,
     },
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 2,
+      qty: 15,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 3],
-      [CraftingResourcesBlueprint.Leather, 2],
+      [CraftingResourcesBlueprint.IronIngot, 5],
+      [CraftingResourcesBlueprint.Leather, 15],
     ]),
   ],
 };

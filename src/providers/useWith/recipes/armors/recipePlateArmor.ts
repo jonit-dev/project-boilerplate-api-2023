@@ -9,29 +9,29 @@ export const recipePlateArmor: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 20,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 15,
+      qty: 25,
     },
     {
       key: CraftingResourcesBlueprint.CopperIngot,
-      qty: 5,
+      qty: 25,
     },
 
     {
       key: CraftingResourcesBlueprint.Leather,
-      qty: 5,
+      qty: 20,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 20],
-      [CraftingResourcesBlueprint.IronIngot, 15],
-      [CraftingResourcesBlueprint.CopperIngot, 5],
-      [CraftingResourcesBlueprint.Leather, 5],
+      [CraftingResourcesBlueprint.SteelIngot, 25],
+      [CraftingResourcesBlueprint.IronIngot, 25],
+      [CraftingResourcesBlueprint.CopperIngot, 25],
+      [CraftingResourcesBlueprint.Leather, 20],
     ]),
   ],
 };

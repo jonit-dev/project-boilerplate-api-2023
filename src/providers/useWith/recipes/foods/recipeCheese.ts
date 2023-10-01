@@ -8,8 +8,8 @@ export const recipeCheese: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: FoodsBlueprint.Milk,
-      qty: 0.25,
+      qty: 4,
     },
   ],
-  minCraftingRequirements: [CraftingSkill.Cooking, 1],
+  minCraftingRequirements: [CraftingSkill.Cooking, 3],
 };

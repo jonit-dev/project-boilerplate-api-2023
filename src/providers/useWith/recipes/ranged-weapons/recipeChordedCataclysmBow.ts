@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, RangedWeaponsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -9,7 +8,7 @@ export const recipeChordedCataclysmBow: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.GoldenOre,
-      qty: 40,
+      qty: 70,
     },
     {
       key: CraftingResourcesBlueprint.DragonTooth,
@@ -24,13 +23,5 @@ export const recipeChordedCataclysmBow: IUseWithCraftingRecipe = {
       qty: 40,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Lumberjacking,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.GoldenOre, 40],
-      [CraftingResourcesBlueprint.DragonTooth, 15],
-      [CraftingResourcesBlueprint.BatsWing, 80],
-      [CraftingResourcesBlueprint.MagicRecipe, 40],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Lumberjacking, 34],
 };

@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { ArmorsBlueprint, CraftingResourcesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
 import { IUseWithCraftingRecipe } from "../../useWithTypes";
@@ -13,19 +12,12 @@ export const recipeBlueCape: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.RedSapphire,
-      qty: 10,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 10,
+      qty: 8,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Alchemy,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.BlueSilk, 10],
-      [CraftingResourcesBlueprint.RedSapphire, 10],
-      [CraftingResourcesBlueprint.BlueSapphire, 10],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Alchemy, 10],
 };

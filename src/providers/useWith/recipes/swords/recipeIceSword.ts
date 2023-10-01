@@ -13,19 +13,19 @@ export const recipeIceSword: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.SilverIngot,
-      qty: 6,
+      qty: 3,
     },
     {
       key: CraftingResourcesBlueprint.GreenOre,
-      qty: 5,
+      qty: 2,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
       [CraftingResourcesBlueprint.BlueSapphire, 3],
-      [CraftingResourcesBlueprint.SilverIngot, 6],
-      [CraftingResourcesBlueprint.GoldenOre, 5],
+      [CraftingResourcesBlueprint.SilverIngot, 3],
+      [CraftingResourcesBlueprint.GoldenOre, 2],
     ]),
   ],
 };

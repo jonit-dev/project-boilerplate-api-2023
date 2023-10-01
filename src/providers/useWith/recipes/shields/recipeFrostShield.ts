@@ -9,23 +9,23 @@ export const recipeFrostShield: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.IronIngot,
-      qty: 2,
+      qty: 12,
     },
     {
       key: CraftingResourcesBlueprint.BlueSapphire,
-      qty: 3,
+      qty: 10,
     },
     {
       key: CraftingResourcesBlueprint.GreaterWoodenLog,
-      qty: 1,
+      qty: 5,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.IronIngot, 2],
-      [CraftingResourcesBlueprint.BlueSapphire, 3],
-      [CraftingResourcesBlueprint.GreaterWoodenLog, 1],
+      [CraftingResourcesBlueprint.IronIngot, 12],
+      [CraftingResourcesBlueprint.BlueSapphire, 10],
+      [CraftingResourcesBlueprint.GreaterWoodenLog, 5],
     ]),
   ],
 };

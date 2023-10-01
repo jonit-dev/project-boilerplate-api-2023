@@ -9,18 +9,18 @@ export const recipePlateBoots: IUseWithCraftingRecipe = {
   requiredItems: [
     {
       key: CraftingResourcesBlueprint.SteelIngot,
-      qty: 10,
+      qty: 8,
     },
     {
       key: CraftingResourcesBlueprint.PolishedStone,
-      qty: 10,
+      qty: 8,
     },
   ],
   minCraftingRequirements: [
     CraftingSkill.Blacksmithing,
     calculateMinimumLevel([
-      [CraftingResourcesBlueprint.SteelIngot, 10],
-      [CraftingResourcesBlueprint.PolishedStone, 10],
+      [CraftingResourcesBlueprint.SteelIngot, 8],
+      [CraftingResourcesBlueprint.PolishedStone, 8],
     ]),
   ],
 };

@@ -1,4 +1,3 @@
-import { calculateMinimumLevel } from "@providers/crafting/CraftingMinLevelCalculator";
 import { CraftingResourcesBlueprint, GlovesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
 import { IUseWithCraftingRecipe } from "@providers/useWith/useWithTypes";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -13,24 +12,16 @@ export const recipeShadowlordGloves: IUseWithCraftingRecipe = {
     },
     {
       key: CraftingResourcesBlueprint.CopperOre,
-      qty: 130,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.Eye,
-      qty: 140,
+      qty: 100,
     },
     {
       key: CraftingResourcesBlueprint.BatsWing,
-      qty: 150,
+      qty: 120,
     },
   ],
-  minCraftingRequirements: [
-    CraftingSkill.Blacksmithing,
-    calculateMinimumLevel([
-      [CraftingResourcesBlueprint.ObsidiumIngot, 120],
-      [CraftingResourcesBlueprint.CopperOre, 130],
-      [CraftingResourcesBlueprint.Eye, 140],
-      [CraftingResourcesBlueprint.BatsWing, 150],
-    ]),
-  ],
+  minCraftingRequirements: [CraftingSkill.Blacksmithing, 33],
 };
