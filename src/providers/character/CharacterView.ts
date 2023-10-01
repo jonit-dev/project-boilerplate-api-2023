@@ -36,11 +36,18 @@ export class CharacterView {
       return;
     }
 
-    await this.inMemoryHashTable.set(`character-view-${type}:${characterId}`, viewElement.id, viewElement);
+    const currentViewElements = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
+
+    await this.inMemoryHashTable.set(`character-view-${type}`, characterId, {
+      ...currentViewElements,
+      [viewElement.id]: viewElement,
+    });
   }
 
   public async isOnCharacterView(characterId: string, elementId: string, type: CharacterViewType): Promise<boolean> {
-    return await this.inMemoryHashTable.has(`character-view-${type}:${characterId}`, elementId);
+    const viewElements = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
+
+    return !!(viewElements && viewElements[elementId]);
   }
 
   public isOutOfCharacterView(characterX: number, characterY: number, x: number, y: number): boolean {
@@ -73,32 +80,22 @@ export class CharacterView {
     characterY: number,
     type: CharacterViewType
   ): Promise<void> {
-    const hasView = await this.inMemoryHashTable.hasAll(`character-view-${type}:${characterId}`);
+    const hasView = await this.inMemoryHashTable.has(`character-view-${type}`, characterId);
     if (!hasView) {
       return;
     }
 
-    const elementsOnView = await this.inMemoryHashTable.getAll(`character-view-${type}:${characterId}`);
+    const elementsOnView = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
     if (!elementsOnView) {
       return;
     }
 
-    const elementsIds = Object.keys(elementsOnView);
-    const elementsToRemove = new Set<string>();
-
-    for (const elementId of elementsIds) {
-      const element = elementsOnView[elementId] as unknown as IViewElement;
+    for (const elementId in elementsOnView) {
+      const element = elementsOnView[elementId] as IViewElement;
       if (this.isOutOfCharacterView(characterX, characterY, element.x, element.y)) {
-        elementsToRemove.add(elementId);
+        await this.removeFromCharacterView(characterId, elementId, type);
       }
     }
-
-    // Convert the Set back to an array for Promise.all
-    const removePromises = Array.from(elementsToRemove).map((elementId) =>
-      this.removeFromCharacterView(characterId, elementId, type)
-    );
-
-    await Promise.all(removePromises);
   }
 
   @TrackNewRelicTransaction()
@@ -107,16 +104,13 @@ export class CharacterView {
     elementId: string,
     type: CharacterViewType
   ): Promise<IViewElement | undefined> {
-    const query = (await this.inMemoryHashTable.get(
-      `character-view-${type}:${character._id}`,
-      elementId
-    )) as IViewElement;
+    const query = (await this.inMemoryHashTable.get(`character-view-${type}`, character._id)) as IViewElement;
 
     if (!query) {
       return;
     }
 
-    return query;
+    return query[elementId];
   }
 
   @TrackNewRelicTransaction()
@@ -124,27 +118,39 @@ export class CharacterView {
     character: ICharacter,
     type: CharacterViewType
   ): Promise<Record<string, IViewElement> | undefined> {
-    return await this.inMemoryHashTable.getAll<IViewElement>(`character-view-${type}:${character._id}`);
+    return await this.inMemoryHashTable.get(`character-view-${type}`, character._id);
   }
 
   @TrackNewRelicTransaction()
   public async hasElementOnView(character: ICharacter, elementId: string, type: CharacterViewType): Promise<boolean> {
-    const result = await this.inMemoryHashTable.has(`character-view-${type}:${character._id}`, elementId);
+    const currentElements = await this.inMemoryHashTable.get(`character-view-${type}`, character._id);
 
-    return result;
+    if (!currentElements) {
+      return false;
+    }
+
+    return !!currentElements[elementId];
   }
 
   @TrackNewRelicTransaction()
   public async clearCharacterView(character: ICharacter): Promise<void> {
     const types: CharacterViewType[] = ["npcs", "items", "characters"];
     for (const type of types) {
-      await this.inMemoryHashTable.deleteAll(`character-view-${type}:${character._id}`);
+      await this.inMemoryHashTable.delete(`character-view-${type}`, character._id);
     }
   }
 
   @TrackNewRelicTransaction()
   public async removeFromCharacterView(characterId: string, elementId: string, type: CharacterViewType): Promise<void> {
-    await this.inMemoryHashTable.delete(`character-view-${type}:${characterId}`, elementId);
+    const currentElements = await this.inMemoryHashTable.get(`character-view-${type}`, characterId);
+
+    if (!currentElements) {
+      return;
+    }
+
+    delete currentElements[elementId];
+
+    await this.inMemoryHashTable.set(`character-view-${type}`, characterId, currentElements);
   }
 
   @TrackNewRelicTransaction()
