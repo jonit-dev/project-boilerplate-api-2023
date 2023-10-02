@@ -62,7 +62,7 @@ describe("CharacterMovementWarn", () => {
       elementOnViewMock = jest
         .spyOn(CharacterView.prototype, "getElementOnView")
         .mockImplementation(jest.fn().mockReturnValue(Promise.resolve(false)));
-      addToViewMock = jest.spyOn(CharacterView.prototype, "addToCharacterView").mockImplementation();
+      addToViewMock = jest.spyOn(CharacterView.prototype, "batchAddToCharacterView").mockImplementation();
     });
 
     afterEach(() => {
@@ -75,13 +75,15 @@ describe("CharacterMovementWarn", () => {
 
       expect(addToViewMock).toHaveBeenCalledWith(
         testCharacter._id,
-        {
-          id: character.id,
-          x: character.x,
-          y: character.y,
-          direction: character.direction,
-          scene: character.scene,
-        },
+        [
+          {
+            id: character.id,
+            x: character.x,
+            y: character.y,
+            direction: character.direction,
+            scene: character.scene,
+          },
+        ],
         "characters"
       );
 

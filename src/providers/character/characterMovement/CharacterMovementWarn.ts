@@ -12,6 +12,7 @@ import {
   IAllCharacterPositionUpdateFromServer,
   ICharacterPositionUpdateFromClient,
   ICharacterPositionUpdateFromServer,
+  IViewElement,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
@@ -112,22 +113,20 @@ export class CharacterMovementWarn {
   private async warnEmitterAboutCharactersAround(character: ICharacter): Promise<void> {
     const nearbyCharacters = await this.characterView.getCharactersInView(character);
 
+    const viewElementsToAdd: IViewElement[] = [];
+
     const promises = nearbyCharacters.map(async (nearbyCharacter) => {
       if (!(await this.shouldWarnCharacter(character, nearbyCharacter))) {
         return null;
       }
 
-      await this.characterView.addToCharacterView(
-        character._id,
-        {
-          id: nearbyCharacter.id,
-          x: nearbyCharacter.x,
-          y: nearbyCharacter.y,
-          direction: nearbyCharacter.direction,
-          scene: nearbyCharacter.scene,
-        },
-        "characters"
-      );
+      viewElementsToAdd.push({
+        id: nearbyCharacter.id,
+        x: nearbyCharacter.x,
+        y: nearbyCharacter.y,
+        direction: nearbyCharacter.direction,
+        scene: nearbyCharacter.scene,
+      });
 
       return {
         id: nearbyCharacter.id,
@@ -150,6 +149,8 @@ export class CharacterMovementWarn {
         alpha: await this.specialEffect.getOpacity(nearbyCharacter),
       };
     });
+
+    await this.characterView.batchAddToCharacterView(character._id, viewElementsToAdd, "characters");
 
     const nearbyCharacterDataPayloads = (await Promise.all(promises)).filter(
       (payload) => payload !== null

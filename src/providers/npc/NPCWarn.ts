@@ -35,12 +35,14 @@ export class NPCWarn {
     // Fetch all NPCs in view first, before entering loop
     const npcsNearby = await this.npcView.getNPCsInView(character);
 
+    const allNpcsOnCharView = await this.characterView.getAllElementsOnView(character, "npcs");
+
     const npcWarnings = Promise.map(
       npcsNearby,
       async (npc) => {
         if (!options?.always) {
           // Fetch all elements and proceed with object checks
-          const npcOnCharView = await this.characterView.getElementOnView(character, npc.id, "npcs");
+          const npcOnCharView = allNpcsOnCharView?.find((npcOnCharView) => npcOnCharView.id === npc._id);
           if (npcOnCharView) {
             const doesServerNPCMatchesClientNPC = this.objectHelper.doesObjectAttrMatches(npcOnCharView, npc, [
               "id",
