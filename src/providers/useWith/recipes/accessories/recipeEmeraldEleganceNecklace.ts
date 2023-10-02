@@ -15,7 +15,7 @@ export const recipeEmeraldEleganceNecklace: IUseWithCraftingRecipe = {
       qty: 100,
     },
     {
-      key: MagicsBlueprint.Rune,
+      key: MagicsBlueprint.CorruptionRune,
       qty: 100,
     },
     {
