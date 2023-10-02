@@ -28,17 +28,14 @@ export class BattleEvent {
   public async calculateEvent(attacker: BattleParticipant, target: BattleParticipant): Promise<BattleEventType> {
     const attackerSkills = attacker.skills as unknown as ISkill;
     const defenderSkills = target.skills as unknown as ISkill;
-    const defenderDefense = await this.skillStatsCalculator.getDefense(defenderSkills);
-    const attackerAttack = await this.skillStatsCalculator.getAttack(attackerSkills);
 
-    const attackerDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
-      attackerSkills,
-      BasicAttribute.Dexterity
-    );
-    const defenderDexterityLevel = await this.traitGetter.getSkillLevelWithBuffs(
-      defenderSkills,
-      BasicAttribute.Dexterity
-    );
+    // Fetch the required data in parallel
+    const [defenderDefense, attackerAttack, attackerDexterityLevel, defenderDexterityLevel] = await Promise.all([
+      this.skillStatsCalculator.getDefense(defenderSkills),
+      this.skillStatsCalculator.getAttack(attackerSkills),
+      this.traitGetter.getSkillLevelWithBuffs(attackerSkills, BasicAttribute.Dexterity),
+      this.traitGetter.getSkillLevelWithBuffs(defenderSkills, BasicAttribute.Dexterity),
+    ]);
 
     const defenderModifiers = defenderDefense + defenderDexterityLevel;
     const attackerModifiers = attackerAttack + attackerDexterityLevel;
