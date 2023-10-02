@@ -132,6 +132,8 @@ export class SkillFunctions {
       type: "info",
     });
 
+    await this.inMemoryHashTable.delete(`${character._id}-skill-level-with-buff`, skillData.skillName);
+
     this.socketMessaging.sendEventToUser(character.channelId!, SkillSocketEvents.SkillGain, levelUpEventPayload);
 
     await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.SkillLevelUp);

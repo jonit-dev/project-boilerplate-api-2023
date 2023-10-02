@@ -276,6 +276,7 @@ export class CharacterDeath {
     await clearCacheForKey(`${character._id}-equipment`);
     await clearCacheForKey(`${character._id}-inventory`);
     await this.inMemoryHashTable.delete("equipment-slots", character._id);
+    await this.inMemoryHashTable.deleteAll(`${character._id}-skill-level-with-buff`);
   }
 
   private async sendRefreshEquipmentEvent(character: ICharacter): Promise<void> {

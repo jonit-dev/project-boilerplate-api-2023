@@ -24,7 +24,7 @@ export class CharacterBuffTracker {
 
       await newCharacterBuff.save();
 
-      await this.clearCache({ _id: characterId } as ICharacter);
+      await this.clearCache({ _id: characterId } as ICharacter, buff.trait);
 
       return newCharacterBuff as ICharacterBuff;
     } catch (error) {
@@ -97,15 +97,17 @@ export class CharacterBuffTracker {
 
   public async deleteBuff(character: ICharacter, buffId: string): Promise<boolean> {
     try {
-      await CharacterBuff.deleteOne({ _id: buffId, owner: character._id });
+      const buff = (await this.getBuff(character._id, buffId)) as ICharacterBuff;
 
-      await this.clearCache(character);
+      await this.clearCache(character, buff?.trait);
 
       return true;
     } catch (error) {
       console.error(error);
 
       return false;
+    } finally {
+      await CharacterBuff.deleteOne({ _id: buffId, owner: character._id });
     }
   }
 
@@ -128,10 +130,11 @@ export class CharacterBuffTracker {
     }
   }
 
-  private async clearCache(character: ICharacter): Promise<void> {
+  private async clearCache(character: ICharacter, skillName: string): Promise<void> {
     await clearCacheForKey(`characterBuffs_${character._id}`);
     await clearCacheForKey(`${character._id}-skills`);
     await this.inMemoryHashTable.delete(character._id.toString(), "totalAttack");
     await this.inMemoryHashTable.delete(character._id.toString(), "totalDefense");
+    await this.inMemoryHashTable.delete(`${character._id}-skill-level-with-buff`, skillName);
   }
 }

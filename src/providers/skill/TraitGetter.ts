@@ -1,10 +1,10 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
+import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { NumberFormatter } from "@providers/text/NumberFormatter";
 import { CharacterAttributes, CharacterTrait } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -19,8 +19,8 @@ export class TraitGetter {
   constructor(
     private characterBuffTracker: CharacterBuffTracker,
     private numberFormatter: NumberFormatter,
-    private newRelic: NewRelic,
-    private characterBonusOrPenalties: CharacterClassBonusOrPenalties
+    private characterBonusOrPenalties: CharacterClassBonusOrPenalties,
+    private inMemoryHashTable: InMemoryHashTable
   ) {}
 
   @TrackNewRelicTransaction()
@@ -28,6 +28,12 @@ export class TraitGetter {
     try {
       if (!skills.owner) {
         throw new Error("Skills owner is undefined");
+      }
+
+      const hasCache = await this.inMemoryHashTable.has(`${skills?.owner}-skill-level-with-buff`, skillName);
+
+      if (hasCache) {
+        return this.inMemoryHashTable.get(`${skills?.owner}-skill-level-with-buff`, skillName) as unknown as number;
       }
 
       let totalBuffPercentages = 0;
@@ -54,7 +60,11 @@ export class TraitGetter {
 
       const skillValue = skillLevel + (skillLevel * totalBuffPercentages) / 100;
 
-      return this.numberFormatter.formatNumber(skillValue);
+      const result = this.numberFormatter.formatNumber(skillValue);
+
+      await this.inMemoryHashTable.set(`${skills?.owner}-skill-level-with-buff`, skillName, result);
+
+      return result;
     } catch (error) {
       console.error(error);
     }
