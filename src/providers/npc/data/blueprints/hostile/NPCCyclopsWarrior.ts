@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 
 import { EntityEffectBlueprint } from "@providers/entityEffects/data/types/entityEffectBlueprintTypes";
 import {
+  BootsBlueprint,
   DaggersBlueprint,
   PotionsBlueprint,
   ShieldsBlueprint,
@@ -64,6 +65,10 @@ export const npcCyclopsWarrior = {
     {
       itemBlueprintKey: SwordsBlueprint.EonGuardianSword,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.SolarflareBoots,
+      chance: 10,
     },
   ],
   entityEffects: [EntityEffectBlueprint.Bleeding],
