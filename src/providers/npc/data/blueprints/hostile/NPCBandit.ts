@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
   AxesBlueprint,
+  BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   GlovesBlueprint,
@@ -100,6 +101,10 @@ export const npcBandit: Partial<INPC> = {
     {
       itemBlueprintKey: AccessoriesBlueprint.Bandana,
       chance: 30,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.SteelBoots,
+      chance: 10,
     },
   ],
 };

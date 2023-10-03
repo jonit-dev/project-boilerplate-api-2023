@@ -241,6 +241,17 @@ export enum BootsBlueprint {
   BloodfireBoot = "bloodfire-boot",
   FarmersBoot = "farmers-boot",
   JadeEmperorsBoot = "jade-emperors-boot",
+  BronzeBoots = "bronze-boots",
+  CavalierBoots = "cavalier-boots",
+  ChainBoots = "chain-boots",
+  FalconBoots = "falcon-boots",
+  GaiasSoleplate = "gaias-soleplate",
+  KnightBoots = "knight-boots",
+  LeafstepBoots = "leafstep-boots",
+  SolarflareBoots = "solarflare-boots",
+  SteelBoots = "steel-boots",
+  VoltstepBoots = "voltstep-boots",
+  WindstriderBoots = "windstrider-boots",
 }
 
 export enum FoodsBlueprint {

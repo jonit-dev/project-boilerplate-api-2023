@@ -3,6 +3,7 @@ import { Dice } from "@providers/constants/DiceConstants";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
+  BootsBlueprint,
   CraftingResourcesBlueprint,
   FoodsBlueprint,
   HelmetsBlueprint,
@@ -131,6 +132,10 @@ export const npcHighElf: Partial<INPC> = {
       itemBlueprintKey: CraftingResourcesBlueprint.Herb,
       chance: 30,
       quantityRange: [5, 10],
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.KnightBoots,
+      chance: 10,
     },
   ],
 };

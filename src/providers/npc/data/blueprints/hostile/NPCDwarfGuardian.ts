@@ -4,6 +4,7 @@ import { MovementSpeed } from "@providers/constants/MovementConstants";
 import {
   AccessoriesBlueprint,
   AxesBlueprint,
+  BootsBlueprint,
   ContainersBlueprint,
   DaggersBlueprint,
   FoodsBlueprint,
@@ -101,6 +102,10 @@ export const npcDwarfGuardian: Partial<INPC> = {
     {
       itemBlueprintKey: AxesBlueprint.MoonBeamAxe,
       chance: 2,
+    },
+    {
+      itemBlueprintKey: BootsBlueprint.BronzeBoots,
+      chance: 5,
     },
   ],
 };

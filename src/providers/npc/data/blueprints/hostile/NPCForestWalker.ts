@@ -108,6 +108,10 @@ export const npcForestWalker: Partial<INPC> = {
       chance: 3,
       quantityRange: [10, 20],
     },
+    {
+      itemBlueprintKey: BootsBlueprint.LeafstepBoots,
+      chance: 5,
+    },
   ],
   entityEffects: [EntityEffectBlueprint.Poison],
   areaSpells: [
