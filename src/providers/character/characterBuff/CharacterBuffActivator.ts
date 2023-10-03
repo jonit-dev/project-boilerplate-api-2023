@@ -1,5 +1,6 @@
 import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import {
   CharacterBuffDurationType,
   CharacterBuffType,
@@ -20,6 +21,7 @@ export class CharacterBuffActivator {
     private characterBuffTracker: CharacterBuffTracker
   ) {}
 
+  @TrackNewRelicTransaction()
   public async enableTemporaryBuff(
     character: ICharacter,
     buff: ICharacterTemporaryBuff
@@ -50,6 +52,7 @@ export class CharacterBuffActivator {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async enablePermanentBuff(
     character: ICharacter,
     buff: ICharacterPermanentBuff,
@@ -58,6 +61,7 @@ export class CharacterBuffActivator {
     return await this.enableBuff(character, buff, noMessage);
   }
 
+  @TrackNewRelicTransaction()
   public async disableBuff(
     character: ICharacter,
     buffId: string,
@@ -73,6 +77,7 @@ export class CharacterBuffActivator {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async disableAllBuffs(
     character: ICharacter,
     durationType: CharacterBuffDurationType | "all" = CharacterBuffDurationType.Temporary
@@ -90,6 +95,7 @@ export class CharacterBuffActivator {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async disableAllTemporaryBuffsAllCharacters(): Promise<void> {
     const temporaryBuffs = await CharacterBuff.find({ durationType: CharacterBuffDurationType.Temporary }).lean();
 

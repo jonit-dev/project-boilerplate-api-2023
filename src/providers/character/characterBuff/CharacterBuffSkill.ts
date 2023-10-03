@@ -6,6 +6,7 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { ICharacterBuff, ISkill, ISkillDetails, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SkillBuff } from "@providers/skill/SkillBuff";
 import { IBuffValueCalculations } from "./CharacterBuffAttribute";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
@@ -19,6 +20,7 @@ export class CharacterBuffSkill {
     private skillBuff: SkillBuff
   ) {}
 
+  @TrackNewRelicTransaction()
   public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
     const skill = (await Skill.findById(character.skills)
       .lean()
@@ -49,6 +51,7 @@ export class CharacterBuffSkill {
     return addedBuff;
   }
 
+  @TrackNewRelicTransaction()
   public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
     const skills = (await Skill.findById(character.skills)
       .lean()
@@ -138,6 +141,7 @@ export class CharacterBuffSkill {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async calculateAllActiveBuffs(character: ICharacter): Promise<ICharacterBuff[] | undefined> {
     if (!character) {
       throw new Error("Character not found");

@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { PM2Helper } from "@providers/server/PM2Helper";
@@ -15,6 +16,7 @@ export class CharacterMonitor {
 
   constructor(private pm2Helper: PM2Helper, private newRelic: NewRelic) {}
 
+  @TrackNewRelicTransaction()
   public async monitor(intervalMs?: number): Promise<void> {
     this.monitorIntervalMS = intervalMs || 3000;
     this.clear(); // clear our state in redis before beginning

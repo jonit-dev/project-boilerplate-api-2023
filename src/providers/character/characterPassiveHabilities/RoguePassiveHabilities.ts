@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { CharacterClass, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,6 +10,7 @@ import { Types } from "mongoose";
 export class RoguePassiveHabilities {
   constructor(private equipmentSlots: EquipmentSlots) {}
 
+  @TrackNewRelicTransaction()
   public async rogueWeaponHandler(characterId: Types.ObjectId, itemId: Types.ObjectId): Promise<boolean> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
 

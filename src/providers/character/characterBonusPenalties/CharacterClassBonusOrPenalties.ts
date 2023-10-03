@@ -1,4 +1,5 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CLASS_BONUS_OR_PENALTIES } from "@providers/constants/SkillConstants";
 import { CharacterClass } from "@rpg-engine/shared";
 import {
@@ -29,6 +30,7 @@ export class CharacterClassBonusOrPenalties {
     };
   }
 
+  @TrackNewRelicTransaction()
   public async getClassBonusOrPenaltiesBuffs(characterId: string): Promise<Record<string, number>> {
     const character = await Character.findById(characterId).lean({ virtuals: true, defaults: true }).select("class");
 

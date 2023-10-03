@@ -4,6 +4,7 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { CharacterSocketEvents, ICharacterBuff } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
 export interface IBuffValueCalculations {
@@ -20,6 +21,7 @@ export class CharacterBuffAttribute {
     private textFormatter: TextFormatter
   ) {}
 
+  @TrackNewRelicTransaction()
   public async enableBuff(character: ICharacter, buff: ICharacterBuff, noMessage?: boolean): Promise<ICharacterBuff> {
     const { buffAbsoluteChange, updatedTraitValue } = await this.performBuffValueCalculations(character._id, buff);
 
@@ -50,6 +52,7 @@ export class CharacterBuffAttribute {
     return addedBuff;
   }
 
+  @TrackNewRelicTransaction()
   public async disableBuff(character: ICharacter, buffId: string, noMessage?: boolean): Promise<boolean> {
     const updatedCharacter = await Character.findById(character._id).lean();
 

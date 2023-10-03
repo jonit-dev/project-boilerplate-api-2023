@@ -1,4 +1,5 @@
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { blueprintManager } from "@providers/inversify/container";
 import { MapHelper } from "@providers/map/MapHelper";
 import { MapLoader } from "@providers/map/MapLoader";
@@ -16,6 +17,7 @@ export interface IItemSeedData extends Omit<IItem, "_id"> {
 export class ItemLoader {
   constructor(private mapHelper: MapHelper, private mapObjectsLoader: MapObjectsLoader) {}
 
+  @TrackNewRelicTransaction()
   public async loadItemSeedData(): Promise<Map<string, IItemSeedData>> {
     const itemSeedData = new Map<string, IItemSeedData>();
 

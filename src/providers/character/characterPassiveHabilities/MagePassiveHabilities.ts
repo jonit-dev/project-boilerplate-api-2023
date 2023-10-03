@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -29,6 +30,7 @@ export class MagePassiveHabilities {
     private newRelic: NewRelic
   ) {}
 
+  @TrackNewRelicTransaction()
   public async autoRegenManaHandler(character: ICharacter): Promise<void> {
     const { _id, mana, maxMana } = character;
 

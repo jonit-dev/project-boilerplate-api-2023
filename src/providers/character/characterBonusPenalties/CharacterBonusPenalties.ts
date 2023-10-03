@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import {
   CharacterClass,
@@ -29,6 +30,7 @@ export class CharacterBonusPenalties {
     private characterRaceBonusOrPenalties: CharacterRaceBonusOrPenalties
   ) {}
 
+  @TrackNewRelicTransaction()
   public async applyRaceBonusPenalties(character: ICharacter, skillType: string): Promise<void> {
     const skills = (await Skill.findById(character.skills)
       .lean({

@@ -1,4 +1,5 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DiscordBot } from "@providers/discord/DiscordBot";
 import { NPCSpawn } from "@providers/npc/NPCSpawn";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -20,6 +21,7 @@ export class NPCRaidActivator {
     private discordBot: DiscordBot
   ) {}
 
+  @TrackNewRelicTransaction()
   public async activateRaids(): Promise<void> {
     try {
       const selectedRaid = await this.getRandomInactiveRaid();
@@ -73,6 +75,7 @@ export class NPCRaidActivator {
     await Promise.all(npcPromises);
   }
 
+  @TrackNewRelicTransaction()
   public async shutdownRaids(): Promise<void> {
     await this.time.waitForSeconds(10); // added this to avoid activating and deactivating at the same time
 

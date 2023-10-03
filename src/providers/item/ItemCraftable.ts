@@ -60,6 +60,7 @@ export class ItemCraftable {
     private itemCraftbook: ItemCraftbook
   ) {}
 
+  @TrackNewRelicTransaction()
   public async craftItem(itemToCraft: ICraftItemPayload, character: ICharacter): Promise<void> {
     if (!character.skills) {
       return;

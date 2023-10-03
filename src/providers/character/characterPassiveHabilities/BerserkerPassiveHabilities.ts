@@ -1,5 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
 import { CharacterClass, ICharacter, IItem, ItemSubType, ItemType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,6 +10,7 @@ import { Types } from "mongoose";
 export class BerserkerPassiveHabilities {
   constructor(private equipmentSlots: EquipmentSlots) {}
 
+  @TrackNewRelicTransaction()
   public async canBerserkerEquipItem(characterId: Types.ObjectId, itemId: Types.ObjectId): Promise<boolean> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
 

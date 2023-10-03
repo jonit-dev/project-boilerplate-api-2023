@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { spellsBlueprints } from "@providers/spells/data/blueprints";
@@ -17,6 +18,7 @@ export interface ISpellAreaNPC {
 export class NPCSpellArea {
   constructor(private blueprintManager: BlueprintManager, private movementHelper: MovementHelper) {}
 
+  @TrackNewRelicTransaction()
   public async castNPCSpell(attacker: INPC, target: ICharacter | INPC): Promise<boolean | undefined> {
     try {
       const npcBlueprint = (await this.blueprintManager.getBlueprint("npcs", attacker.baseKey as any)) as Record<

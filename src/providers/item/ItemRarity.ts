@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { blueprintManager } from "@providers/inversify/container";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { CraftingSkill } from "@rpg-engine/shared";
@@ -55,6 +56,7 @@ export class ItemRarity {
     return rarityAttackDefense;
   }
 
+  @TrackNewRelicTransaction()
   public async setItemRarityOnLootDropForFood(
     item: IItem
   ): Promise<{ healthRecovery: number; rarity: ItemRarities; usableEffectDescription: string } | undefined> {

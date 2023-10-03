@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { provide } from "inversify-binding-decorators";
 import { CharacterItemEquipment } from "./CharacterItemEquipment";
 import { CharacterItemInventory } from "./CharacterItemInventory";
@@ -17,6 +18,7 @@ export class CharacterItems {
   ) {}
 
   //! Warning: This completely WIPES OUT the item from the inventory or equipment. It DOES NOT DROP IT. Once it's executed, it's gone! If you want to drop an item, check ItemDrop.ts
+  @TrackNewRelicTransaction()
   public async deleteItemFromContainer(
     itemId: string,
     character: ICharacter,
@@ -45,6 +47,7 @@ export class CharacterItems {
    * @param decrementQty
    * @returns
    */
+  @TrackNewRelicTransaction()
   public async decrementItemFromContainer(
     itemId: string,
     character: ICharacter,
@@ -66,6 +69,7 @@ export class CharacterItems {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async hasItem(
     itemId: string,
     character: ICharacter,
@@ -93,6 +97,7 @@ export class CharacterItems {
    * @param container
    * @returns ItemByKeyResult with item id and the container where it was found. returns undefined if not found
    */
+  @TrackNewRelicTransaction()
   public async hasItemByKey(
     itemKey: string,
     character: ICharacter,

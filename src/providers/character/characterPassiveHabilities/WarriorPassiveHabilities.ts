@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -28,6 +29,7 @@ export class WarriorPassiveHabilities {
     private spellCalculator: SpellCalculator
   ) {}
 
+  @TrackNewRelicTransaction()
   public async warriorAutoRegenHealthHandler(character: ICharacter): Promise<void> {
     if (!character) {
       return;

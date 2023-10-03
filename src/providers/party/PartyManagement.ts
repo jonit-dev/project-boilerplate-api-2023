@@ -2,6 +2,7 @@ import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { CharacterParty, ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { PARTY_BONUS_RATIO } from "@providers/constants/PartyConstants";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -36,6 +37,7 @@ export default class PartyManagement {
   constructor(private socketMessaging: SocketMessaging, private characterBuffActivator: CharacterBuffActivator) {}
 
   // PARTY MANAGEMENT
+  @TrackNewRelicTransaction()
   public async inviteToParty(leader: ICharacter, target: ICharacter): Promise<void> {
     const isTargetInParty = await this.getPartyByCharacterId(target._id);
     if (isTargetInParty) {
@@ -65,6 +67,7 @@ export default class PartyManagement {
     });
   }
 
+  @TrackNewRelicTransaction()
   public async acceptInvite(leader: ICharacter, target: ICharacter): Promise<ICharacterParty | undefined> {
     const isPartyExist = await this.getPartyByCharacterId(leader._id);
 
@@ -183,6 +186,7 @@ export default class PartyManagement {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async transferLeadership(partyId: string, target: ICharacter, eventCaller: ICharacter): Promise<boolean> {
     const party = (await CharacterParty.findById(partyId).lean().select("_id leader members")) as ICharacterParty;
 
@@ -238,6 +242,7 @@ export default class PartyManagement {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async leaveParty(partyId: string, targetOfEvent: ICharacter, eventCaller: ICharacter): Promise<boolean> {
     const party = (await CharacterParty.findById(partyId).lean().select("_id leader members")) as ICharacterParty;
 
@@ -319,6 +324,7 @@ export default class PartyManagement {
     await this.partyPayloadSend(updatedParty);
   }
 
+  @TrackNewRelicTransaction()
   public async getPartyByCharacterId(characterId: string): Promise<ICharacterParty | null> {
     const party = (await CharacterParty.findOne({
       $or: [
@@ -334,6 +340,7 @@ export default class PartyManagement {
     return party || null;
   }
 
+  @TrackNewRelicTransaction()
   public calculatePartyBenefits(
     numberOfMembers: number,
     differentClasses: number
@@ -403,6 +410,7 @@ export default class PartyManagement {
     ];
   }
 
+  @TrackNewRelicTransaction()
   public getDifferentClasses(party: ICharacterParty): number {
     const leaderClass = party.leader.class;
     const memberClasses = party.members.map((member) => member.class);
@@ -517,6 +525,7 @@ export default class PartyManagement {
   }
 
   // SEND MESSAGE OR DATA
+  @TrackNewRelicTransaction()
   public async partyPayloadSend(party: ICharacterParty | null, charactersId?: Types.ObjectId[]): Promise<void> {
     const allCharactersId = new Set<Types.ObjectId>(charactersId ? [...charactersId] : []);
 
@@ -634,6 +643,7 @@ export default class PartyManagement {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async isWithinRange(
     target: INPC,
     charactersId: Types.ObjectId[],
@@ -674,6 +684,7 @@ export default class PartyManagement {
   }
 
   // HELP FUNCTIONS
+  @TrackNewRelicTransaction()
   public generateDataPayloadFromServer(party: ICharacterParty): ICharacterPartyShared | undefined {
     const convertedParty: ICharacterPartyShared = {
       id: party._id ? party._id.toString() : undefined,
@@ -715,6 +726,7 @@ export default class PartyManagement {
   }
 
   // SERVER BOOTSTRAP
+  @TrackNewRelicTransaction()
   public async clearAllParties(): Promise<void> {
     const allPartys = (await CharacterParty.find({}).lean()) as ICharacterParty[];
 

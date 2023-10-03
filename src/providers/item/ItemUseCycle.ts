@@ -1,9 +1,12 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+
 /* eslint-disable @typescript-eslint/no-floating-promises */
 export class ItemUseCycle {
   constructor(fn: Function, iterations: number) {
     this.execute(fn, iterations);
   }
 
+  @TrackNewRelicTransaction()
   private async execute(fn: Function, iterations: number): Promise<void> {
     await fn();
 

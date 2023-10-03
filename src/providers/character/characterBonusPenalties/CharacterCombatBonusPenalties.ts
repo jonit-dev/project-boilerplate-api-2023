@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { DiscordBot } from "@providers/discord/DiscordBot";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import { ICombatSkillsBonusAndPenalties, IIncreaseSPResult } from "@rpg-engine/shared";
@@ -9,6 +10,7 @@ import { provide } from "inversify-binding-decorators";
 export class CharacterCombatBonusPenalties {
   constructor(private skillFunctions: SkillFunctions, private discordBot: DiscordBot) {}
 
+  @TrackNewRelicTransaction()
   public async updateCombatSkills(
     skills: ISkill,
     skillName: string,

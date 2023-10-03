@@ -3,6 +3,7 @@ import { ICharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterView } from "@providers/character/CharacterView";
 import { CharacterBuffSkill } from "@providers/character/characterBuff/CharacterBuffSkill";
@@ -66,6 +67,7 @@ export class NPCExperience {
    * the xp stored in the xpToRelease array to the corresponding
    * characters and notifies them if leveled up
    */
+  @TrackNewRelicTransaction()
   public async releaseXP(target: INPC): Promise<void> {
     await this.time.waitForMilliseconds(random(0, 50)); // add artificial delay to avoid concurrency
 
@@ -152,6 +154,7 @@ export class NPCExperience {
    * In case the target is NPC, it stores the character's xp gained in the xpToRelease array
    */
 
+  @TrackNewRelicTransaction()
   public async recordXPinBattle(attacker: ICharacter, target: ICharacter | INPC, damage: number): Promise<void> {
     try {
       const canProceed = await this.locker.lock(`npc-${target._id}-record-xp`);
