@@ -1,6 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterBan } from "@providers/character/CharacterBan";
+import { ANTI_MACRO_PROBABILITY_TRIGGER } from "@providers/constants/AntiMacroConstants";
 import { MacroCaptchaSend } from "@providers/macro/MacroCaptchaSend";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
@@ -16,13 +17,13 @@ export class MacroCaptchaCrons {
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 * * * *", async () => {
+    nodeCron.schedule("*/2 * * * *", async () => {
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "BanMacroCharacters", async () => {
         await this.banMacroCharacters();
       });
     });
 
-    nodeCron.schedule("0 */2 * * *", async () => {
+    nodeCron.schedule("*/5 * * * *", async () => {
       await this.newRelic.trackTransaction(
         NewRelicTransactionCategory.CronJob,
         "SendMacroCaptchaToActiveCharacters",
@@ -72,7 +73,7 @@ export class MacroCaptchaCrons {
 
     await Promise.all(
       charactersWithCaptchaNotVerified.map(async (character) => {
-        if (character.isOnline) await this.characterBan.increasePenaltyAndBan(character, "macro");
+        if (character.isOnline) await this.characterBan.banWithCustomPenalty(character, 1);
       })
     );
   }
@@ -105,7 +106,7 @@ export class MacroCaptchaCrons {
       charactersWithCaptchaNotVerified.map(async (character) => {
         const n = _.random(0, 100);
 
-        if (n <= 5) {
+        if (n <= ANTI_MACRO_PROBABILITY_TRIGGER) {
           await this.macroCaptchaSend.sendAndStartCaptchaVerification(character);
           sentTo++;
         }

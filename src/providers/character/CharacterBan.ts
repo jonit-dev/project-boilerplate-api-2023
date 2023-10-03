@@ -54,14 +54,27 @@ export class CharacterBan {
   }
 
   @TrackNewRelicTransaction()
-  public async increasePenaltyAndBan(character: ICharacter, cause?: "macro"): Promise<void> {
-    if (cause === "macro") {
-      await this.discordBot.sendMessage(
-        `Character ${character.name} has been banned for not answering the anti-macro properly.`,
-        "bans"
-      );
-    }
+  public async banWithCustomPenalty(character: ICharacter, penalty: number): Promise<void> {
+    await this.discordBot.sendMessage(
+      `Character ${character.name} has been banned for not answering the anti-macro properly.`,
+      "bans"
+    );
 
+    character.penalty = penalty;
+    character.isBanned = true;
+    character.isOnline = false;
+    character.banRemovalDate = dayjs(new Date()).add(character.penalty, "day").toDate();
+    await character.save();
+
+    this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+      reason: "Your character is now banned.",
+    });
+
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Characters, "Banned", 1);
+  }
+
+  @TrackNewRelicTransaction()
+  public async increasePenaltyAndBan(character: ICharacter): Promise<void> {
     character.penalty = Math.floor(character.penalty / 10) * 10 + 10;
 
     if (character.penalty % 10 === 0) {

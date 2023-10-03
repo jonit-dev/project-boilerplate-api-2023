@@ -13,7 +13,7 @@ export class MacroCaptchaVerify {
     private characterBan: CharacterBan
   ) {}
 
-  public async startCaptchaVerification(character: ICharacter, code: string) {
+  public async startCaptchaVerification(character: ICharacter, code: string): Promise<boolean> {
     if (!this.characterValidation.hasBasicValidation(character)) {
       this.socketMessaging.sendErrorMessageToCharacter(character);
       return false;
@@ -22,7 +22,7 @@ export class MacroCaptchaVerify {
     return await this.verifyUserCaptcha(character, code);
   }
 
-  private async verifyUserCaptcha(character: ICharacter, code: string) {
+  private async verifyUserCaptcha(character: ICharacter, code: string): Promise<boolean> {
     const fetchedCharacter = await Character.findById(character._id).select("+captchaVerifyCode");
 
     if (!fetchedCharacter?.captchaVerifyCode) {
@@ -38,17 +38,17 @@ export class MacroCaptchaVerify {
     return true;
   }
 
-  private async handleSuccessVerify(character: ICharacter) {
+  private async handleSuccessVerify(character: ICharacter): Promise<void> {
     await this.removeCaptchaFromCharacter(character);
     this.socketMessaging.sendEventToUser(character.channelId!, MacroSocketEvents.MacroVerifySuccess);
   }
 
-  private async handleVerifyBan(character: ICharacter) {
+  private async handleVerifyBan(character: ICharacter): Promise<void> {
     await this.removeCaptchaFromCharacter(character);
-    await this.characterBan.increasePenaltyAndBan(character, "macro");
+    await this.characterBan.banWithCustomPenalty(character, 1);
   }
 
-  private async handleDecreaseCaptchaTries(character: ICharacter) {
+  private async handleDecreaseCaptchaTries(character: ICharacter): Promise<void> {
     if (!character.captchaTriesLeft) return;
 
     await Character.findByIdAndUpdate(character._id, {
@@ -59,7 +59,7 @@ export class MacroCaptchaVerify {
     });
   }
 
-  private async removeCaptchaFromCharacter(character: ICharacter) {
+  private async removeCaptchaFromCharacter(character: ICharacter): Promise<void> {
     const captchaNoVerifyUntil = new Date();
     captchaNoVerifyUntil.setHours(captchaNoVerifyUntil.getHours() + 1);
 

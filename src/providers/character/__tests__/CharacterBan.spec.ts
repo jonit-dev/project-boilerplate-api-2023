@@ -68,4 +68,16 @@ describe("CharacterBan.ts", () => {
 
     expect(banRemovalDate.diff(today, "day")).toBe(19);
   });
+
+  it("should ban with custom penalty", async () => {
+    await characterBan.banWithCustomPenalty(testCharacter, 1);
+
+    testCharacter = (await Character.findById(testCharacter._id)
+      .lean()
+      .select("penalty isBanned banRemovalDate")) as ICharacter;
+
+    expect(testCharacter.isBanned).toBe(true);
+    expect(testCharacter.penalty).toBe(1);
+    expect(testCharacter.banRemovalDate).toBeDefined();
+  });
 });
