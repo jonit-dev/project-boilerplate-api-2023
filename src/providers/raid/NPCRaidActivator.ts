@@ -77,7 +77,7 @@ export class NPCRaidActivator {
 
   @TrackNewRelicTransaction()
   public async shutdownRaids(): Promise<void> {
-    await this.time.waitForSeconds(10); // added this to avoid activating and deactivating at the same time
+    await this.time.waitForMilliseconds(10); // added this to avoid activating and deactivating at the same time
 
     try {
       // Fetch only the active raids
