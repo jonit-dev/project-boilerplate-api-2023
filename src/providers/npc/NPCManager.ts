@@ -27,6 +27,7 @@ import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
+import { Locker } from "@providers/locks/Locker";
 import { MathHelper } from "@providers/math/MathHelper";
 import { RaidManager } from "@providers/raid/RaidManager";
 import {
@@ -52,7 +53,8 @@ export class NPCManager {
     private inMemoryHashTable: InMemoryHashTable,
     private newRelic: NewRelic,
     private mathHelper: MathHelper,
-    private raidManager: RaidManager
+    private raidManager: RaidManager,
+    private locker: Locker
   ) {}
 
   public listenForBehaviorTrigger(): void {
@@ -108,6 +110,16 @@ export class NPCManager {
   public async startBehaviorLoop(initialNPC: INPC): Promise<void> {
     let npc = initialNPC;
 
+    if (!npc) {
+      return;
+    }
+
+    const canProceed = await this.locker.lock(`npc-${npc._id}-npc-cycle`);
+
+    if (!canProceed) {
+      return;
+    }
+
     if (npc) {
       await this.inMemoryHashTable.set("npc", npc._id, npc);
     }
@@ -121,14 +133,14 @@ export class NPCManager {
     }
 
     if (!npc.isBehaviorEnabled) {
-      const npcSkills = await Skill.find({ owner: npc._id }).cacheQuery({
-        cacheKey: `npc-${npc.id}-skills`,
-      });
-
       // prevent double behavior loop
       if (NPC_CYCLES.has(npc.id)) {
         return;
       }
+
+      const npcSkills = await Skill.find({ owner: npc._id }).cacheQuery({
+        cacheKey: `npc-${npc.id}-skills`,
+      });
 
       new NPCCycle(
         npc.id,
@@ -149,12 +161,12 @@ export class NPCManager {
                   defaults: true,
                 });
 
-                npc.skills = npcSkills;
-
                 if (!npc.isBehaviorEnabled) {
                   await this.npcFreezer.freezeNPC(npc);
                   return;
                 }
+
+                npc.skills = npcSkills;
 
                 if (await this.specialEffect.isStun(npc)) {
                   return;

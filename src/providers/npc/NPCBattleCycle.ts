@@ -1,5 +1,4 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
-import { locker } from "@providers/inversify/container";
 
 type SetInterval = ReturnType<typeof setInterval>;
 
@@ -29,8 +28,6 @@ export class NPCBattleCycle {
   public async clear(): Promise<void> {
     clearInterval(this.interval);
     NPC_BATTLE_CYCLES.delete(this.id);
-
-    await locker.unlock(`npc-${this.id}-battle-cycle`);
 
     await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
   }

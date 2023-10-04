@@ -80,7 +80,7 @@ export class NPCSeeder {
       await this.locker.unlock(`npc-body-generation-${npc._id}`);
       await this.locker.unlock(`npc-${npc._id}-release-xp`);
       await this.locker.unlock(`npc-${npc._id}-record-xp`);
-      await this.locker.unlock(`npc-${npc._id}-battle-cycle`);
+      await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
 
       await this.inMemoryHashTable.delete("npc-force-pathfinding-calculation", npc._id);
 

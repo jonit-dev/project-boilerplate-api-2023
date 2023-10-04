@@ -10,6 +10,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
+import { Locker } from "@providers/locks/Locker";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
@@ -19,7 +20,7 @@ import round from "lodash/round";
 export class NPCFreezer {
   public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private npcView: NPCView, private newRelic: NewRelic) {}
+  constructor(private npcView: NPCView, private newRelic: NewRelic, private locker: Locker) {}
 
   public init(): void {
     this.setCPUUsageCheckInterval();
@@ -62,6 +63,8 @@ export class NPCFreezer {
     }
 
     this.freezeCheckIntervals.delete(npc.id);
+
+    await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
   }
 
   private setCPUUsageCheckInterval(): void {

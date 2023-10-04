@@ -7,7 +7,6 @@ import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleA
 import { CharacterView } from "@providers/character/CharacterView";
 import { NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { Locker } from "@providers/locks/Locker";
 import { MapHelper } from "@providers/map/MapHelper";
 import { PathfindingCaching } from "@providers/map/PathfindingCaching";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -49,8 +48,7 @@ export class NPCMovementMoveTowards {
     private characterView: CharacterView,
     private specialEffect: SpecialEffect,
     private pathfindingCaching: PathfindingCaching,
-    private newRelic: NewRelic,
-    private locker: Locker
+    private newRelic: NewRelic
   ) {}
 
   @TrackNewRelicTransaction()
@@ -72,6 +70,11 @@ export class NPCMovementMoveTowards {
     }
 
     if (targetCharacter) {
+      if (targetCharacter.scene !== npc.scene) {
+        await this.npcTarget.clearTarget(npc);
+        return;
+      }
+
       await this.npcTarget.tryToClearOutOfRangeTargets(npc);
 
       switch (npc.attackType) {
@@ -247,12 +250,6 @@ export class NPCMovementMoveTowards {
     }
 
     if (!hasBattleCycle) {
-      const canProceed = await this.locker.lock(`npc-${npc._id}-battle-cycle`);
-
-      if (!canProceed) {
-        return;
-      }
-
       const npcSkills = (await Skill.findOne({
         _id: npc.skills,
       })
