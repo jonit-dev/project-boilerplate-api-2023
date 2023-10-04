@@ -4,6 +4,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
+import { appEnv } from "@providers/config/env";
 import { NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapHelper } from "@providers/map/MapHelper";
@@ -99,9 +100,13 @@ export class NPCMovementMoveTowards {
           await NPC.updateOne({ _id: npc.id }, { pathOrientation: NPCPathOrientation.Forward });
         }
 
-        this.debouncedFaceTarget = debounce(this.faceTarget, 300);
+        if (appEnv.general.IS_UNIT_TEST) {
+          await this.faceTarget(npc, targetCharacter);
+        } else {
+          this.debouncedFaceTarget = debounce(this.faceTarget, 300);
 
-        await this.debouncedFaceTarget(npc, targetCharacter);
+          await this.debouncedFaceTarget(npc, targetCharacter);
+        }
 
         return;
       }
