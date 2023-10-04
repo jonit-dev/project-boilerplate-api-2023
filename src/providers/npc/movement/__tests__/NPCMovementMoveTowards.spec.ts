@@ -199,7 +199,12 @@ describe("NPCMovementMoveTowards.ts", () => {
 
         // assert
         // @ts-ignore
-        expect(npcMovementMoveTowards.faceTarget).toHaveBeenCalledWith(testNPC);
+        expect(npcMovementMoveTowards.faceTarget).toHaveBeenCalledWith(
+          testNPC,
+          expect.objectContaining({
+            _id: testCharacter._id,
+          })
+        );
       });
     });
 

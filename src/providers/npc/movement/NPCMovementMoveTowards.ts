@@ -4,7 +4,6 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
-import { CharacterView } from "@providers/character/CharacterView";
 import { NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { MapHelper } from "@providers/map/MapHelper";
@@ -24,12 +23,11 @@ import {
   ToGridY,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import _ from "lodash";
+import _, { debounce } from "lodash";
 import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
-
 export interface ICharacterHealth {
   id: string;
   health: number;
@@ -37,6 +35,7 @@ export interface ICharacterHealth {
 
 @provide(NPCMovementMoveTowards)
 export class NPCMovementMoveTowards {
+  debouncedFaceTarget: _.DebouncedFunc<(npc: INPC, targetCharacter: ICharacter) => Promise<void>>;
   constructor(
     private movementHelper: MovementHelper,
     private npcMovement: NPCMovement,
@@ -45,7 +44,6 @@ export class NPCMovementMoveTowards {
     private socketMessaging: SocketMessaging,
     private npcView: NPCView,
     private mapHelper: MapHelper,
-    private characterView: CharacterView,
     private specialEffect: SpecialEffect,
     private pathfindingCaching: PathfindingCaching,
     private newRelic: NewRelic
@@ -101,7 +99,9 @@ export class NPCMovementMoveTowards {
           await NPC.updateOne({ _id: npc.id }, { pathOrientation: NPCPathOrientation.Forward });
         }
 
-        await this.faceTarget(npc);
+        this.debouncedFaceTarget = debounce(this.faceTarget, 300);
+
+        await this.debouncedFaceTarget(npc, targetCharacter);
 
         return;
       }
@@ -191,34 +191,31 @@ export class NPCMovementMoveTowards {
     }
   }
 
-  private async faceTarget(npc: INPC): Promise<void> {
-    const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;
+  @TrackNewRelicTransaction()
+  private async faceTarget(npc: INPC, targetCharacter: ICharacter): Promise<void> {
+    if (!targetCharacter) {
+      return;
+    }
 
-    if (targetCharacter) {
-      const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
+    const facingDirection = this.npcTarget.getTargetDirection(npc, targetCharacter.x, targetCharacter.y);
 
-      await NPC.updateOne({ _id: npc.id }, { direction: facingDirection });
+    await NPC.updateOne({ _id: npc.id }, { direction: facingDirection });
 
-      const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+    const nearbyCharacters = await this.npcView.getCharactersInView(npc);
 
-      for (const nearbyCharacter of nearbyCharacters) {
-        // check if update is needed (if character is not in the same scene, it's not needed)
-        if (nearbyCharacter.scene !== npc.scene) {
-          continue;
-        }
-        const clientNpc = await this.characterView.getElementOnView(nearbyCharacter, npc._id, "npcs");
+    // Filter characters needing updates based on the fetched client NPCs
+    const charactersNeedingUpdates: ICharacter[] = nearbyCharacters.filter((nearbyCharacter) => {
+      return nearbyCharacter?.direction !== facingDirection;
+    });
 
-        if (clientNpc?.direction === facingDirection) {
-          return;
-        }
-
-        this.socketMessaging.sendEventToUser(nearbyCharacter.channelId!, NPCSocketEvents.NPCDataUpdate, {
-          id: npc.id,
-          direction: npc.direction,
-          x: npc.x,
-          y: npc.y,
-        });
-      }
+    // Broadcast to all characters needing an update
+    for (const character of charactersNeedingUpdates) {
+      this.socketMessaging.sendEventToUser(character.channelId!, NPCSocketEvents.NPCDataUpdate, {
+        id: npc.id,
+        direction: npc.direction,
+        x: npc.x,
+        y: npc.y,
+      });
     }
   }
 
