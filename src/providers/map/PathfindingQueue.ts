@@ -4,7 +4,6 @@ import { appEnv } from "@providers/config/env";
 import { Time } from "@providers/time/Time";
 import { Job, Queue, Worker } from "bullmq";
 import { provide } from "inversify-binding-decorators";
-import { random } from "lodash";
 import { Pathfinder } from "./Pathfinder";
 import { PathfindingResults } from "./PathfindingResults";
 
@@ -98,9 +97,6 @@ export class PathfindingQueue {
     endGridX: number,
     endGridY: number
   ): Promise<Job> {
-    // avoid clogging the queue wtih too many jobs at the same time
-    await this.time.waitForMilliseconds(random(50, 150));
-
     return await this.queue.add(
       "pathfindingJob",
       { npc, target, startGridX, startGridY, endGridX, endGridY },
@@ -110,7 +106,7 @@ export class PathfindingQueue {
         attempts: 3,
         backoff: {
           type: "exponential",
-          delay: 200,
+          delay: 10,
         },
       }
     );

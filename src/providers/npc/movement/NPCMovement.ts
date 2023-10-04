@@ -245,7 +245,7 @@ export class NPCMovement {
 
             reject(new Error("Error while trying to fetch pathfinding result for NPC. Timeout!"));
           }
-        }, 50);
+        }, 1);
       } catch (error) {
         console.log(error);
         reject(error);
