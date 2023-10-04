@@ -53,6 +53,7 @@ export class Cronjob {
         this.cleanupEmptyBodyCrons.schedule();
         this.macroCaptchaCrons.schedule();
         this.marketplaceCrons.schedule();
+        this.totalAvailableGold.schedule();
         break;
       case EnvType.Staging:
       case EnvType.Production:

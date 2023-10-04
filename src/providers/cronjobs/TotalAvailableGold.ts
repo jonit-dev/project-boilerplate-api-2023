@@ -35,7 +35,7 @@ export class TotalAvailableGold {
         NewRelicMetricCategory.Count,
         NewRelicSubCategory.Items,
         "TotalAvailableGold",
-        totalGold
+        Math.round(totalGold)
       );
     });
   }
