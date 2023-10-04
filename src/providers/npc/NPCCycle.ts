@@ -1,6 +1,8 @@
 /* eslint-disable no-void */
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
+import { newRelic } from "@providers/inversify/container";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { NPC_BATTLE_CYCLES } from "./NPCBattleCycle";
 
 type SetInterval = ReturnType<typeof setInterval>;
@@ -27,6 +29,8 @@ export class NPCCycle {
     this.clearIfAlreadyExists();
 
     NPC_CYCLES.set(this.id, this);
+
+    newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Server, "NPCCycles", 1);
   }
 
   public async clear(): Promise<void> {
@@ -44,7 +48,7 @@ export class NPCCycle {
   }
 
   private async shouldNPCBeCleared(): Promise<boolean> {
-    const npc = await NPC.findById(this.id).lean();
+    const npc = await NPC.findById(this.id).lean().select("isBehaviorEnabled health");
 
     if (!npc) return true;
 

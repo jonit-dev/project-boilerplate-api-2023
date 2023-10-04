@@ -18,4 +18,5 @@ export enum NewRelicSubCategory {
   NPCs = "NPCs",
   Items = "Items",
   Marketplace = "Marketplace",
+  Server = "Server",
 }

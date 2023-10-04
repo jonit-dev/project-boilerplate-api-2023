@@ -1,7 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { Locker } from "@providers/locks/Locker";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
@@ -20,8 +19,7 @@ export class NPCTarget {
     private movementHelper: MovementHelper,
     private mapNonPVPZone: MapNonPVPZone,
     private specialEffect: SpecialEffect,
-    private locker: Locker,
-    private inMemoryHashTable: InMemoryHashTable
+    private locker: Locker
   ) {}
 
   public async clearTarget(npc: INPC): Promise<void> {
@@ -107,6 +105,7 @@ export class NPCTarget {
     );
 
     if (!isMovementUnderRange) {
+      await this.clearTarget(npc);
       return;
     }
 

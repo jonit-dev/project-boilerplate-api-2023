@@ -2,8 +2,10 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleAttackTarget";
 import { CharacterView } from "@providers/character/CharacterView";
+import { NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { Locker } from "@providers/locks/Locker";
 import { MapHelper } from "@providers/map/MapHelper";
@@ -51,6 +53,7 @@ export class NPCMovementMoveTowards {
     private locker: Locker
   ) {}
 
+  @TrackNewRelicTransaction()
   public async startMoveTowardsMovement(npc: INPC): Promise<void> {
     // first step is setting a target
     // for this, get all characters nearby and set the target to the closest one
@@ -155,6 +158,7 @@ export class NPCMovementMoveTowards {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async initOrClearBattleCycle(
     npc: INPC,
     targetCharacter: ICharacter,
@@ -233,6 +237,7 @@ export class NPCMovementMoveTowards {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   private async initBattleCycle(npc: INPC): Promise<void> {
     const hasBattleCycle = NPC_BATTLE_CYCLES.has(npc.id);
 
@@ -242,6 +247,12 @@ export class NPCMovementMoveTowards {
     }
 
     if (!hasBattleCycle) {
+      const canProceed = await this.locker.lock(`npc-${npc._id}-battle-cycle`);
+
+      if (!canProceed) {
+        return;
+      }
+
       const npcSkills = (await Skill.findOne({
         _id: npc.skills,
       })
@@ -250,12 +261,6 @@ export class NPCMovementMoveTowards {
           cacheKey: `${npc.id}-skills`,
           ttl: 60 * 60 * 24 * 7,
         })) as ISkill;
-
-      const canProceed = await this.locker.lock(`npc-${npc._id}-battle-cycle`);
-
-      if (!canProceed) {
-        return;
-      }
 
       new NPCBattleCycle(
         npc.id,
@@ -268,7 +273,20 @@ export class NPCMovementMoveTowards {
 
             const targetCharacter = result[1] as ICharacter;
 
-            if (!targetCharacter) {
+            const isUnderRange = this.movementHelper.isUnderRange(
+              npc.x,
+              npc.y,
+              targetCharacter.x,
+              targetCharacter.y,
+              npc.maxRangeInGridCells || NPC_MIN_DISTANCE_TO_ACTIVATE
+            );
+
+            if (
+              !targetCharacter ||
+              targetCharacter.health <= 0 ||
+              targetCharacter.scene !== npc.scene ||
+              !isUnderRange
+            ) {
               await this.npcTarget.clearTarget(npc);
               return;
             }

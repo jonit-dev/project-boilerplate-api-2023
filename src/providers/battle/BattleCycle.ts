@@ -1,13 +1,14 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
-import { Locker } from "@providers/locks/Locker";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 
 @provideSingleton(BattleCycle)
 export class BattleCycle {
   private intervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private characterValidation: CharacterValidation, private locker: Locker) {}
+  constructor(private characterValidation: CharacterValidation, private newRelic: NewRelic) {}
 
   public async init(
     character: ICharacter,
@@ -48,6 +49,8 @@ export class BattleCycle {
       }, attackIntervalSpeed);
 
       this.intervals.set(character._id.toString(), interval);
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Server, "CharacterBattleCycle", 1);
     } catch (error) {
       console.error(error);
     }

@@ -72,11 +72,10 @@ export class NPCFreezer {
     setInterval(async () => {
       const end = CPUusage(start);
       const totalCPUUsage = round(end.percent);
-      if (appEnv.general.DEBUG_MODE) {
-        console.log(
-          `NPC_CYCLES: ${NPC_CYCLES.size} NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} CPU_USAGE: ${totalCPUUsage}%`
-        );
-      }
+
+      console.log(
+        `NPC_CYCLES: ${NPC_CYCLES.size} NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} CPU_USAGE: ${totalCPUUsage}%`
+      );
 
       const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
       const freezeTasks: any[] = [];
