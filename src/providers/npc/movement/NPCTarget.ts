@@ -36,8 +36,6 @@ export class NPCTarget {
       }
     );
 
-    await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
-
     const npcBattleCycle = NPC_BATTLE_CYCLES.get(npc.id);
     const npcCycle = NPC_CYCLES.get(npc.id);
     if (npcBattleCycle) {
