@@ -1,17 +1,19 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { EntityAttackType, ItemSlotType, ItemSubType, ItemType, SKILLS_MAP } from "@rpg-engine/shared";
 
 import { provide } from "inversify-binding-decorators";
 
-interface ICharacterWeaponResult {
+export interface ICharacterWeaponResult {
   item: IItem;
   location: ItemSlotType;
 }
 
+@TrackClassExecutionTime()
 @provide(CharacterWeapon)
 export class CharacterWeapon {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}

@@ -2,6 +2,7 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import {
@@ -19,6 +20,7 @@ import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { BattleParticipant } from "./BattleEvent";
 
+@TrackClassExecutionTime()
 @provide(BattleDamageCalculator)
 export class BattleDamageCalculator {
   constructor(

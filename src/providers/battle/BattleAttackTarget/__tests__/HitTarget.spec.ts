@@ -190,36 +190,40 @@ describe("HitTarget", () => {
     it("should  call apply effects one time for the weapon", async () => {
       // @ts-ignore
       applyEntitySpy = jest.spyOn(hitTarget, "applyEntity");
-      // @ts-ignore
-      getWeaponSpy = jest.spyOn(hitTarget.characterWeapon, "getWeapon");
+
       // @ts-ignore
       findByIdSpy = jest.spyOn(Item, "findById");
 
-      getWeaponSpy.mockResolvedValueOnce({ item: fireSwordItem });
+      const mockWeapon = { item: fireSwordItem };
 
       // @ts-ignore
-      await hitTarget.applyEntityEffectsCharacter(attackerCharacter, testNPC);
+      await hitTarget.applyEntityEffectsCharacter(attackerCharacter, mockWeapon, testNPC);
 
-      expect(getWeaponSpy).toHaveBeenCalledWith(attackerCharacter);
       expect(applyEntitySpy).toHaveBeenCalledWith(testNPC, attackerCharacter, fireSwordItem);
       expect(applyEntitySpy).toBeCalledTimes(1);
     });
 
     it("should call applyEntityEffectsCharacter if the attacker is a Character", async () => {
       // @ts-ignore
+      const applyEntityEffectsCharacter = jest.spyOn(hitTarget, "applyEntityEffectsCharacter");
+      // @ts-ignore
       jest.spyOn(hitTarget.battleEvent, "calculateEvent" as any).mockImplementation(() => BattleEventType.Hit);
       // @ts-ignore
       jest.spyOn(hitTarget.battleDamageCalculator, "calculateHitDamage" as any).mockImplementation(() => 50);
+
+      const mockWeapon = { item: fireSwordItem };
       // @ts-ignore
-      // prettier-ignore
-      const applyEntityEffectsCharacter = jest.spyOn(hitTarget, "applyEntityEffectsCharacter").mockResolvedValue(undefined);
+      getWeaponSpy = jest.spyOn(hitTarget.characterWeapon, "getWeapon").mockImplementation(() => mockWeapon);
+
       // @ts-ignore
       // prettier-ignore
       const applyEntityEffectsIfApplicable = jest.spyOn(hitTarget, "applyEntityEffectsIfApplicable").mockResolvedValue(undefined);
 
       await hitTarget.hit(attackerCharacter, testNPC);
 
-      expect(applyEntityEffectsCharacter).toHaveBeenCalledWith(attackerCharacter, testNPC);
+      // return weapon on getWeapon
+
+      expect(applyEntityEffectsCharacter).toHaveBeenCalledWith(attackerCharacter, mockWeapon, testNPC);
       expect(applyEntityEffectsIfApplicable).not.toHaveBeenCalled();
     });
 

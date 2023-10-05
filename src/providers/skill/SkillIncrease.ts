@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
@@ -34,6 +35,7 @@ import { SkillFunctions } from "./SkillFunctions";
 import { SkillGainValidation } from "./SkillGainValidation";
 import { CraftingSkillsMap } from "./constants";
 
+@TrackClassExecutionTime()
 @provide(SkillIncrease)
 export class SkillIncrease {
   constructor(

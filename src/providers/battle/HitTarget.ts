@@ -5,7 +5,7 @@ import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
-import { CharacterWeapon } from "@providers/character/CharacterWeapon";
+import { CharacterWeapon, ICharacterWeaponResult } from "@providers/character/CharacterWeapon";
 import { CharacterMovementWarn } from "@providers/character/characterMovement/CharacterMovementWarn";
 import { EntityEffectUse } from "@providers/entityEffects/EntityEffectUse";
 import { NPCWarn } from "@providers/npc/NPCWarn";
@@ -24,6 +24,7 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { appEnv } from "@providers/config/env";
 import { BONUS_DAMAGE_MULTIPLIER } from "@providers/constants/BattleConstants";
 import { Queue, Worker } from "bullmq";
@@ -32,7 +33,7 @@ import { BattleAttackTargetDeath } from "./BattleAttackTarget/BattleAttackTarget
 import { BattleDamageCalculator } from "./BattleDamageCalculator";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
-
+@TrackClassExecutionTime()
 @provide(HitTarget)
 export class HitTarget {
   private npcQueue: Queue;
@@ -290,24 +291,33 @@ export class HitTarget {
           isCriticalHit: damage > baseDamage,
         };
 
-        const weaponPromise = this.characterWeapon.getWeapon(attacker as ICharacter);
-
+        let weapon;
         if (target.type === "Character") {
-          const weapon = await weaponPromise;
+          weapon = (await this.characterWeapon.getWeapon(attacker as ICharacter)) as unknown as ICharacterWeaponResult;
+
           if (
             (weapon?.item && weapon?.item.subType === ItemSubType.Magic) ||
             (weapon?.item && weapon?.item.subType === ItemSubType.Staff)
           ) {
-            await this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, this.getPower(weapon?.item));
+            damageRelatedPromises.push(
+              this.skillIncrease.increaseMagicResistanceSP(target as ICharacter, this.getPower(weapon?.item))
+            );
           } else {
-            await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance);
+            damageRelatedPromises.push(
+              this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Resistance)
+            );
           }
         }
 
         if (target.isAlive) {
           if (attacker.type === EntityType.Character) {
+            if (!weapon) {
+              weapon = (await this.characterWeapon.getWeapon(
+                attacker as ICharacter
+              )) as unknown as ICharacterWeaponResult;
+            }
             if (target.appliedEntityEffects?.length! === 0) {
-              damageRelatedPromises.push(this.applyEntityEffectsCharacter(attacker as ICharacter, target));
+              damageRelatedPromises.push(this.applyEntityEffectsCharacter(attacker as ICharacter, weapon, target));
             }
           } else if (attacker.type === EntityType.NPC) {
             damageRelatedPromises.push(this.applyEntityEffectsIfApplicable(attacker as INPC, target));
@@ -365,13 +375,11 @@ export class HitTarget {
     }
   }
 
-  private async applyEntityEffectsCharacter(character: ICharacter, target: ICharacter | INPC): Promise<void> {
-    const weapon = await this.characterWeapon.getWeapon(character);
-
-    if (!weapon) {
-      return;
-    }
-
+  private async applyEntityEffectsCharacter(
+    character: ICharacter,
+    weapon: ICharacterWeaponResult,
+    target: ICharacter | INPC
+  ): Promise<void> {
     // if we have a ranged weapon without entity effects, just use the accessory one
     if (weapon?.item.subType === ItemSubType.Ranged && !weapon.item.entityEffects?.length!) {
       const equipment = await Equipment.findById(character.equipment).cacheQuery({
