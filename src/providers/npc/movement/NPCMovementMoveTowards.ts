@@ -273,6 +273,14 @@ export class NPCMovementMoveTowards {
         npc.id,
         async () => {
           await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NpcBattleCycle", async () => {
+            const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
+
+            if (!hasLock) {
+              // if we dont have a lock and this is running, we cant have a NPCBattleCycle
+              await this.npcTarget.clearTarget(npc);
+              return;
+            }
+
             const result = await Promise.all([
               NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
               Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),
