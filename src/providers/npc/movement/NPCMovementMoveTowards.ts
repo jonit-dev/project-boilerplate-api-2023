@@ -7,6 +7,7 @@ import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleA
 import { appEnv } from "@providers/config/env";
 import { NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { MapHelper } from "@providers/map/MapHelper";
 import { PathfindingCaching } from "@providers/map/PathfindingCaching";
 import { MovementHelper } from "@providers/movement/MovementHelper";
@@ -47,7 +48,8 @@ export class NPCMovementMoveTowards {
     private mapHelper: MapHelper,
     private specialEffect: SpecialEffect,
     private pathfindingCaching: PathfindingCaching,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private locker: Locker
   ) {}
 
   @TrackNewRelicTransaction()
@@ -252,6 +254,12 @@ export class NPCMovementMoveTowards {
     }
 
     if (!hasBattleCycle) {
+      const canProceed = await this.locker.lock(`npc-${npc._id}-npc-battle-cycle`);
+
+      if (!canProceed) {
+        return;
+      }
+
       const npcSkills = (await Skill.findOne({
         _id: npc.skills,
       })
@@ -265,6 +273,14 @@ export class NPCMovementMoveTowards {
         npc.id,
         async () => {
           await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NpcBattleCycle", async () => {
+            const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
+
+            if (!hasLock) {
+              // if we dont have a lock and this is running, we cant have a NPCBattleCycle
+              await this.npcTarget.clearTarget(npc);
+              return;
+            }
+
             const result = await Promise.all([
               NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
               Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),

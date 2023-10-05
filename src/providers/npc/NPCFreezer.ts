@@ -65,6 +65,7 @@ export class NPCFreezer {
     this.freezeCheckIntervals.delete(npc.id);
 
     await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
+    await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
   }
 
   private setCPUUsageCheckInterval(): void {
