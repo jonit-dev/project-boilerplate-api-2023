@@ -186,14 +186,17 @@ export class NPCManager {
     await this.setNPCBehavior(npc, true);
   }
 
+  @TrackNewRelicTransaction()
   public async disableNPCBehaviors(): Promise<void> {
     await NPC.updateMany({}, { $set: { isBehaviorEnabled: false } }).lean();
   }
 
+  @TrackNewRelicTransaction()
   public async setNPCBehavior(npc: INPC, value: boolean): Promise<void> {
     await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } }).lean();
   }
 
+  @TrackNewRelicTransaction()
   private async startCoreNPCBehavior(npc: INPC): Promise<void> {
     switch (npc.currentMovementType) {
       case NPCMovementType.MoveAway:

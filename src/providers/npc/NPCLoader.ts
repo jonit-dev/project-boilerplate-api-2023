@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MapHelper } from "@providers/map/MapHelper";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MapObjectsLoader } from "@providers/map/MapObjectsLoader";
@@ -13,6 +14,7 @@ export interface INPCSeedData extends Omit<INPC, "_id"> {
 export class NPCLoader {
   constructor(private mapHelper: MapHelper, private mapObjectsLoader: MapObjectsLoader) {}
 
+  @TrackNewRelicTransaction()
   public async loadNPCSeedData(): Promise<Map<string, INPCSeedData>> {
     const npcSeedData = new Map<string, INPCSeedData>();
 

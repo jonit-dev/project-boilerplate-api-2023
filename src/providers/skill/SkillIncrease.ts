@@ -181,6 +181,7 @@ export class SkillIncrease {
     await this.increaseBasicAttributeSP(character, BasicAttribute.Magic, this.getMagicSkillIncreaseCalculator(power));
   }
 
+  @TrackNewRelicTransaction()
   public async increaseMagicResistanceSP(character: ICharacter, power: number): Promise<void> {
     await this.increaseBasicAttributeSP(
       character,
@@ -236,6 +237,7 @@ export class SkillIncrease {
     await this.characterBonusPenalties.applyRaceBonusPenalties(character, attribute);
   }
 
+  @TrackNewRelicTransaction()
   public async increaseCraftingSP(character: ICharacter, craftedItemKey: string, isSuccess: boolean): Promise<void> {
     const skillToUpdate = this.skillMapper.getCraftingSkillToUpdate(craftedItemKey);
 
@@ -274,6 +276,7 @@ export class SkillIncrease {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async fetchCharacterSkills(character: ICharacter): Promise<ISkill> {
     const skills = (await Skill.findById(character.skills)
       .lean({ virtuals: true, defaults: true })

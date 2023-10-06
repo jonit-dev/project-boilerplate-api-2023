@@ -1,5 +1,6 @@
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { rollDice } from "@providers/constants/DiceConstants";
 import {
   NPC_BASE_HEALTH_MULTIPLIER,
@@ -28,6 +29,7 @@ export class NPCSeeder {
     private inMemoryHashTable: InMemoryHashTable
   ) {}
 
+  @TrackNewRelicTransaction()
   public async seed(): Promise<void> {
     const npcSeedData = await this.npcLoader.loadNPCSeedData();
 
@@ -74,6 +76,7 @@ export class NPCSeeder {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async resetNPC(npc: INPC, NPCData: INPCSeedData): Promise<void> {
     try {
       await this.locker.unlock(`npc-death-${npc._id}`);

@@ -1,10 +1,11 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
-import { provide } from "inversify-binding-decorators";
 import { TimerWrapper } from "@providers/helpers/TimerWrapper";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 
 enum SpecialEffectNamespace {
   Stun = "character-special-effect-stun",
@@ -20,14 +21,17 @@ export class SpecialEffect {
     private socketMessaging: SocketMessaging
   ) {}
 
+  @TrackNewRelicTransaction()
   async stun(target: ICharacter | INPC, intervalSec: number): Promise<boolean> {
     return await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Stun);
   }
 
+  @TrackNewRelicTransaction()
   async isStun(target: ICharacter | INPC): Promise<boolean> {
     return await this.isEffectApplied(target, SpecialEffectNamespace.Stun);
   }
 
+  @TrackNewRelicTransaction()
   async turnInvisible(target: ICharacter, intervalSec: number): Promise<boolean> {
     const applied = await this.applyEffect(target, intervalSec, SpecialEffectNamespace.Stealth, async () => {
       await this.sendOpacityChange(target);
@@ -42,15 +46,18 @@ export class SpecialEffect {
     return applied;
   }
 
+  @TrackNewRelicTransaction()
   async isInvisible(target: ICharacter | INPC): Promise<boolean> {
     return await this.isEffectApplied(target, SpecialEffectNamespace.Stealth);
   }
 
+  @TrackNewRelicTransaction()
   async cleanup(): Promise<void> {
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stun);
     await this.inMemoryHashTable.deleteAll(SpecialEffectNamespace.Stealth);
   }
 
+  @TrackNewRelicTransaction()
   async getOpacity(target: ICharacter | INPC): Promise<number> {
     if (await this.isInvisible(target)) {
       return 0.3;
@@ -58,6 +65,7 @@ export class SpecialEffect {
     return 1;
   }
 
+  @TrackNewRelicTransaction()
   async clearEffects(target: ICharacter | INPC): Promise<void> {
     if (!target) {
       return;
@@ -66,6 +74,7 @@ export class SpecialEffect {
     await this.inMemoryHashTable.delete(SpecialEffectNamespace.Stealth, this.getEntityKey(target));
   }
 
+  @TrackNewRelicTransaction()
   private async applyEffect(
     target: ICharacter | INPC,
     intervalSec: number,

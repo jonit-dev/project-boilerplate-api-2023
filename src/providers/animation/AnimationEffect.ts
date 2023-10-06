@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
   AnimationEffectKeys,
@@ -13,6 +14,7 @@ import { provide } from "inversify-binding-decorators";
 export class AnimationEffect {
   constructor(private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async sendAnimationEventToCharacter(
     character: ICharacter,
     effectKey: AnimationEffectKeys,
@@ -26,6 +28,7 @@ export class AnimationEffect {
     await this.sendAnimationEffectEvent(character, payload);
   }
 
+  @TrackNewRelicTransaction()
   public async sendAnimationEventToNPC(npc: INPC, effectKey: string): Promise<void> {
     const payload: IAnimationEffect = {
       targetId: npc._id,
@@ -35,6 +38,7 @@ export class AnimationEffect {
     await this.socketMessaging.sendEventToCharactersAroundNPC(npc, AnimationSocketEvents.ShowAnimation, payload);
   }
 
+  @TrackNewRelicTransaction()
   public async sendProjectileAnimationEventToCharacter(
     character: ICharacter,
     sourceId: string,
@@ -73,6 +77,7 @@ export class AnimationEffect {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async sendAnimationEventToXYPosition(
     character: ICharacter,
     effectKey: string,
@@ -88,6 +93,7 @@ export class AnimationEffect {
     await this.sendAnimationEffectEvent(character, payload);
   }
 
+  @TrackNewRelicTransaction()
   private async sendAnimationEffectEvent(character: ICharacter, payload: IAnimationEffect): Promise<void> {
     this.socketMessaging.sendEventToUser(character.channelId!, AnimationSocketEvents.ShowAnimation, payload);
     await this.socketMessaging.sendEventToCharactersAroundCharacter(
@@ -97,6 +103,7 @@ export class AnimationEffect {
     );
   }
 
+  @TrackNewRelicTransaction()
   private async sendProjectileAnimationEffectEvent(
     character: ICharacter,
     payload: IProjectileAnimationEffect

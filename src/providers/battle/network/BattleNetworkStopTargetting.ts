@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { Locker } from "@providers/locks/Locker";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -16,6 +17,7 @@ export class BattleNetworkStopTargeting {
     });
   }
 
+  @TrackNewRelicTransaction()
   public async stopTargeting(character: ICharacter): Promise<void> {
     try {
       if (character) {

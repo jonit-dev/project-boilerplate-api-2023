@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterItemEquipment } from "@providers/character/characterItems/CharacterItemEquipment";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
@@ -85,6 +86,7 @@ export class BattleAttackRanged {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async sendRangedAttackEvent(
     attacker: ICharacter | INPC,
     target: ICharacter | INPC,
@@ -200,6 +202,7 @@ export class BattleAttackRanged {
    * and sends updateItemInventoryCharacter event
    */
 
+  @TrackNewRelicTransaction()
   public async consumeAmmo(attackParams: IRangedAttackParams, character: ICharacter): Promise<void> {
     const equipment = attackParams.equipment!;
 

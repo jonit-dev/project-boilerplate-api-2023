@@ -150,6 +150,7 @@ export class NPCMovementMoveTowards {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async fleeIfHealthIsLow(npc: INPC): Promise<void> {
     if (npc.fleeOnLowHealth) {
       if (npc.health <= npc.maxHealth / 4) {
@@ -158,6 +159,7 @@ export class NPCMovementMoveTowards {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async moveBackToOriginalPosIfNoTarget(npc: INPC, target: ICharacter): Promise<void> {
     if (
       !npc.targetCharacter &&
@@ -350,6 +352,7 @@ export class NPCMovementMoveTowards {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async tryToSwitchToRandomTarget(npc: INPC): Promise<boolean> {
     if (npc.canSwitchToLowHealthTarget || npc.canSwitchToRandomTarget) {
       // Odds have failed, we will not change target
@@ -395,6 +398,7 @@ export class NPCMovementMoveTowards {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   private async moveTowardsPosition(npc: INPC, target: ICharacter, x: number, y: number): Promise<void> {
     try {
       const shortestPath = await this.npcMovement.getShortestPathNextPosition(
@@ -450,6 +454,7 @@ export class NPCMovementMoveTowards {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   private async getVisibleCharactersInView(npc: INPC): Promise<ICharacter[]> {
     const chars = await this.npcView.getCharactersInView(npc);
     const visible: ICharacter[] = [];
