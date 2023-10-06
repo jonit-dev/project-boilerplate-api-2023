@@ -27,8 +27,14 @@ export class NPCFreezer {
   }
 
   @TrackNewRelicTransaction()
-  public tryToFreezeNPC(npc: INPC): void {
+  public async tryToFreezeNPC(npc: INPC): Promise<void> {
     if (this.freezeCheckIntervals.has(npc.id) || !npc.isBehaviorEnabled) {
+      return;
+    }
+
+    const canProceed = await this.locker.lock(`npc-freeze-${npc.id}`);
+
+    if (!canProceed) {
       return;
     }
 
@@ -47,6 +53,8 @@ export class NPCFreezer {
 
   @TrackNewRelicTransaction()
   public async freezeNPC(npc: INPC, isForced?: boolean): Promise<void> {
+    await this.locker.unlock(`npc-freeze-${npc.id}`);
+
     if (appEnv.general.ENV === EnvType.Development) {
       console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
     }
@@ -63,8 +71,6 @@ export class NPCFreezer {
     }
 
     this.freezeCheckIntervals.delete(npc.id);
-
-    await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
   }
 
   private setCPUUsageCheckInterval(): void {
@@ -101,6 +107,7 @@ export class NPCFreezer {
     }, checkInterval);
   }
 
+  @TrackNewRelicTransaction()
   private async shouldFreezeNPC(npc: INPC): Promise<boolean> {
     const nearbyCharacters = await this.npcView.getCharactersInView(npc);
     return nearbyCharacters.length === 0;

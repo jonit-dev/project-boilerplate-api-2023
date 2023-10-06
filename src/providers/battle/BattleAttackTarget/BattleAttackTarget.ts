@@ -6,6 +6,7 @@ import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCTarget } from "@providers/npc/movement/NPCTarget";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPCSpellArea } from "@providers/spells/area-spells/NPCSpellArea";
 import {
   BattleSocketEvents,
@@ -36,6 +37,7 @@ export class BattleAttackTarget {
     private npcSpellArea: NPCSpellArea
   ) {}
 
+  @TrackNewRelicTransaction()
   public async checkRangeAndAttack(attacker: ICharacter | INPC, target: ICharacter | INPC): Promise<boolean> {
     if (!target.isAlive) {
       return false;
@@ -151,6 +153,7 @@ export class BattleAttackTarget {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   private async performRangedAttack(
     attacker: ICharacter | INPC,
     target: ICharacter | INPC,

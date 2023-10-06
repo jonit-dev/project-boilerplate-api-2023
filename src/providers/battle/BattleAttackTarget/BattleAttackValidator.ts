@@ -97,6 +97,7 @@ export class BattleAttackValidator {
     return this.movementHelper.isUnderRange(attacker.x, attacker.y, target.x, target.y, maxRange);
   }
 
+  @TrackNewRelicTransaction()
   public async validateMagicAttack(
     characterId: Types.ObjectId,
     target: { targetId: string; targetType: EntityType }

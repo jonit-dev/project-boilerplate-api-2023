@@ -375,6 +375,7 @@ export class HitTarget {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async applyEntityEffectsCharacter(
     character: ICharacter,
     weapon: ICharacterWeaponResult,
@@ -393,6 +394,7 @@ export class HitTarget {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async applyEntity(target: ICharacter | INPC, character: ICharacter | INPC, item: IItem): Promise<void> {
     const hasEntityEffect = item?.entityEffects?.length! > 0;
     const entityEffectChance = item?.entityEffectChance;
@@ -405,6 +407,7 @@ export class HitTarget {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async warnCharacterIfNotInView(character: ICharacter, target: ICharacter | INPC): Promise<void> {
     switch (target.type) {
       case "NPC":

@@ -1,8 +1,8 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { Locker } from "@providers/locks/Locker";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
@@ -18,10 +18,10 @@ export class NPCTarget {
     private npcView: NPCView,
     private movementHelper: MovementHelper,
     private mapNonPVPZone: MapNonPVPZone,
-    private specialEffect: SpecialEffect,
-    private locker: Locker
+    private specialEffect: SpecialEffect
   ) {}
 
+  @TrackNewRelicTransaction()
   public async clearTarget(npc: INPC): Promise<void> {
     await NPC.updateOne(
       { _id: npc.id },
@@ -35,8 +35,6 @@ export class NPCTarget {
         },
       }
     );
-
-    await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
 
     const npcBattleCycle = NPC_BATTLE_CYCLES.get(npc.id);
     const npcCycle = NPC_CYCLES.get(npc.id);
@@ -68,6 +66,7 @@ export class NPCTarget {
     return "down";
   }
 
+  @TrackNewRelicTransaction()
   public async tryToSetTarget(npc: INPC): Promise<void> {
     if (!npc.isAlive) {
       return;
@@ -132,6 +131,7 @@ export class NPCTarget {
     await NPC.updateOne({ _id: npc._id }, { $set: { targetCharacter: character._id } });
   }
 
+  @TrackNewRelicTransaction()
   public async tryToClearOutOfRangeTargets(npc: INPC): Promise<void> {
     if (!npc.targetCharacter) {
       // no target set, nothing to remove here!
@@ -169,6 +169,7 @@ export class NPCTarget {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async setTarget(npc: INPC, character: ICharacter): Promise<void> {
     try {
       if (!npc.isAlive) {

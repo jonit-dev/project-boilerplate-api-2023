@@ -2,6 +2,7 @@ import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import {
   LOOT_CRAFTING_MATERIAL_DROP_CHANCE,
   LOOT_FOOD_DROP_CHANCE,
@@ -37,6 +38,7 @@ export class NPCLoot {
     return goldLoot;
   }
 
+  @TrackNewRelicTransaction()
   public async addLootToNPCBody(npcBody: IItem, loots: INPCLoot[], wasNpcInGiantForm?: boolean): Promise<void> {
     const itemContainer = await this.fetchItemContainer(npcBody);
     let isDeadBodyLootable = false;

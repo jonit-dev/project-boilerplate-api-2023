@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellsBlueprint } from "@rpg-engine/shared";
@@ -9,6 +10,7 @@ import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 export class ManaShield {
   constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async handleManaShield(character: ICharacter, damage: number): Promise<boolean> {
     try {
       if (!character || character.mana === character.maxMana) {
@@ -22,6 +24,7 @@ export class ManaShield {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async getManaShieldSpell(character: ICharacter): Promise<boolean> {
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     const key = SpellsBlueprint.ManaShield;
@@ -30,6 +33,7 @@ export class ManaShield {
     return !!spell;
   }
 
+  @TrackNewRelicTransaction()
   private async applyManaShield(character: ICharacter, damage: number): Promise<boolean> {
     try {
       if (typeof damage !== "number" || isNaN(damage)) {
