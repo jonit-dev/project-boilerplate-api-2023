@@ -1,4 +1,5 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CLASS_BONUS_OR_PENALTIES } from "@providers/constants/SkillConstants";
 import { CharacterClass } from "@rpg-engine/shared";
@@ -9,6 +10,7 @@ import {
 } from "@rpg-engine/shared/dist/types/skills.types";
 import { provide } from "inversify-binding-decorators";
 
+@TrackClassExecutionTime()
 @provide(CharacterClassBonusOrPenalties)
 export class CharacterClassBonusOrPenalties {
   constructor() {}

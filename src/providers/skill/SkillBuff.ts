@@ -1,6 +1,7 @@
 import { CharacterBuff } from "@entities/ModuleCharacter/CharacterBuffModel";
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
@@ -8,6 +9,7 @@ import { CharacterBuffType, CharacterTrait } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 
+@TrackClassExecutionTime()
 @provide(SkillBuff)
 export class SkillBuff {
   constructor(
