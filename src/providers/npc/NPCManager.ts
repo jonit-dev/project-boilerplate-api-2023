@@ -128,16 +128,12 @@ export class NPCManager {
                   defaults: true,
                 });
 
-                console.log("NPCCycle => ", npc.key);
-
                 if (!npc.isBehaviorEnabled) {
                   await this.npcFreezer.freezeNPC(npc);
                   return;
                 }
 
                 await this.friendlyNPCFreezeCheck(npc);
-
-                console.log(npc.targetCharacter);
 
                 npc.skills = npcSkills;
 
