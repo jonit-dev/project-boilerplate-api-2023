@@ -40,7 +40,7 @@ export class SocketMessaging {
   }
 
   public sendEventToUser<T>(userChannel: string, eventName: string, data?: T): void {
-    this.socketAdapter.emitToUser(userChannel, eventName, data || {});
+    void this.socketAdapter.emitToUser(userChannel, eventName, data || {});
   }
 
   //! Careful with the method! This sends an event to ALL USERS ON THE SERVER!
