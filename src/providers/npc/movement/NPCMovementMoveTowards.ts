@@ -275,11 +275,6 @@ export class NPCMovementMoveTowards {
         npc.id,
         async () => {
           await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NpcBattleCycle", async () => {
-            if (!npc.isBehaviorEnabled) {
-              await this.npcTarget.clearTarget(npc);
-              return;
-            }
-
             const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
 
             if (!hasLock) {
@@ -316,6 +311,22 @@ export class NPCMovementMoveTowards {
               return;
             }
 
+            const updatedNPC = result[0] as INPC;
+            updatedNPC.skills = npcSkills;
+
+            if (!updatedNPC.isBehaviorEnabled) {
+              await this.npcTarget.clearTarget(npc);
+              return;
+            }
+
+            const hasNoTarget = !updatedNPC.targetCharacter?.toString();
+            const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
+
+            if (hasNoTarget || hasDifferentTarget) {
+              await this.npcTarget.clearTarget(npc);
+              return;
+            }
+
             const characterSkills = (await Skill.findOne({
               _id: targetCharacter.skills,
             })
@@ -326,26 +337,13 @@ export class NPCMovementMoveTowards {
 
             targetCharacter.skills = characterSkills;
 
-            const updatedNPC = result[0] as INPC;
-
-            updatedNPC.skills = npcSkills;
-
-            const hasNoTarget = !updatedNPC.targetCharacter?.toString();
-            const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
-
-            if (hasNoTarget || hasDifferentTarget) {
-              await this.npcTarget.clearTarget(npc);
-
-              return;
-            }
-
-            const isInvisible = await this.specialEffect.isInvisible(targetCharacter);
+            const isTargetInvisible = await this.specialEffect.isInvisible(targetCharacter);
 
             if (
               updatedNPC?.alignment === NPCAlignment.Hostile &&
-              targetCharacter?.isAlive &&
-              updatedNPC.isAlive &&
-              !isInvisible
+              targetCharacter?.health > 0 &&
+              updatedNPC.health > 0 &&
+              !isTargetInvisible
             ) {
               // if reached target and alignment is enemy, lets hit it
               await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);

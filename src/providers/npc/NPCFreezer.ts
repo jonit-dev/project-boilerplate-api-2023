@@ -8,7 +8,7 @@ import { NPC_CYCLES } from "./NPCCycle";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_ACTIVE_NPCS } from "@providers/constants/NPCConstants";
-import { EnvType } from "@rpg-engine/shared";
+import { EnvType, NPCAlignment } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
 
@@ -68,7 +68,17 @@ export class NPCFreezer {
         }
       }
 
-      console.log(`NPC_CYCLES: ${NPC_CYCLES.size} - NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size}`);
+      if (totalActiveNPCs >= NPC_MAX_ACTIVE_NPCS * 0.7) {
+        const friendlyNPCs = await NPC.find({ alignment: NPCAlignment.Friendly, isBehaviorEnabled: true }).lean();
+
+        for (const npc of friendlyNPCs) {
+          freezeTasks.push(this.freezeNPC(npc as INPC));
+        }
+      }
+
+      console.log(
+        `TOTAL_ACTIVE_NPCS: ${totalActiveNPCs} - NPC_CYCLES: ${NPC_CYCLES.size} - NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} - CPU: ${totalCPUUsage}%`
+      );
 
       await Promise.all(freezeTasks);
     }, checkInterval);
