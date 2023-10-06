@@ -4,14 +4,10 @@ import { provideSingleton } from "@providers/inversify/provideSingleton";
 import random from "lodash/random";
 import { NPC_BATTLE_CYCLES } from "./NPCBattleCycle";
 import { NPC_CYCLES } from "./NPCCycle";
-import { NPCView } from "./NPCView";
 
-import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
-import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE } from "@providers/constants/NPCConstants";
-import { Locker } from "@providers/locks/Locker";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_ACTIVE_NPCS } from "@providers/constants/NPCConstants";
 import { EnvType } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
@@ -20,41 +16,14 @@ import round from "lodash/round";
 export class NPCFreezer {
   public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();
 
-  constructor(private npcView: NPCView, private newRelic: NewRelic, private locker: Locker) {}
+  constructor() {}
 
   public init(): void {
     this.setCPUUsageCheckInterval();
   }
 
   @TrackNewRelicTransaction()
-  public async tryToFreezeNPC(npc: INPC): Promise<void> {
-    if (this.freezeCheckIntervals.has(npc.id) || !npc.isBehaviorEnabled) {
-      return;
-    }
-
-    const canProceed = await this.locker.lock(`npc-freeze-${npc.id}`);
-
-    if (!canProceed) {
-      return;
-    }
-
-    const checkRange = random(12000, 14000);
-    const interval = setInterval(async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NPCFreezer", async () => {
-        if (await this.shouldFreezeNPC(npc)) {
-          await this.freezeNPC(npc);
-          clearInterval(interval);
-        }
-      });
-    }, checkRange);
-
-    this.freezeCheckIntervals.set(npc.id, interval);
-  }
-
-  @TrackNewRelicTransaction()
   public async freezeNPC(npc: INPC, isForced?: boolean): Promise<void> {
-    await this.locker.unlock(`npc-freeze-${npc.id}`);
-
     if (appEnv.general.ENV === EnvType.Development) {
       console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
     }
@@ -85,8 +54,8 @@ export class NPCFreezer {
       const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
       const freezeTasks: any[] = [];
 
-      if (totalActiveNPCs >= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
-        const diff = totalActiveNPCs - NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE;
+      if (totalActiveNPCs >= NPC_MAX_ACTIVE_NPCS) {
+        const diff = totalActiveNPCs - NPC_MAX_ACTIVE_NPCS;
         for (let i = 0; i < diff; i++) {
           freezeTasks.push(this.freezeRandomNPC());
         }
@@ -103,12 +72,6 @@ export class NPCFreezer {
 
       await Promise.all(freezeTasks);
     }, checkInterval);
-  }
-
-  @TrackNewRelicTransaction()
-  private async shouldFreezeNPC(npc: INPC): Promise<boolean> {
-    const nearbyCharacters = await this.npcView.getCharactersInView(npc);
-    return nearbyCharacters.length === 0;
   }
 
   @TrackNewRelicTransaction()

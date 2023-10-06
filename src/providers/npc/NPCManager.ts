@@ -1,12 +1,13 @@
 /* eslint-disable no-void */
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
+import { NPCAlignment, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import {
   NPC_CYCLE_INTERVAL_RATIO,
-  NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE,
+  NPC_FRIENDLY_FREEZE_CHECK_CHANCE,
+  NPC_MAX_ACTIVE_NPCS,
   NPC_MIN_DISTANCE_TO_ACTIVATE,
 } from "@providers/constants/NPCConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -72,7 +73,7 @@ export class NPCManager {
         continue;
       }
 
-      if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
+      if (totalActiveNPCs <= NPC_MAX_ACTIVE_NPCS) {
         // watch out for max NPCs active limit so we don't fry our CPU
         behaviorLoops.push(this.startBehaviorLoop(npc));
         totalActiveNPCs++;
@@ -127,10 +128,16 @@ export class NPCManager {
                   defaults: true,
                 });
 
+                console.log("NPCCycle => ", npc.key);
+
                 if (!npc.isBehaviorEnabled) {
                   await this.npcFreezer.freezeNPC(npc);
                   return;
                 }
+
+                await this.friendlyNPCFreezeCheck(npc);
+
+                console.log(npc.targetCharacter);
 
                 npc.skills = npcSkills;
 
@@ -160,6 +167,20 @@ export class NPCManager {
   @TrackNewRelicTransaction()
   public async setNPCBehavior(npc: INPC, value: boolean): Promise<void> {
     await NPC.updateOne({ _id: npc._id }, { $set: { isBehaviorEnabled: value } }).lean();
+  }
+
+  @TrackNewRelicTransaction()
+  private async friendlyNPCFreezeCheck(npc: INPC): Promise<void> {
+    if (npc.alignment === NPCAlignment.Friendly) {
+      const n = random(0, 100);
+
+      if (n <= NPC_FRIENDLY_FREEZE_CHECK_CHANCE) {
+        const nearbyCharacters = await this.npcView.getCharactersInView(npc);
+        if (!nearbyCharacters.length) {
+          await this.npcFreezer.freezeNPC(npc);
+        }
+      }
+    }
   }
 
   @TrackNewRelicTransaction()
