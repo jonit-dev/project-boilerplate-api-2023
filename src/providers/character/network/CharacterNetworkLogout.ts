@@ -55,7 +55,7 @@ export class CharacterNetworkLogout {
       channel,
       CharacterSocketEvents.CharacterLogout,
       async (data: ICharacterLogout, character: ICharacter) => {
-        this.characterMonitor.unwatch(character);
+        await this.characterMonitor.unwatch(character);
 
         const nearbyCharacters = await this.characterView.getCharactersInView(character);
 

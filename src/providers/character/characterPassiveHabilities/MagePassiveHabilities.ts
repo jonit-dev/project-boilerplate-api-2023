@@ -35,7 +35,7 @@ export class MagePassiveHabilities {
     const { _id, mana, maxMana } = character;
 
     if (character.class !== CharacterClass.Sorcerer && character.class !== CharacterClass.Druid) {
-      this.characterMonitor.unwatch(character);
+      await this.characterMonitor.unwatch(character);
       return;
     }
 
@@ -77,7 +77,7 @@ export class MagePassiveHabilities {
 
                 if (refreshCharacter.mana === refreshCharacter.maxMana) {
                   clearInterval(intervalId);
-                  this.characterMonitor.unwatch(character);
+                  await this.characterMonitor.unwatch(character);
                   return;
                 }
 
@@ -106,14 +106,14 @@ export class MagePassiveHabilities {
 
                 if (updatedCharacter.mana === updatedCharacter.maxMana) {
                   clearInterval(intervalId);
-                  this.characterMonitor.unwatch(character);
+                  await this.characterMonitor.unwatch(character);
                   await this.inMemoryHashTable.delete(namespace, key);
                   return;
                 }
               } catch (err) {
                 console.error("Error during mana regeneration interval:", err);
                 clearInterval(intervalId);
-                this.characterMonitor.unwatch(character);
+                await this.characterMonitor.unwatch(character);
               }
             }
           );

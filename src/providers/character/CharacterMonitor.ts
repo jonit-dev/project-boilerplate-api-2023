@@ -3,6 +3,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
+import { Locker } from "@providers/locks/Locker";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared";
@@ -14,7 +15,7 @@ export class CharacterMonitor {
   private charactersCallbacks = new Map<string, CharacterMonitorCallback>();
   private monitorIntervalMS: number;
 
-  constructor(private pm2Helper: PM2Helper, private newRelic: NewRelic) {}
+  constructor(private pm2Helper: PM2Helper, private newRelic: NewRelic, private locker: Locker) {}
 
   @TrackNewRelicTransaction()
   public async monitor(intervalMs?: number): Promise<void> {
@@ -30,7 +31,13 @@ export class CharacterMonitor {
     }
   }
 
-  public watch(character: ICharacter, callback: CharacterMonitorCallback): void {
+  public async watch(character: ICharacter, callback: CharacterMonitorCallback): Promise<void> {
+    const canProced = await this.locker.lock(`character-monitor-${character._id}`);
+
+    if (!canProced) {
+      return;
+    }
+
     // clear out previous callbacks
     if (this.charactersCallbacks.has(String(character._id))) {
       this.charactersCallbacks.delete(String(character._id));
@@ -39,8 +46,10 @@ export class CharacterMonitor {
     this.charactersCallbacks.set(String(character._id), callback);
   }
 
-  public unwatch(character: ICharacter): void {
+  public async unwatch(character: ICharacter): Promise<void> {
     this.charactersCallbacks.delete(character._id);
+
+    await this.locker.unlock(`character-monitor-${character._id}`);
   }
 
   public clear(): void {

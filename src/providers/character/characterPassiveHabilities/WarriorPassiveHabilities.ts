@@ -38,7 +38,7 @@ export class WarriorPassiveHabilities {
     const { _id, skills, health, maxHealth } = character;
 
     if (character.class !== CharacterClass.Warrior) {
-      this.characterMonitor.unwatch(character);
+      await this.characterMonitor.unwatch(character);
       return;
     }
 
@@ -80,7 +80,7 @@ export class WarriorPassiveHabilities {
                 if (refreshCharacter.health === refreshCharacter.maxHealth) {
                   clearInterval(intervalId);
                   await this.inMemoryHashTable.delete(namespace, key);
-                  this.characterMonitor.unwatch(character);
+                  await this.characterMonitor.unwatch(character);
                   return;
                 }
 
@@ -109,14 +109,14 @@ export class WarriorPassiveHabilities {
 
                 if (updatedCharacter.health === updatedCharacter.maxHealth) {
                   clearInterval(intervalId);
-                  this.characterMonitor.unwatch(character);
+                  await this.characterMonitor.unwatch(character);
                   await this.inMemoryHashTable.delete(namespace, key);
                   return;
                 }
               } catch (err) {
                 console.error("Error during health regeneration interval:", err);
                 clearInterval(intervalId);
-                this.characterMonitor.unwatch(character);
+                await this.characterMonitor.unwatch(character);
               }
             }
           );

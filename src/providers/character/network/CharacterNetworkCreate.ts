@@ -185,7 +185,7 @@ export class CharacterNetworkCreate {
 
         await this.warnAboutWeatherStatus(character.channelId!);
 
-        this.characterMonitor.watch(character, async (character: ICharacter) => {
+        await this.characterMonitor.watch(character, async (character: ICharacter) => {
           await this.handleCharacterRegen(character);
         });
       },
@@ -303,7 +303,7 @@ export class CharacterNetworkCreate {
           if (healthCondition) {
             const isActive = await this.inMemoryHashTable.has(namespace, healthKey);
             isActive
-              ? this.characterMonitor.unwatch(character)
+              ? await this.characterMonitor.unwatch(character)
               : await this.warriorPassiveHabilities.warriorAutoRegenHealthHandler(character);
           }
           break;
@@ -313,13 +313,13 @@ export class CharacterNetworkCreate {
           if (manaCondition) {
             const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
             isActive
-              ? this.characterMonitor.unwatch(character)
+              ? await this.characterMonitor.unwatch(character)
               : await this.magePassiveHabilities.autoRegenManaHandler(character);
           }
           break;
 
         default:
-          this.characterMonitor.unwatch(character);
+          await this.characterMonitor.unwatch(character);
           break;
       }
     } catch (error) {
