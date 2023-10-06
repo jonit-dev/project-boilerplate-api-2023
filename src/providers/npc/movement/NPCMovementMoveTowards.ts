@@ -279,7 +279,10 @@ export class NPCMovementMoveTowards {
 
             if (!hasLock) {
               // if we dont have a lock and this is running, we cant have a NPCBattleCycle
-              NPC_BATTLE_CYCLES.delete(npc.id);
+              const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
+              if (battleCycle) {
+                battleCycle.clearIntervalOnly();
+              }
               return;
             }
 
