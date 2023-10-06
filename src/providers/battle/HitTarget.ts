@@ -326,25 +326,30 @@ export class HitTarget {
 
         const generateBloodChance = random(1, 100);
 
-        generateBloodChance <= 10 && void this.battleEffects.generateBloodOnGround(target);
+        generateBloodChance <= 10 && damageRelatedPromises.push(this.battleEffects.generateBloodOnGround(target));
       }
 
-      await Promise.all([...damageRelatedPromises]);
+      await Promise.all(damageRelatedPromises);
     }
 
+    const remainingPromises: any[] = [];
+
     if (battleEvent === BattleEventType.Block && target.type === "Character") {
-      await this.skillIncrease.increaseShieldingSP(target as ICharacter);
+      remainingPromises.push(this.skillIncrease.increaseShieldingSP(target as ICharacter));
     }
 
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
-      await this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity);
+      remainingPromises.push(this.skillIncrease.increaseShieldingSP(target as ICharacter));
     }
 
-    await this.warnCharacterIfNotInView(attacker as ICharacter, target);
+    remainingPromises.push(this.warnCharacterIfNotInView(attacker as ICharacter, target));
 
     const character = attacker.type === "Character" ? (attacker as ICharacter) : (target as ICharacter);
-    await this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer);
-    await this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target);
+
+    remainingPromises.push(this.sendBattleEvent(character, battleEventPayload as IBattleEventFromServer));
+    remainingPromises.push(this.battleAttackTargetDeath.handleDeathAfterHit(attacker, target));
+
+    await Promise.all(remainingPromises);
   }
 
   private async sendBattleEvent(character: ICharacter, battleEventPayload: IBattleEventFromServer): Promise<void> {
