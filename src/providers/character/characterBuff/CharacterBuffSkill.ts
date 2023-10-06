@@ -6,13 +6,11 @@ import { TextFormatter } from "@providers/text/TextFormatter";
 import { ICharacterBuff, ISkill, ISkillDetails, SkillSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SkillBuff } from "@providers/skill/SkillBuff";
 import { IBuffValueCalculations } from "./CharacterBuffAttribute";
 import { CharacterBuffTracker } from "./CharacterBuffTracker";
 
-@TrackClassExecutionTime()
 @provide(CharacterBuffSkill)
 export class CharacterBuffSkill {
   constructor(

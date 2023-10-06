@@ -1,7 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import {
@@ -17,7 +16,6 @@ import _ from "lodash";
 
 export type BattleParticipant = ICharacter | INPC;
 
-@TrackClassExecutionTime()
 @provide(BattleEvent)
 export class BattleEvent {
   constructor(

@@ -24,7 +24,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { appEnv } from "@providers/config/env";
 import { BONUS_DAMAGE_MULTIPLIER } from "@providers/constants/BattleConstants";
 import { Queue, Worker } from "bullmq";
@@ -33,7 +32,7 @@ import { BattleAttackTargetDeath } from "./BattleAttackTarget/BattleAttackTarget
 import { BattleDamageCalculator } from "./BattleDamageCalculator";
 import { BattleEffects } from "./BattleEffects";
 import { BattleEvent } from "./BattleEvent";
-@TrackClassExecutionTime()
+
 @provide(HitTarget)
 export class HitTarget {
   private npcQueue: Queue;

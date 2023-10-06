@@ -1,6 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { TrackClassExecutionTime } from "@jonit-dev/decorators-utils";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SkillFunctions } from "@providers/skill/SkillFunctions";
 import { CharacterClass, IIncreaseSPResult, LifeBringerRaces, SKILLS_MAP, ShadowWalkerRaces } from "@rpg-engine/shared";
@@ -11,7 +10,6 @@ import { CharacterCombatBonusPenalties } from "./CharacterCombatBonusPenalties";
 import { CharacterCraftingBonusPenalties } from "./CharacterCraftingBonusPenalties";
 import { CharacterRaceBonusOrPenalties } from "./CharacterRaceBonusOrPenalties";
 
-@TrackClassExecutionTime()
 @provide(CharacterBonusPenalties)
 export class CharacterBonusPenalties {
   constructor(
