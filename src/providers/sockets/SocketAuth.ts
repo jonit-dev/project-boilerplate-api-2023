@@ -44,7 +44,16 @@ export class SocketAuth {
     runBasicCharacterValidation: boolean = true,
     isLeanQuery = true
   ): void {
+    // remove listener to this event, if exists, to avoid duplicates
+    channel.removeAllListeners(event);
+
     channel.on(event, async (data: any) => {
+      const canProceed = await this.locker.lock(`global-lock-event-${event}-${channel.id}`);
+
+      if (!canProceed) {
+        return;
+      }
+
       let owner, character;
 
       try {
@@ -159,6 +168,8 @@ export class SocketAuth {
         if (LOCKABLE_EVENTS.includes(event)) {
           await this.locker.unlock(`event-${event}-${character._id}`);
         }
+      } finally {
+        await this.locker.unlock(`global-lock-event-${event}-${channel.id}`);
       }
     });
   }

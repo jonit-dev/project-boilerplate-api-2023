@@ -1,6 +1,7 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { socketEventsBinderControl } from "@providers/inversify/container";
+import { Locker } from "@providers/locks/Locker";
 import { CharacterSocketEvents, ISocket, SocketTypes } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { GeckosIO } from "./GeckosIO";
@@ -15,7 +16,8 @@ export class SocketAdapter implements ISocket {
   constructor(
     private socketIO: SocketIO,
     private geckosIO: GeckosIO,
-    private socketSessionControl: SocketSessionControl
+    private socketSessionControl: SocketSessionControl,
+    private locker: Locker
   ) {}
 
   public async init(socketType: SocketTypes): Promise<void> {
@@ -36,17 +38,29 @@ export class SocketAdapter implements ISocket {
     this.onConnect();
   }
 
-  public emitToUser<T>(channel: string, eventName: string, data?: T): void {
-    if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
-      console.log("⬆️ (SENDING): ", channel, eventName, JSON.stringify(data));
-    }
+  public async emitToUser<T>(channel: string, eventName: string, data?: T): Promise<void> {
+    try {
+      const canProceed = await this.locker.lock(`emit-to-user-${channel}-${eventName}`);
 
-    if (data) {
-      //! This workaround is to avoid mongoose bjson object issue instead of string ids: https://stackoverflow.com/questions/69532987/mongoose-returns-new-objectid-in-id-field-of-the-result
-      data = this.dataIdToString(data);
-    }
+      if (!canProceed) {
+        return;
+      }
 
-    SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
+      if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
+        console.log("⬆️ (SENDING): ", channel, eventName, JSON.stringify(data));
+      }
+
+      if (data) {
+        //! This workaround is to avoid mongoose bjson object issue instead of string ids: https://stackoverflow.com/questions/69532987/mongoose-returns-new-objectid-in-id-field-of-the-result
+        data = this.dataIdToString(data);
+      }
+
+      SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await this.locker.unlock(`emit-to-user-${channel}-${eventName}`);
+    }
   }
 
   public emitToAllUsers<T>(eventName: string, eventData?: T): void {
@@ -77,7 +91,7 @@ export class SocketAdapter implements ISocket {
             throw new Error("Character not found!");
           }
 
-          this.emitToUser(previousCharacter.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+          void this.emitToUser(previousCharacter.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
             reason: "You have been disconnected because you logged in from another device!",
           });
 
