@@ -2,7 +2,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
 import { BattleNetworkStopTargeting } from "@providers/battle/network/BattleNetworkStopTargetting";
-import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { ItemView } from "@providers/item/ItemView";
@@ -20,7 +19,6 @@ import {
   CharacterClass,
   CharacterSkullType,
   CharacterSocketEvents,
-  EnvType,
   ICharacterCreateFromClient,
   ICharacterCreateFromServer,
   IControlTime,
@@ -162,17 +160,7 @@ export class CharacterNetworkCreate {
           skullType: character.skullType as CharacterSkullType,
         };
 
-        switch (appEnv.general.ENV) {
-          case EnvType.Development:
-            void this.npcManager.startNearbyNPCsBehaviorLoop(character);
-
-            break;
-          case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
-            this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
-              character,
-            });
-            break;
-        }
+        void this.npcManager.startNearbyNPCsBehaviorLoop(character);
 
         void this.npcWarn.warnCharacterAboutNPCsInView(character, { always: true });
 

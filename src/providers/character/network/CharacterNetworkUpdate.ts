@@ -1,6 +1,5 @@
 /* eslint-disable no-void */
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { appEnv } from "@providers/config/env";
 import { GridManager } from "@providers/map/GridManager";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MapTransitionTeleport } from "@providers/map/MapTransition/MapTransitionTeleport";
@@ -14,7 +13,6 @@ import { SocketChannel } from "@providers/sockets/SocketsTypes";
 import {
   AnimationDirection,
   CharacterSocketEvents,
-  EnvType,
   GRID_WIDTH,
   ICharacterPositionUpdateConfirm,
   ICharacterPositionUpdateFromClient,
@@ -32,6 +30,7 @@ import { Locker } from "@providers/locks/Locker";
 import { MapTransitionInfo } from "@providers/map/MapTransition/MapTransitionInfo";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import dayjs from "dayjs";
+import { throttle } from "lodash";
 import random from "lodash/random";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
@@ -114,17 +113,7 @@ export class CharacterNetworkUpdate {
 
               void this.characterMovementWarn.warn(character, data);
 
-              switch (appEnv.general.ENV) {
-                case EnvType.Development:
-                  void this.npcManager.startNearbyNPCsBehaviorLoop(character);
-
-                  break;
-                case EnvType.Production: // This allocates a random CPU in charge of this NPC behavior in prod
-                  void this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", {
-                    character,
-                  });
-                  break;
-              }
+              void this.throttledNPCActivation(character);
 
               await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
@@ -143,6 +132,12 @@ export class CharacterNetworkUpdate {
         }
       }
     );
+  }
+
+  private throttledNPCActivation(character: ICharacter): void {
+    throttle(() => {
+      void this.npcManager.startNearbyNPCsBehaviorLoop(character);
+    }, 50);
   }
 
   private sendConfirmation(character: ICharacter, direction: AnimationDirection, isPositionUpdateValid: boolean): void {

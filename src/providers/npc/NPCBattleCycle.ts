@@ -30,7 +30,6 @@ export class NPCBattleCycle {
     clearInterval(this.interval);
     NPC_BATTLE_CYCLES.delete(this.id);
     await locker.unlock(`npc-${this.id}-npc-battle-cycle`);
-    await locker.unlock(`npc-${this.id}-npc-cycle`);
     await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
   }
 

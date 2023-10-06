@@ -275,6 +275,11 @@ export class NPCMovementMoveTowards {
         npc.id,
         async () => {
           await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NpcBattleCycle", async () => {
+            if (!npc.isBehaviorEnabled) {
+              await this.npcTarget.clearTarget(npc);
+              return;
+            }
+
             const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
 
             if (!hasLock) {
@@ -329,9 +334,7 @@ export class NPCMovementMoveTowards {
             const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
 
             if (hasNoTarget || hasDifferentTarget) {
-              if (hasBattleCycle) {
-                await this.npcTarget.clearTarget(npc);
-              }
+              await this.npcTarget.clearTarget(npc);
 
               return;
             }

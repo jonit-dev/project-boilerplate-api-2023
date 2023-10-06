@@ -99,6 +99,8 @@ export class NPCFreezer {
         }
       }
 
+      console.log(`NPC_CYCLES: ${NPC_CYCLES.size} - NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size}`);
+
       await Promise.all(freezeTasks);
     }, checkInterval);
   }

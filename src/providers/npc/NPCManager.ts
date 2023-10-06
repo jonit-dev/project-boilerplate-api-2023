@@ -11,7 +11,7 @@ import {
 } from "@providers/constants/NPCConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
-import { PM2Helper } from "@providers/server/PM2Helper";
+import { Promise } from "bluebird";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 import { NPCCycle, NPC_CYCLES } from "./NPCCycle";
@@ -27,7 +27,7 @@ import { NPCMovementStopped } from "./movement/NPCMovementStopped";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { Locker } from "@providers/locks/Locker";
+import { PROMISE_DEFAULT_CONCURRENCY } from "@providers/constants/ServerConstants";
 import { MathHelper } from "@providers/math/MathHelper";
 import { RaidManager } from "@providers/raid/RaidManager";
 import {
@@ -48,34 +48,12 @@ export class NPCManager {
     private npcView: NPCView,
     private npcLoader: NPCLoader,
     private npcFreezer: NPCFreezer,
-    private pm2Helper: PM2Helper,
     private specialEffect: SpecialEffect,
     private inMemoryHashTable: InMemoryHashTable,
     private newRelic: NewRelic,
     private mathHelper: MathHelper,
-    private raidManager: RaidManager,
-    private locker: Locker
+    private raidManager: RaidManager
   ) {}
-
-  public listenForBehaviorTrigger(): void {
-    process.on("message", async (data) => {
-      const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
-
-      // if we still have room for more NPCs, start the behavior loop, if not, just repass the signal to another pm2 instance
-      if (totalActiveNPCs <= NPC_MAX_SIMULTANEOUS_ACTIVE_PER_INSTANCE) {
-        if (data.type === "startNPCBehavior") {
-          const randomN = random(0, 3000);
-
-          setTimeout(() => {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.startNearbyNPCsBehaviorLoop(data.data.character);
-          }, randomN);
-        }
-      } else {
-        this.pm2Helper.sendEventToRandomCPUInstance("startNPCBehavior", { character: data.data.character });
-      }
-    });
-  }
 
   @TrackNewRelicTransaction()
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
@@ -103,7 +81,7 @@ export class NPCManager {
       }
     }
 
-    await Promise.all(behaviorLoops);
+    await Promise.map(behaviorLoops, (behaviorLoop) => behaviorLoop, { concurrency: PROMISE_DEFAULT_CONCURRENCY });
   }
 
   @TrackNewRelicTransaction()
@@ -111,12 +89,6 @@ export class NPCManager {
     let npc = initialNPC;
 
     if (!npc) {
-      return;
-    }
-
-    const canProceed = await this.locker.lock(`npc-${npc._id}-npc-cycle`);
-
-    if (!canProceed) {
       return;
     }
 
@@ -150,12 +122,6 @@ export class NPCManager {
               NewRelicTransactionCategory.Operation,
               `NPCCycle/${npc.currentMovementType}`,
               async () => {
-                const n = random(0, 100);
-
-                if (n <= 5) {
-                  this.npcFreezer.tryToFreezeNPC(npc);
-                }
-
                 npc = await NPC.findById(npc._id).lean({
                   virtuals: true,
                   defaults: true,
@@ -182,8 +148,8 @@ export class NPCManager {
         },
         (1600 + random(0, 200)) / (npc.speed * 1.6) / NPC_CYCLE_INTERVAL_RATIO
       );
+      await this.setNPCBehavior(npc, true);
     }
-    await this.setNPCBehavior(npc, true);
   }
 
   @TrackNewRelicTransaction()

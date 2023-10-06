@@ -66,9 +66,6 @@ export class ServerBootstrap {
 
     await this.characterMonitor.monitor();
 
-    //! TODO: Load balance NPCs on PM2 instances
-    this.npcManager.listenForBehaviorTrigger();
-
     this.discordBot.initialize();
   }
 
