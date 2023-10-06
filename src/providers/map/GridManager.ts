@@ -138,20 +138,33 @@ export class GridManager {
 
   public generateGridBetweenPoints(map: string, gridCourse: IGridCourse): IGridBetweenPoints {
     const tree = this.getGrid(map);
-    if (!tree) {
-      throw new Error(`❌ Could not find grid for map: ${map}`);
+
+    if (!tree || tree.length === 0) {
+      throw new Error(`❌ The tree is empty or not defined for map: ${map}`);
     }
 
     const dimens = this.mapProperties.getMapDimensions(map);
     const offset = this.mapProperties.getMapOffset(dimens.startX, dimens.startY)!;
 
+    if (!offset) {
+      throw new Error(`❌ Offset is not defined for startX: ${dimens.startX} and startY: ${dimens.startY}`);
+    }
+
     const bounds = this.getSubGridBounds(map, gridCourse);
+
+    if (bounds.startY + bounds.height > tree.length) {
+      throw new Error(`❌ The vertical bounds exceed the grid height for map: ${map}`);
+    }
+
+    if (tree[0] && bounds.startX + bounds.width > tree[0].length) {
+      throw new Error(`❌ The horizontal bounds exceed the grid width for map: ${map}`);
+    }
 
     const solids = new Set();
 
     for (let y = bounds.startY + offset.gridOffsetY; y < bounds.startY + bounds.height + offset.gridOffsetY; y++) {
       for (let x = bounds.startX + offset.gridOffsetX; x < bounds.startX + bounds.width + offset.gridOffsetX; x++) {
-        if (tree[y][x] === 1) {
+        if (tree[y] && tree[y][x] === 1) {
           solids.add(`${x}-${y}`);
         }
       }
