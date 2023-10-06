@@ -279,7 +279,7 @@ export class NPCMovementMoveTowards {
 
             if (!hasLock) {
               // if we dont have a lock and this is running, we cant have a NPCBattleCycle
-              await this.npcTarget.clearTarget(npc);
+              NPC_BATTLE_CYCLES.delete(npc.id);
               return;
             }
 
