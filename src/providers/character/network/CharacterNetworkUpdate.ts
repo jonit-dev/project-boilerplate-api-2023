@@ -30,7 +30,6 @@ import { Locker } from "@providers/locks/Locker";
 import { MapTransitionInfo } from "@providers/map/MapTransition/MapTransitionInfo";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import dayjs from "dayjs";
-import { throttle } from "lodash";
 import random from "lodash/random";
 import { CharacterView } from "../CharacterView";
 import { CharacterMovementValidation } from "../characterMovement/CharacterMovementValidation";
@@ -113,8 +112,7 @@ export class CharacterNetworkUpdate {
 
               void this.characterMovementWarn.warn(character, data);
 
-              void this.throttledNPCActivation(character);
-
+              void this.npcManager.startNearbyNPCsBehaviorLoop(character);
               await this.updateServerSideEmitterInfo(character, newX, newY, isMoving, data.direction);
 
               void this.handleNonPVPZone(character, newX, newY);
@@ -132,12 +130,6 @@ export class CharacterNetworkUpdate {
         }
       }
     );
-  }
-
-  private throttledNPCActivation(character: ICharacter): void {
-    throttle(() => {
-      void this.npcManager.startNearbyNPCsBehaviorLoop(character);
-    }, 50);
   }
 
   private sendConfirmation(character: ICharacter, direction: AnimationDirection, isPositionUpdateValid: boolean): void {
