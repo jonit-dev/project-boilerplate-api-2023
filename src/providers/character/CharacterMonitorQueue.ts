@@ -85,7 +85,23 @@ export class CharacterMonitorQueue {
     await this.add(character, callbackId);
   }
 
-  public unwatch(character: ICharacter): void {
+  public unwatch(character: ICharacter, callbackId: string): void {
+    const currentCallbacks = this.charactersCallbacks.get(character._id.toString());
+
+    if (!currentCallbacks) {
+      return;
+    }
+
+    delete currentCallbacks[callbackId];
+
+    if (Object.keys(currentCallbacks).length === 0) {
+      this.charactersCallbacks.delete(character._id.toString());
+    }
+
+    this.charactersCallbacks.set(character._id.toString(), currentCallbacks);
+  }
+
+  public unwatchAll(character: ICharacter): void {
     this.charactersCallbacks.delete(character._id);
   }
 
