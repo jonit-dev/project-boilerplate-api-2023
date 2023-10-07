@@ -103,6 +103,12 @@ export class NPCBattleCycleQueue {
   }
 
   private async execBattleCycle(npc: INPC, npcSkills: ISkill): Promise<void> {
+    const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
+
+    if (!hasLock) {
+      return;
+    }
+
     this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "NPCBattleCycle", 1);
 
     const result = await Promise.all([

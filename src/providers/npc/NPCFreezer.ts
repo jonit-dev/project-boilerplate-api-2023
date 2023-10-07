@@ -28,10 +28,6 @@ export class NPCFreezer {
     }
 
     await NPC.updateOne({ _id: npc._id, scene: npc.scene }, { isBehaviorEnabled: false });
-    const npcCycle = NPC_CYCLES.get(npc.id);
-    if (npcCycle) {
-      await npcCycle.clear();
-    }
 
     this.freezeCheckIntervals.delete(npc.id);
   }
