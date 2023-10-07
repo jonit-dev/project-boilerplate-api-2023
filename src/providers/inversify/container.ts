@@ -1,7 +1,7 @@
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { BlueprintManager } from "@providers/blueprint/BlueprintManager";
 import { CharacterConnection } from "@providers/character/CharacterConnection";
-import { CharacterMonitor } from "@providers/character/CharacterMonitor";
+
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { ContainerSlotsCaching } from "@providers/container/ContainerSlotsCaching";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -72,8 +72,6 @@ export const redisManager = container.get<RedisManager>(RedisManager);
 export const inMemoryHashTable = container.get<InMemoryHashTable>(InMemoryHashTable);
 
 export const pm2Helper = container.get<PM2Helper>(PM2Helper);
-
-export const characterMonitor = container.get<CharacterMonitor>(CharacterMonitor);
 
 export const spellCalculator = container.get<SpellCalculator>(SpellCalculator);
 
