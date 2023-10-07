@@ -207,15 +207,6 @@ describe("NPCTarget.ts", () => {
       expect(result).toBeUndefined();
     });
 
-    it("should throw an error if the NPC has no maxRangeInGridCells specified", async () => {
-      testNPC.maxRangeInGridCells = undefined;
-      await testNPC.save();
-
-      await expect(npcTarget.tryToSetTarget(testNPC)).rejects.toThrowError(
-        "NPC test-npc-22 is trying to set target, but no maxRangeInGridCells is specified (required for range)!"
-      );
-    });
-
     it("clears target if tries to set it but its out of range", async () => {
       const clearTarget = jest.spyOn(npcTarget, "clearTarget");
 

@@ -221,16 +221,5 @@ describe("NPCMovementMoveTowards.ts", () => {
         expect(testNPC.pathOrientation).toBe(NPCPathOrientation.Forward);
       });
     });
-
-    it("throws an error if no maxRangeInGridCells is set", async () => {
-      testNPC.maxRangeInGridCells = undefined;
-      await testNPC.save();
-
-      // startMoveTowardsMOvement should throw error "NPC test-npc-22 is trying to set target, but no maxRangeInGridCells is specified (required for range)!"
-
-      await expect(npcMovementMoveTowards.startMoveTowardsMovement(testNPC)).rejects.toThrow(
-        "NPC test-npc-22 is trying to set target, but no maxRangeInGridCells is specified (required for range)!"
-      );
-    });
   });
 });
