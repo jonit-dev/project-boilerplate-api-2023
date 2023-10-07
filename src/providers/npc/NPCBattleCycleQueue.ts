@@ -136,17 +136,17 @@ export class NPCBattleCycleQueue {
     const hasNoTarget = !updatedNPC.targetCharacter?.toString();
     const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
 
-    if (hasNoTarget || hasDifferentTarget) {
+    if (hasNoTarget || hasDifferentTarget || !targetCharacter) {
       await this.stop(npc);
       return;
     }
 
     const characterSkills = (await Skill.findOne({
-      _id: targetCharacter.skills,
+      owner: targetCharacter._id,
     })
       .lean()
       .cacheQuery({
-        cacheKey: `${targetCharacter.id}-skills`,
+        cacheKey: `${targetCharacter._id}-skills`,
       })) as ISkill;
 
     targetCharacter.skills = characterSkills;
