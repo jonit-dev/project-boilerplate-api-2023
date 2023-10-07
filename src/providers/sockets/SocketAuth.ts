@@ -130,8 +130,7 @@ export class SocketAuth {
                     character.channelId!,
                     CharacterSocketEvents.CharacterForceDisconnect,
                     {
-                      reason:
-                        "You're disconnected for spamming the server with events! Do things slower next time (or stop using macro!)",
+                      reason: "You're disconnected for spamming the server with events.",
                     }
                   );
 

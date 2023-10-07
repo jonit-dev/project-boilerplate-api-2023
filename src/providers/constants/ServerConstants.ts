@@ -1,4 +1,4 @@
-import { BattleSocketEvents, ChatSocketEvents, ItemSocketEvents } from "@rpg-engine/shared";
+import { BattleSocketEvents, ChatSocketEvents, ItemSocketEvents, ViewSocketEvents } from "@rpg-engine/shared";
 
 import os from "os";
 
@@ -36,13 +36,19 @@ export const LOCKABLE_EVENTS = [
   BattleSocketEvents.StopTargeting,
   ItemSocketEvents.LoadCraftBook,
   ItemSocketEvents.CraftItem,
+  ChatSocketEvents.GlobalChatMessageCreate,
+  ViewSocketEvents.Destroy,
 ] as string[];
 
 export const DEBOUNCEABLE_EVENTS_MS_THRESHOLD = 250;
 
 export const DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT = 70;
 
-export const DEBOUNCEABLE_EVENTS = [ItemSocketEvents.LoadCraftBook, ItemSocketEvents.CraftItem] as string[];
+export const DEBOUNCEABLE_EVENTS = [
+  ItemSocketEvents.LoadCraftBook,
+  ItemSocketEvents.CraftItem,
+  ChatSocketEvents.GlobalChatMessageCreate,
+] as string[];
 
 export const PROMISE_DEFAULT_CONCURRENCY = os.cpus().length || 2;
 

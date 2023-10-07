@@ -16,15 +16,11 @@ export class CleanupBloodCrons {
         const fiveMinAgo = new Date();
         fiveMinAgo.setMinutes(fiveMinAgo.getMinutes() - 5);
 
-        const expiredGroundBlood = await Item.find({
+        await Item.deleteMany({
           createdAt: { $lt: fiveMinAgo },
           key: EffectsBlueprint.GroundBlood,
           subType: { $ne: ItemSubType.DeadBody },
         });
-
-        for (const groundBlood of expiredGroundBlood) {
-          await groundBlood.remove();
-        }
       });
     });
   }
