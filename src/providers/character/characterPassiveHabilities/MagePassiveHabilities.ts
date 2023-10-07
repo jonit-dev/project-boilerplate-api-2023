@@ -2,32 +2,23 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
-import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import {
-  BasicAttribute,
-  CharacterClass,
-  CharacterSocketEvents,
-  ICharacterAttributeChanged,
-  SpellsBlueprint,
-} from "@rpg-engine/shared";
+import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterMonitor } from "../CharacterMonitor";
+import { CharacterMonitorQueue } from "../CharacterMonitorQueue";
 
 //! Mage = sorcerer & druid
 @provide(MagePassiveHabilities)
 export class MagePassiveHabilities {
   constructor(
     private socketMessaging: SocketMessaging,
-    private inMemoryHashTable: InMemoryHashTable,
-    private characterMonitor: CharacterMonitor,
-    private spellCalculator: SpellCalculator,
+    private characterMonitorQueue: CharacterMonitorQueue,
     private traitGetter: TraitGetter,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private spellCalculator: SpellCalculator
   ) {}
 
   @TrackNewRelicTransaction()
@@ -35,15 +26,7 @@ export class MagePassiveHabilities {
     const { _id, mana, maxMana } = character;
 
     if (character.class !== CharacterClass.Sorcerer && character.class !== CharacterClass.Druid) {
-      await this.characterMonitor.unwatch(character);
-      return;
-    }
-
-    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id.toString()}`;
-    const key = SpellsBlueprint.ManaRegenSpell;
-
-    const rengenManaIsActive = await this.inMemoryHashTable.has(namespace, key);
-    if (rengenManaIsActive) {
+      await this.characterMonitorQueue.unwatch("mana-regen", character);
       return;
     }
 
@@ -55,72 +38,68 @@ export class MagePassiveHabilities {
         })) as unknown as ISkill as ISkill;
 
       const magicLvl = await this.traitGetter.getSkillLevelWithBuffs(skills, BasicAttribute.Magic);
-      const interval =
-        (await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
-          max: 30,
-          min: 5,
-          skillAssociation: "reverse",
-        })) * 1000;
 
       const manaRegenAmount = Math.max(Math.floor(magicLvl / 3), 4);
 
       if (mana < maxMana) {
-        const intervalId = setInterval(async () => {
-          await this.newRelic.trackTransaction(
-            NewRelicTransactionCategory.Interval,
-            "AutoRegenManaHandler",
-            async () => {
-              try {
-                const refreshCharacter = (await Character.findById(_id)
-                  .lean()
-                  .select("_id mana maxMana")) as ICharacter;
+        const intervalMs = await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
+          max: 30000,
+          min: 5000,
+          skillAssociation: "reverse",
+        });
 
-                if (refreshCharacter.mana === refreshCharacter.maxMana) {
-                  clearInterval(intervalId);
-                  await this.characterMonitor.unwatch(character);
-                  return;
-                }
+        await this.characterMonitorQueue.watch(
+          "mana-regen",
+          character,
+          async (character: ICharacter) => {
+            await this.newRelic.trackTransaction(
+              NewRelicTransactionCategory.Interval,
+              "AutoRegenManaHandler",
+              async () => {
+                try {
+                  const refreshCharacter = (await Character.findById(_id)
+                    .lean()
+                    .select("_id mana maxMana")) as ICharacter;
 
-                const updatedCharacter = (await Character.findByIdAndUpdate(
-                  _id,
-                  {
-                    mana: Math.min(refreshCharacter.mana + manaRegenAmount, refreshCharacter.maxMana),
-                  },
-                  {
-                    new: true,
+                  if (refreshCharacter.mana === refreshCharacter.maxMana) {
+                    return;
                   }
-                )
-                  .lean()
-                  .select("_id mana channelId")) as ICharacter;
 
-                const payload: ICharacterAttributeChanged = {
-                  targetId: updatedCharacter._id,
-                  mana: updatedCharacter.mana,
-                };
+                  const updatedCharacter = (await Character.findByIdAndUpdate(
+                    _id,
+                    {
+                      mana: Math.min(refreshCharacter.mana + manaRegenAmount, refreshCharacter.maxMana),
+                    },
+                    {
+                      new: true,
+                    }
+                  )
+                    .lean()
+                    .select("_id mana channelId")) as ICharacter;
 
-                this.socketMessaging.sendEventToUser(
-                  updatedCharacter.channelId!,
-                  CharacterSocketEvents.AttributeChanged,
-                  payload
-                );
+                  if (updatedCharacter.mana === updatedCharacter.maxMana) {
+                    return;
+                  }
 
-                if (updatedCharacter.mana === updatedCharacter.maxMana) {
-                  clearInterval(intervalId);
-                  await this.characterMonitor.unwatch(character);
-                  await this.inMemoryHashTable.delete(namespace, key);
-                  return;
+                  const payload: ICharacterAttributeChanged = {
+                    targetId: updatedCharacter._id,
+                    mana: updatedCharacter.mana,
+                  };
+
+                  this.socketMessaging.sendEventToUser(
+                    updatedCharacter.channelId!,
+                    CharacterSocketEvents.AttributeChanged,
+                    payload
+                  );
+                } catch (err) {
+                  console.error("Error during mana regeneration interval:", err);
+                  await this.characterMonitorQueue.unwatch("mana-regen", character);
                 }
-              } catch (err) {
-                console.error("Error during mana regeneration interval:", err);
-                clearInterval(intervalId);
-                await this.characterMonitor.unwatch(character);
               }
-            }
-          );
-        }, interval);
-
-        await this.inMemoryHashTable.set(namespace, key, `interval: ${interval} qtyHealthRegen: ${manaRegenAmount}`);
-        await this.inMemoryHashTable.expire(namespace, 120, "NX");
+            );
+          },
+          intervalMs
+        );
       }
     } catch (err) {
       console.error(err);

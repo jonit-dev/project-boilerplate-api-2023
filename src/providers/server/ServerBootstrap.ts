@@ -1,6 +1,6 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
 import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
-import { CharacterMonitor } from "@providers/character/CharacterMonitor";
+
 import { CharacterTextureChange } from "@providers/character/CharacterTextureChange";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
 import { PathfindingQueue } from "@providers/map/PathfindingQueue";
@@ -38,7 +38,7 @@ export class ServerBootstrap {
     private spellSilence: SpellSilence,
     private characterTextureChange: CharacterTextureChange,
     private pathfindingResults: PathfindingResults,
-    private characterMonitor: CharacterMonitor,
+
     private heapMonitor: HeapMonitor,
     private npcFreezer: NPCFreezer,
     private locker: Locker,
@@ -63,11 +63,7 @@ export class ServerBootstrap {
     }
   }
 
-  public async performMultipleInstancesOperations(): Promise<void> {
-    await this.clearAllQueues();
-
-    await this.characterMonitor.monitor();
-
+  public performMultipleInstancesOperations(): void {
     this.discordBot.initialize();
   }
 
@@ -104,14 +100,15 @@ export class ServerBootstrap {
 
     this.npcFreezer.init();
 
-    await this.hitTarget.clearAllQueueJobs();
-    await this.npcBattleCycleQueue.clearAllJobs();
+    await this.clearAllQueues();
 
     await this.locker.clear();
   }
 
   private async clearAllQueues(): Promise<void> {
     await this.pathfindingQueue.clearAllJobs();
+    await this.npcBattleCycleQueue.clearAllJobs();
+    await this.hitTarget.clearAllQueueJobs();
     console.log("🧹 BullMQ queues cleared...");
   }
 }

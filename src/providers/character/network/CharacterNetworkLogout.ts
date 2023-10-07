@@ -24,7 +24,7 @@ import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterInventory } from "../CharacterInventory";
-import { CharacterMonitor } from "../CharacterMonitor";
+import { CharacterMonitorQueue } from "../CharacterMonitorQueue";
 import { CharacterView } from "../CharacterView";
 import { CharacterItemContainer } from "../characterItems/CharacterItemContainer";
 import { CharacterItems } from "../characterItems/CharacterItems";
@@ -42,7 +42,7 @@ export class CharacterNetworkLogout {
     private characterInventory: CharacterInventory,
     private characterItemContainer: CharacterItemContainer,
     private characterItems: CharacterItems,
-    private characterMonitor: CharacterMonitor,
+    private characterMonitorQueue: CharacterMonitorQueue,
     private specialEffect: SpecialEffect,
     private socketSessionControl: SocketSessionControl,
 
@@ -55,7 +55,7 @@ export class CharacterNetworkLogout {
       channel,
       CharacterSocketEvents.CharacterLogout,
       async (data: ICharacterLogout, character: ICharacter) => {
-        await this.characterMonitor.unwatch(character);
+        await this.characterMonitorQueue.unwatchAll(character);
 
         const nearbyCharacters = await this.characterView.getCharactersInView(character);
 

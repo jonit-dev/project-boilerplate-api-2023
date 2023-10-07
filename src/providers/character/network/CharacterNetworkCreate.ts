@@ -12,7 +12,6 @@ import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
-import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import {
   AnimationDirection,
   AvailableWeather,
@@ -23,13 +22,11 @@ import {
   ICharacterCreateFromServer,
   IControlTime,
   PeriodOfDay,
-  SpellsBlueprint,
   ToGridX,
   ToGridY,
   WeatherSocketEvents,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterMonitor } from "../CharacterMonitor";
 import { CharacterView } from "../CharacterView";
 
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
@@ -39,6 +36,7 @@ import { Locker } from "@providers/locks/Locker";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
+import { CharacterMonitorQueue } from "../CharacterMonitorQueue";
 import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
@@ -56,7 +54,6 @@ export class CharacterNetworkCreate {
     private npcWarn: NPCWarn,
     private pm2Helper: PM2Helper,
     private characterView: CharacterView,
-    private characterMonitor: CharacterMonitor,
     private specialEffect: SpecialEffect,
     private warriorPassiveHabilities: WarriorPassiveHabilities,
     private magePassiveHabilities: MagePassiveHabilities,
@@ -67,7 +64,8 @@ export class CharacterNetworkCreate {
     private itemMissingReferenceCleaner: ItemMissingReferenceCleaner,
     private characterBuffValidation: CharacterBuffValidation,
     private battleTargeting: BattleTargeting,
-    private locker: Locker
+    private locker: Locker,
+    private characterMonitorQueue: CharacterMonitorQueue
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {
@@ -173,9 +171,7 @@ export class CharacterNetworkCreate {
 
         await this.warnAboutWeatherStatus(character.channelId!);
 
-        await this.characterMonitor.watch(character, async (character: ICharacter) => {
-          await this.handleCharacterRegen(character);
-        });
+        await this.handleCharacterRegen(character);
       },
       false
     );
@@ -278,36 +274,17 @@ export class CharacterNetworkCreate {
       return;
     }
 
-    const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
-    const healthKey = SpellsBlueprint.HealthRegenSell;
-    const manaKey = SpellsBlueprint.ManaRegenSpell;
-
-    const healthCondition = character.health < character.maxHealth;
-    const manaCondition = character.mana < character.maxMana;
-
     try {
       switch (character.class) {
         case CharacterClass.Warrior:
-          if (healthCondition) {
-            const isActive = await this.inMemoryHashTable.has(namespace, healthKey);
-            isActive
-              ? await this.characterMonitor.unwatch(character)
-              : await this.warriorPassiveHabilities.warriorAutoRegenHealthHandler(character);
-          }
+          await this.warriorPassiveHabilities.warriorAutoRegenHealthHandler(character);
+
           break;
 
         case CharacterClass.Druid:
         case CharacterClass.Sorcerer:
-          if (manaCondition) {
-            const isActive = await this.inMemoryHashTable.has(namespace, manaKey);
-            isActive
-              ? await this.characterMonitor.unwatch(character)
-              : await this.magePassiveHabilities.autoRegenManaHandler(character);
-          }
-          break;
+          await this.magePassiveHabilities.autoRegenManaHandler(character);
 
-        default:
-          await this.characterMonitor.unwatch(character);
           break;
       }
     } catch (error) {

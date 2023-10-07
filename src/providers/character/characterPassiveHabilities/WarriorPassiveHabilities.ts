@@ -2,28 +2,19 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { TraitGetter } from "@providers/skill/TraitGetter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SpellCalculator } from "@providers/spells/data/abstractions/SpellCalculator";
-import { NamespaceRedisControl } from "@providers/spells/data/types/SpellsBlueprintTypes";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
-import {
-  BasicAttribute,
-  CharacterClass,
-  CharacterSocketEvents,
-  ICharacterAttributeChanged,
-  SpellsBlueprint,
-} from "@rpg-engine/shared";
+import { BasicAttribute, CharacterClass, CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { CharacterMonitor } from "../CharacterMonitor";
+import { CharacterMonitorQueue } from "../CharacterMonitorQueue";
 
 @provide(WarriorPassiveHabilities)
 export class WarriorPassiveHabilities {
   constructor(
     private socketMessaging: SocketMessaging,
-    private inMemoryHashTable: InMemoryHashTable,
-    private characterMonitor: CharacterMonitor,
+    private characterMonitorQueue: CharacterMonitorQueue,
     private traitGetter: TraitGetter,
     private newRelic: NewRelic,
     private spellCalculator: SpellCalculator
@@ -38,15 +29,7 @@ export class WarriorPassiveHabilities {
     const { _id, skills, health, maxHealth } = character;
 
     if (character.class !== CharacterClass.Warrior) {
-      await this.characterMonitor.unwatch(character);
-      return;
-    }
-
-    const namespace = `${NamespaceRedisControl.CharacterSpell}:${_id.toString()}`;
-    const key = SpellsBlueprint.HealthRegenSell;
-
-    const regenHealthIsActive = await this.inMemoryHashTable.has(namespace, key);
-    if (regenHealthIsActive) {
+      await this.characterMonitorQueue.unwatch("health-regen", character);
       return;
     }
 
@@ -58,72 +41,67 @@ export class WarriorPassiveHabilities {
         })) as unknown as ISkill;
       const strengthLvl = await this.traitGetter.getSkillLevelWithBuffs(charSkills as ISkill, BasicAttribute.Strength);
 
-      const interval = await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Strength, {
-        min: 5000,
-        max: 20000,
-        skillAssociation: "reverse",
-      });
-
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
       if (health < maxHealth) {
-        const intervalId = setInterval(async () => {
-          await this.newRelic.trackTransaction(
-            NewRelicTransactionCategory.Interval,
-            "WarriorAutoRegenHealthHandler",
-            async () => {
-              try {
-                const refreshCharacter = (await Character.findById(_id)
-                  .lean()
-                  .select("_id health maxHealth")) as ICharacter;
+        const intervalMs = await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Strength, {
+          min: 5000,
+          max: 20000,
+          skillAssociation: "reverse",
+        });
 
-                if (refreshCharacter.health === refreshCharacter.maxHealth) {
-                  clearInterval(intervalId);
-                  await this.inMemoryHashTable.delete(namespace, key);
-                  await this.characterMonitor.unwatch(character);
-                  return;
-                }
+        await this.characterMonitorQueue.watch(
+          "health-regen",
+          character,
+          async () => {
+            await this.newRelic.trackTransaction(
+              NewRelicTransactionCategory.Interval,
+              "WarriorAutoRegenHealthHandler",
+              async () => {
+                try {
+                  const refreshCharacter = (await Character.findById(_id)
+                    .lean()
+                    .select("_id health maxHealth")) as ICharacter;
 
-                const updatedCharacter = (await Character.findByIdAndUpdate(
-                  _id,
-                  {
-                    health: Math.min(refreshCharacter.health + healthRegenAmount, refreshCharacter.maxHealth),
-                  },
-                  {
-                    new: true,
+                  if (refreshCharacter.health === refreshCharacter.maxHealth) {
+                    return;
                   }
-                )
-                  .lean()
-                  .select("_id health channelId")) as ICharacter;
 
-                const payload: ICharacterAttributeChanged = {
-                  targetId: updatedCharacter._id,
-                  health: updatedCharacter.health,
-                };
+                  const updatedCharacter = (await Character.findByIdAndUpdate(
+                    _id,
+                    {
+                      health: Math.min(refreshCharacter.health + healthRegenAmount, refreshCharacter.maxHealth),
+                    },
+                    {
+                      new: true,
+                    }
+                  )
+                    .lean()
+                    .select("_id health channelId")) as ICharacter;
 
-                this.socketMessaging.sendEventToUser(
-                  updatedCharacter.channelId!,
-                  CharacterSocketEvents.AttributeChanged,
-                  payload
-                );
+                  if (updatedCharacter.health === updatedCharacter.maxHealth) {
+                    return;
+                  }
 
-                if (updatedCharacter.health === updatedCharacter.maxHealth) {
-                  clearInterval(intervalId);
-                  await this.characterMonitor.unwatch(character);
-                  await this.inMemoryHashTable.delete(namespace, key);
-                  return;
+                  const payload: ICharacterAttributeChanged = {
+                    targetId: updatedCharacter._id,
+                    health: updatedCharacter.health,
+                  };
+
+                  this.socketMessaging.sendEventToUser(
+                    updatedCharacter.channelId!,
+                    CharacterSocketEvents.AttributeChanged,
+                    payload
+                  );
+                } catch (err) {
+                  console.error("Error during health regeneration interval:", err);
+                  await this.characterMonitorQueue.unwatch("health-regen", character);
                 }
-              } catch (err) {
-                console.error("Error during health regeneration interval:", err);
-                clearInterval(intervalId);
-                await this.characterMonitor.unwatch(character);
               }
-            }
-          );
-        }, interval);
-
-        await this.inMemoryHashTable.set(namespace, key, `interval: ${interval} qtyHealthRegen: ${healthRegenAmount}`);
-        await this.inMemoryHashTable.expire(namespace, 120, "NX");
+            );
+          },
+          intervalMs
+        );
       }
     } catch (err) {
       console.error(err);

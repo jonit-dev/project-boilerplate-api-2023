@@ -29,7 +29,7 @@ export class CharacterMonitorQueue {
     this.worker = new Worker(
       "character-monitor-queue",
       async (job) => {
-        const { character, callbackId } = job.data;
+        const { character, callbackId, intervalMs } = job.data;
 
         if (!character.isOnline) {
           return;
@@ -43,7 +43,7 @@ export class CharacterMonitorQueue {
             1
           );
 
-          await this.execMonitorCallback(character, callbackId);
+          await this.execMonitorCallback(character, callbackId, intervalMs);
         } catch (err) {
           console.error("Error processing character monitor queue", err);
           throw err;
@@ -68,12 +68,17 @@ export class CharacterMonitorQueue {
     }
   }
 
-  public async watch(callbackId: string, character: ICharacter, callback: CharacterMonitorCallback): Promise<void> {
+  public async watch(
+    callbackId: string,
+    character: ICharacter,
+    callback: CharacterMonitorCallback,
+    intervalMs: number = 3000
+  ): Promise<void> {
     const currentCallbackRecord = this.charactersCallbacks.get(character._id.toString());
 
-    const hasCallback = currentCallbackRecord?.[callbackId];
+    const isWatching = this.isWatching(callbackId, character);
 
-    if (hasCallback) {
+    if (isWatching) {
       return;
     }
 
@@ -82,10 +87,18 @@ export class CharacterMonitorQueue {
       [callbackId]: callback,
     });
 
-    await this.add(character, callbackId);
+    await this.add(character, callbackId, intervalMs);
   }
 
-  public unwatch(character: ICharacter, callbackId: string): void {
+  public isWatching(callbackId: string, character: ICharacter): boolean {
+    const currentCallbackRecord = this.charactersCallbacks.get(character._id.toString());
+
+    const hasCallback = currentCallbackRecord?.[callbackId];
+
+    return !!hasCallback;
+  }
+
+  public unwatch(callbackId: string, character: ICharacter): void {
     const currentCallbacks = this.charactersCallbacks.get(character._id.toString());
 
     if (!currentCallbacks) {
@@ -105,9 +118,9 @@ export class CharacterMonitorQueue {
     this.charactersCallbacks.delete(character._id);
   }
 
-  private async add(character: ICharacter, callbackId: string): Promise<void> {
+  private async add(character: ICharacter, callbackId: string, intervalMs: number): Promise<void> {
     if (appEnv.general.IS_UNIT_TEST) {
-      await this.execMonitorCallback(character, callbackId);
+      await this.execMonitorCallback(character, callbackId, intervalMs);
       return;
     }
 
@@ -116,28 +129,18 @@ export class CharacterMonitorQueue {
       {
         character,
         callbackId,
+        intervalMs,
       },
       {
-        delay: 3000,
+        delay: intervalMs,
         removeOnComplete: true,
         removeOnFail: true,
       }
     );
   }
 
-  public async clearAllJobs(): Promise<void> {
-    const jobs = await this.queue.getJobs(["waiting", "active", "delayed", "paused"]);
-    for (const job of jobs) {
-      try {
-        await job?.remove();
-      } catch (err) {
-        console.error(`Error removing job ${job?.id}:`, err.message);
-      }
-    }
-  }
-
   @TrackNewRelicTransaction()
-  private async execMonitorCallback(character: ICharacter, callbackId: string): Promise<void> {
+  private async execMonitorCallback(character: ICharacter, callbackId: string, intervalMs: number): Promise<void> {
     // execute character callback
     const characterCallbacks = this.charactersCallbacks.get(character._id.toString());
 
@@ -150,13 +153,14 @@ export class CharacterMonitorQueue {
       })) as ICharacter;
 
       if (!updatedCharacter.isOnline) {
+        this.unwatch(callbackId, character);
         return;
       }
 
       // execute callback
       callback(updatedCharacter);
 
-      await this.add(character, callbackId);
+      await this.add(character, callbackId, intervalMs);
     }
   }
 }
