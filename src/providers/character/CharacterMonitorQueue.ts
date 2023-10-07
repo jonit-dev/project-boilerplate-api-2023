@@ -3,10 +3,12 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
-import { Locker } from "@providers/locks/Locker";
-import { PM2Helper } from "@providers/server/PM2Helper";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
+import { EnvType } from "@rpg-engine/shared";
 import { Queue, Worker } from "bullmq";
+
+// uniqueId
+import { v4 as uuidv4 } from "uuid";
 
 type CharacterMonitorCallback = (character: ICharacter) => void;
 
@@ -17,9 +19,12 @@ export class CharacterMonitorQueue {
   private queue: Queue<any, any, string>;
   private worker: Worker;
   private charactersCallbacks = new Map<string, CallbackRecord>();
+  private queueName: string = `character-monitor-queue-${uuidv4()}-${
+    appEnv.general.ENV === EnvType.Development ? "dev" : process.env.pm_id
+  }`;
 
-  constructor(private newRelic: NewRelic, private locker: Locker, private pm2Helper: PM2Helper) {
-    this.queue = new Queue("character-monitor-queue", {
+  constructor(private newRelic: NewRelic) {
+    this.queue = new Queue(this.queueName, {
       connection: {
         host: appEnv.database.REDIS_CONTAINER,
         port: Number(appEnv.database.REDIS_PORT),
@@ -27,7 +32,7 @@ export class CharacterMonitorQueue {
     });
 
     this.worker = new Worker(
-      "character-monitor-queue",
+      this.queueName,
       async (job) => {
         const { character, callbackId, intervalMs } = job.data;
 
@@ -59,11 +64,11 @@ export class CharacterMonitorQueue {
 
     if (!appEnv.general.IS_UNIT_TEST) {
       this.worker.on("failed", (job, err) => {
-        console.log(`character-monitor-queue job ${job?.id} failed with error ${err.message}`);
+        console.log(`${this.queueName} job ${job?.id} failed with error ${err.message}`);
       });
 
       this.queue.on("error", (error) => {
-        console.error("Error in the character-monitor-queue :", error);
+        console.error(`Error in ${this.queueName}`, error);
       });
     }
   }
@@ -125,7 +130,7 @@ export class CharacterMonitorQueue {
     }
 
     await this.queue.add(
-      "character-monitor-queue",
+      this.queueName,
       {
         character,
         callbackId,
@@ -143,6 +148,8 @@ export class CharacterMonitorQueue {
   private async execMonitorCallback(character: ICharacter, callbackId: string, intervalMs: number): Promise<void> {
     // execute character callback
     const characterCallbacks = this.charactersCallbacks.get(character._id.toString());
+
+    console.log("execMonitorCallback", character._id.toString(), callbackId, intervalMs);
 
     const callback = characterCallbacks?.[callbackId];
 
