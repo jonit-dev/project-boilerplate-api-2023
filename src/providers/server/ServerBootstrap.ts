@@ -15,6 +15,7 @@ import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { DiscordBot } from "@providers/discord/DiscordBot";
 import { blueprintManager } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
+import { NPCBattleCycleQueue } from "@providers/npc/NPCBattleCycleQueue";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import PartyManagement from "@providers/party/PartyManagement";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
@@ -45,7 +46,8 @@ export class ServerBootstrap {
     private inMemoryHashTable: InMemoryHashTable,
     private hitTarget: HitTarget,
     private discordBot: DiscordBot,
-    private socketSessionControl: SocketSessionControl
+    private socketSessionControl: SocketSessionControl,
+    private npcBattleCycleQueue: NPCBattleCycleQueue
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -103,6 +105,7 @@ export class ServerBootstrap {
     this.npcFreezer.init();
 
     await this.hitTarget.clearAllQueueJobs();
+    await this.npcBattleCycleQueue.clearAllJobs();
 
     await this.locker.clear();
   }
