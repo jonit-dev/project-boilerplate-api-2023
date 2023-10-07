@@ -6,6 +6,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { appEnv } from "@providers/config/env";
 import { NPC_CYCLE_INTERVAL_RATIO, NPC_FRIENDLY_FREEZE_CHECK_CHANCE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { NPCAlignment, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { Queue, Worker } from "bullmq";
@@ -37,7 +38,8 @@ export class NPCCycleQueue {
     private npcMovementStopped: NPCMovementStopped,
     private npcMovementMoveAway: NPCMovementMoveAway,
     private npcLoader: NPCLoader,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private locker: Locker
   ) {
     this.queue = new Queue("npc-cycle-queue", {
       connection: {
@@ -143,6 +145,8 @@ export class NPCCycleQueue {
   }
 
   private async stop(npc: INPC): Promise<void> {
+    await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
+
     await Character.updateOne({ _id: npc.targetCharacter }, { $unset: { target: 1 } });
     await NPC.updateOne(
       { _id: npc._id },

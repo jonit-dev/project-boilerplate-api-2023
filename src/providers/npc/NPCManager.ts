@@ -12,6 +12,7 @@ import { NPCView } from "./NPCView";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { PROMISE_DEFAULT_CONCURRENCY } from "@providers/constants/ServerConstants";
+import { Locker } from "@providers/locks/Locker";
 import { MathHelper } from "@providers/math/MathHelper";
 import { RaidManager } from "@providers/raid/RaidManager";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
@@ -25,7 +26,8 @@ export class NPCManager {
     private newRelic: NewRelic,
     private mathHelper: MathHelper,
     private raidManager: RaidManager,
-    private npcCycleQueue: NPCCycleQueue
+    private npcCycleQueue: NPCCycleQueue,
+    private locker: Locker
   ) {}
 
   @TrackNewRelicTransaction()
@@ -62,6 +64,12 @@ export class NPCManager {
     const npc = initialNPC;
 
     if (!npc) {
+      return;
+    }
+
+    const canProceed = await this.locker.lock(`npc-${npc._id}-npc-cycle`);
+
+    if (!canProceed) {
       return;
     }
 
