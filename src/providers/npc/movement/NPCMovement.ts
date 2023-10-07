@@ -3,6 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { CharacterView } from "@providers/character/CharacterView";
 import { appEnv } from "@providers/config/env";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
+import { PATHFINDING_MAX_TRIES } from "@providers/constants/PathfindingConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { GridManager } from "@providers/map/GridManager";
@@ -239,7 +240,7 @@ export class NPCMovement {
 
           tries++;
 
-          if (tries > 100) {
+          if (tries > PATHFINDING_MAX_TRIES) {
             clearInterval(interval);
             await this.pathfindingResults.deleteResult(jobId);
 
