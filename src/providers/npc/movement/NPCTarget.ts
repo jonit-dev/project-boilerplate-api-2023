@@ -3,6 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { Locker } from "@providers/locks/Locker";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
@@ -16,7 +17,8 @@ export class NPCTarget {
     private npcView: NPCView,
     private movementHelper: MovementHelper,
     private mapNonPVPZone: MapNonPVPZone,
-    private specialEffect: SpecialEffect
+    private specialEffect: SpecialEffect,
+    private locker: Locker
   ) {}
 
   @TrackNewRelicTransaction()
@@ -57,67 +59,78 @@ export class NPCTarget {
 
   @TrackNewRelicTransaction()
   public async tryToSetTarget(npc: INPC): Promise<void> {
-    if (!npc.isAlive) {
-      return;
-    }
+    try {
+      const canProceed = await this.locker.lock(`npc-try-set-target-${npc._id}`);
 
-    if (!npc.maxRangeInGridCells) {
-      throw new Error(
-        `NPC ${npc.key} is trying to set target, but no maxRangeInGridCells is specified (required for range)!`
-      );
-    }
-
-    const minDistanceCharacter = await this.npcView.getNearestCharacter(npc);
-
-    if (!minDistanceCharacter) {
-      return;
-    }
-
-    if (await this.specialEffect.isInvisible(minDistanceCharacter)) {
-      return;
-    }
-
-    const rangeThresholdDefinition = this.getRangeThreshold(npc);
-
-    if (!rangeThresholdDefinition) {
-      throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
-    }
-
-    // check if character is under range
-    const isMovementUnderRange = this.movementHelper.isUnderRange(
-      npc.x,
-      npc.y,
-      minDistanceCharacter.x,
-      minDistanceCharacter.y,
-      rangeThresholdDefinition
-    );
-
-    if (!isMovementUnderRange) {
-      await this.clearTarget(npc);
-      return;
-    }
-
-    const character = await Character.findById(minDistanceCharacter.id).lean();
-
-    if (!character) {
-      throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
-    }
-
-    const isRaid = npc.raidKey !== undefined;
-    const freeze = !isRaid;
-
-    if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE && freeze) {
-      const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
-      // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
-      if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
-        await this.clearTarget(npc);
-
+      if (!canProceed) {
         return;
       }
-    }
 
-    // set target using updateOne
-    await NPC.updateOne({ _id: npc._id }, { $set: { targetCharacter: character._id } });
+      if (!npc.isAlive) {
+        return;
+      }
+
+      if (!npc.maxRangeInGridCells) {
+        throw new Error(
+          `NPC ${npc.key} is trying to set target, but no maxRangeInGridCells is specified (required for range)!`
+        );
+      }
+
+      const minDistanceCharacter = await this.npcView.getNearestCharacter(npc);
+
+      if (!minDistanceCharacter) {
+        return;
+      }
+
+      if (await this.specialEffect.isInvisible(minDistanceCharacter)) {
+        return;
+      }
+
+      const rangeThresholdDefinition = this.getRangeThreshold(npc);
+
+      if (!rangeThresholdDefinition) {
+        throw new Error(`NPC ${npc.key} is trying to set target, failed ot calculate rangeThresholdDefinition!`);
+      }
+
+      // check if character is under range
+      const isMovementUnderRange = this.movementHelper.isUnderRange(
+        npc.x,
+        npc.y,
+        minDistanceCharacter.x,
+        minDistanceCharacter.y,
+        rangeThresholdDefinition
+      );
+
+      if (!isMovementUnderRange) {
+        await this.clearTarget(npc);
+        return;
+      }
+
+      const character = await Character.findById(minDistanceCharacter.id).lean();
+
+      if (!character) {
+        throw new Error(`Error in ${npc.key}: Failed to find character to set as target!`);
+      }
+
+      const isRaid = npc.raidKey !== undefined;
+      const freeze = !isRaid;
+
+      if (!NPC_CAN_ATTACK_IN_NON_PVP_ZONE && freeze) {
+        const isCharInNonPVPZone = this.mapNonPVPZone.isNonPVPZoneAtXY(character.scene, character.x, character.y);
+        // This is needed to prevent NPCs(Hostile) from attacking players in non-PVP zones
+        if (isCharInNonPVPZone && npc.alignment === NPCAlignment.Hostile) {
+          await this.clearTarget(npc);
+
+          return;
+        }
+      }
+
+      // set target using updateOne
+      await NPC.updateOne({ _id: npc._id }, { $set: { targetCharacter: character._id } });
+    } catch (error) {
+      console.error(error);
+      await this.locker.unlock(`npc-try-set-target-${npc._id}`);
+    }
   }
 
   @TrackNewRelicTransaction()
