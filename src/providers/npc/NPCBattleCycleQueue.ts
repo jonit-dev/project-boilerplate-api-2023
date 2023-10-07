@@ -9,7 +9,7 @@ import { NPC_BATTLE_CYCLE_INTERVAL, NPC_MIN_DISTANCE_TO_ACTIVATE } from "@provid
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
 import { Locker } from "@providers/locks/Locker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { Queue, Worker } from "bullmq";
 import { provide } from "inversify-binding-decorators";
@@ -64,13 +64,15 @@ export class NPCBattleCycleQueue {
       }
     );
 
-    this.worker.on("failed", (job, err) => {
-      console.log(`npc-battle-cycle-queue job ${job?.id} failed with error ${err.message}`);
-    });
+    if (!appEnv.general.IS_UNIT_TEST) {
+      this.worker.on("failed", (job, err) => {
+        console.log(`npc-battle-cycle-queue job ${job?.id} failed with error ${err.message}`);
+      });
 
-    this.queue.on("error", (error) => {
-      console.error("Error in the npc-battle-cycle-queue :", error);
-    });
+      this.queue.on("error", (error) => {
+        console.error("Error in the npc-battle-cycle-queue :", error);
+      });
+    }
   }
 
   public async add(npc: INPC, npcSkills: ISkill): Promise<void> {
@@ -101,77 +103,73 @@ export class NPCBattleCycleQueue {
   }
 
   private async execBattleCycle(npc: INPC, npcSkills: ISkill): Promise<void> {
-    await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "NpcBattleCycle", async () => {
-      const result = await Promise.all([
-        NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
-        Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),
-      ]);
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "NPCBattleCycle", 1);
 
-      const targetCharacter = result[1] as ICharacter;
+    const result = await Promise.all([
+      NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
+      Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),
+    ]);
 
-      const isUnderRange = this.movementHelper.isUnderRange(
-        npc.x,
-        npc.y,
-        targetCharacter.x,
-        targetCharacter.y,
-        npc.maxRangeInGridCells || NPC_MIN_DISTANCE_TO_ACTIVATE
-      );
+    const targetCharacter = result[1] as ICharacter;
 
-      if (!targetCharacter || targetCharacter.health <= 0 || targetCharacter.scene !== npc.scene || !isUnderRange) {
-        await this.stop(npc);
-        return;
-      }
+    const isUnderRange = this.movementHelper.isUnderRange(
+      npc.x,
+      npc.y,
+      targetCharacter.x,
+      targetCharacter.y,
+      npc.maxRangeInGridCells || NPC_MIN_DISTANCE_TO_ACTIVATE
+    );
 
-      const updatedNPC = result[0] as INPC;
-      updatedNPC.skills = npcSkills;
+    if (!targetCharacter || targetCharacter.health <= 0 || targetCharacter.scene !== npc.scene || !isUnderRange) {
+      await this.stop(npc);
+      return;
+    }
 
-      if (!updatedNPC.isBehaviorEnabled) {
-        await this.stop(npc);
-        return;
-      }
+    const updatedNPC = result[0] as INPC;
+    updatedNPC.skills = npcSkills;
 
-      const hasNoTarget = !updatedNPC.targetCharacter?.toString();
-      const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
+    if (!updatedNPC.isBehaviorEnabled) {
+      await this.stop(npc);
+      return;
+    }
 
-      if (hasNoTarget || hasDifferentTarget) {
-        await this.stop(npc);
-        return;
-      }
+    const hasNoTarget = !updatedNPC.targetCharacter?.toString();
+    const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
 
-      const characterSkills = (await Skill.findOne({
-        _id: targetCharacter.skills,
-      })
-        .lean()
-        .cacheQuery({
-          cacheKey: `${targetCharacter.id}-skills`,
-        })) as ISkill;
+    if (hasNoTarget || hasDifferentTarget) {
+      await this.stop(npc);
+      return;
+    }
 
-      targetCharacter.skills = characterSkills;
+    const characterSkills = (await Skill.findOne({
+      _id: targetCharacter.skills,
+    })
+      .lean()
+      .cacheQuery({
+        cacheKey: `${targetCharacter.id}-skills`,
+      })) as ISkill;
 
-      const isTargetInvisible = await this.specialEffect.isInvisible(targetCharacter);
+    targetCharacter.skills = characterSkills;
 
-      if (
-        updatedNPC?.alignment === NPCAlignment.Hostile &&
-        targetCharacter?.health > 0 &&
-        updatedNPC.health > 0 &&
-        !isTargetInvisible
-      ) {
-        // if reached target and alignment is enemy, lets hit it
-        await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
-        await this.tryToSwitchToRandomTarget(npc);
-      }
+    const isTargetInvisible = await this.specialEffect.isInvisible(targetCharacter);
 
-      await this.add(updatedNPC, npcSkills);
-    });
+    if (
+      updatedNPC?.alignment === NPCAlignment.Hostile &&
+      targetCharacter?.health > 0 &&
+      updatedNPC.health > 0 &&
+      !isTargetInvisible
+    ) {
+      // if reached target and alignment is enemy, lets hit it
+      await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
+      await this.tryToSwitchToRandomTarget(npc);
+    }
+
+    await this.add(updatedNPC, npcSkills);
   }
 
   private async stop(npc: INPC): Promise<void> {
-    await this.clearTargetCharacterTarget(npc);
     await this.npcTarget.clearTarget(npc);
-  }
-
-  private async clearTargetCharacterTarget(npc: INPC): Promise<void> {
-    await Character.updateOne({ _id: npc.targetCharacter }, { $unset: { target: 1 } });
+    await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
   }
 
   @TrackNewRelicTransaction()
@@ -183,7 +181,7 @@ export class NPCBattleCycleQueue {
       const nearbyCharacters = await this.getVisibleCharactersInView(npc);
       // Only one character around this NPC, cannot change target
       if (nearbyCharacters.length <= 1) return false;
-      let alreadySetted = false;
+      let alreadySet = false;
 
       if (npc.canSwitchToLowHealthTarget) {
         const charactersHealth: ICharacterHealth[] = [];
@@ -205,12 +203,12 @@ export class NPCBattleCycleQueue {
         if (minHealthCharacter.health <= minHealthCharacter.maxHealth / 4) {
           await this.npcTarget.setTarget(npc, minHealthCharacter);
           npc.speed += npc.speed * 0.3;
-          alreadySetted = true;
+          alreadySet = true;
           return true;
         }
       }
 
-      if (npc.canSwitchToRandomTarget && !alreadySetted) {
+      if (npc.canSwitchToRandomTarget && !alreadySet) {
         const randomCharacter = _.sample(nearbyCharacters);
         if (randomCharacter) await this.npcTarget.setTarget(npc, randomCharacter);
         return true;

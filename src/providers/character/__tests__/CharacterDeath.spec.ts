@@ -2,11 +2,10 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
-import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { DROP_EQUIPMENT_CHANCE } from "@providers/constants/DeathConstants";
-import { container, entityEffectUse, unitTestHelper } from "@providers/inversify/container";
+import { container, unitTestHelper } from "@providers/inversify/container";
 import { AccessoriesBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { NPCBattleCycle, NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { CharacterSkullType, Modes } from "@rpg-engine/shared";
 import { EntityAttackType } from "@rpg-engine/shared/dist/types/entity.types";
 import _ from "lodash";
@@ -37,54 +36,6 @@ describe("CharacterDeath.ts", () => {
       hasInventory: true,
       hasSkills: true,
     });
-  });
-
-  it("should properly handle character's death main points", async () => {
-    testNPC.targetCharacter = testCharacter._id;
-    await testNPC.save();
-    new NPCBattleCycle(testNPC.id, () => {}, 10000);
-
-    // @ts-ignore
-    const spySocketMessaging = jest.spyOn(characterDeath.socketMessaging, "sendEventToUser");
-    // @ts-ignore
-    const clearEffectsSpy = jest.spyOn(entityEffectUse, "clearAllEntityEffects");
-
-    await characterDeath.handleCharacterDeath(testNPC, testCharacter);
-
-    //* Generate a body
-    const charBody = await Item.findOne({
-      owner: testCharacter._id,
-    });
-    expect(charBody).toBeDefined();
-
-    //* warn characters around about death
-    expect(spySocketMessaging).toHaveBeenCalled();
-
-    //* clear attacker's target
-    const updatedNPC = await NPC.findById(testNPC.id);
-    expect(updatedNPC?.targetCharacter).toBeUndefined();
-
-    const npcBattleCycle = NPC_BATTLE_CYCLES.get(testNPC.id);
-
-    expect(npcBattleCycle).toBeUndefined();
-
-    //* respawn a character
-    const postDeathCharacter = await Character.findById(testCharacter._id);
-
-    if (!postDeathCharacter) {
-      throw new Error("Character not found");
-    }
-
-    expect(postDeathCharacter.health === postDeathCharacter.maxHealth).toBeTruthy();
-    expect(postDeathCharacter.mana === postDeathCharacter.maxMana).toBeTruthy();
-    expect(postDeathCharacter.x === postDeathCharacter.initialX).toBeTruthy();
-    expect(postDeathCharacter.y === postDeathCharacter.initialY).toBeTruthy();
-    expect(postDeathCharacter.scene === postDeathCharacter.initialScene).toBeTruthy();
-    expect(postDeathCharacter.appliedEntityEffects).toHaveLength(0);
-
-    // * Clear all effects
-    expect(clearEffectsSpy).toHaveBeenCalled();
-    expect(clearEffectsSpy).toHaveBeenCalledWith(testCharacter);
   });
 
   describe("Soft mode", () => {

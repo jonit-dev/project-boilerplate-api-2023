@@ -3,7 +3,6 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { NPC } from "@entities/ModuleNPC/NPCModel";
 import { newRelic } from "@providers/inversify/container";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
-import { NPC_BATTLE_CYCLES } from "./NPCBattleCycle";
 
 type SetInterval = ReturnType<typeof setInterval>;
 
@@ -36,12 +35,6 @@ export class NPCCycle {
   public async clear(): Promise<void> {
     clearInterval(this.interval);
     NPC_CYCLES.delete(this.id);
-
-    const battleCycle = NPC_BATTLE_CYCLES.get(this.id);
-
-    if (battleCycle) {
-      await battleCycle.clear();
-    }
 
     await Character.updateOne({ _id: this.id }, { $unset: { target: 1 } });
     await NPC.updateOne({ _id: this.id }, { $set: { isBehaviorEnabled: false } });

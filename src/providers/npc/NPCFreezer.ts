@@ -2,7 +2,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import random from "lodash/random";
-import { NPC_BATTLE_CYCLES } from "./NPCBattleCycle";
 import { NPC_CYCLES } from "./NPCCycle";
 
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
@@ -32,11 +31,6 @@ export class NPCFreezer {
     const npcCycle = NPC_CYCLES.get(npc.id);
     if (npcCycle) {
       await npcCycle.clear();
-    }
-
-    const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
-    if (battleCycle) {
-      await battleCycle.clear();
     }
 
     this.freezeCheckIntervals.delete(npc.id);
@@ -76,9 +70,7 @@ export class NPCFreezer {
         }
       }
 
-      console.log(
-        `TOTAL_ACTIVE_NPCS: ${totalActiveNPCs} - NPC_CYCLES: ${NPC_CYCLES.size} - NPC_BATTLE_CYCLES: ${NPC_BATTLE_CYCLES.size} - CPU: ${totalCPUUsage}%`
-      );
+      console.log(`TOTAL_ACTIVE_NPCS: ${totalActiveNPCs} - NPC_CYCLES: ${NPC_CYCLES.size} - CPU: ${totalCPUUsage}%`);
 
       await Promise.all(freezeTasks);
     }, checkInterval);

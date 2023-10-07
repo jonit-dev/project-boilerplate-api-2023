@@ -6,7 +6,6 @@ import {
 } from "@providers/character/__tests__/mockConstants/SkillConstants.mock";
 import { blueprintManager, container, redisManager } from "@providers/inversify/container";
 import { MapLoader } from "@providers/map/MapLoader";
-import { NPC_BATTLE_CYCLES } from "@providers/npc/NPCBattleCycle";
 import { NPC_CYCLES } from "@providers/npc/NPCCycle";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
@@ -156,7 +155,6 @@ afterAll(async () => {
   await mongoose.disconnect();
 
   MapLoader.maps.clear();
-  NPC_BATTLE_CYCLES.clear();
   NPC_CYCLES.clear();
 
   await redisManager.client.flushAll();

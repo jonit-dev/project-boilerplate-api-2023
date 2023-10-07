@@ -21,7 +21,6 @@ import {
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _, { debounce } from "lodash";
-import { NPC_BATTLE_CYCLES } from "../NPCBattleCycle";
 import { NPCBattleCycleQueue } from "../NPCBattleCycleQueue";
 import { NPCView } from "../NPCView";
 import { NPCMovement } from "./NPCMovement";
@@ -184,12 +183,6 @@ export class NPCMovementMoveTowards {
 
       if (isInRange) {
         await this.initBattleCycle(npc);
-      } else {
-        const battleCycle = NPC_BATTLE_CYCLES.get(npc.id);
-
-        if (battleCycle) {
-          await battleCycle.clear();
-        }
       }
     }
   }
@@ -242,31 +235,27 @@ export class NPCMovementMoveTowards {
 
   @TrackNewRelicTransaction()
   private async initBattleCycle(npc: INPC): Promise<void> {
-    const hasBattleCycle = NPC_BATTLE_CYCLES.has(npc.id);
-
     if (!npc.targetCharacter) {
       // try to reset target, if somehow its lost
       await this.npcTarget.tryToSetTarget(npc);
     }
 
-    if (!hasBattleCycle) {
-      const canProceed = await this.locker.lock(`npc-${npc._id}-npc-battle-cycle`);
+    const canProceed = await this.locker.lock(`npc-${npc._id}-npc-battle-cycle`);
 
-      if (!canProceed) {
-        return;
-      }
-
-      const npcSkills = (await Skill.findOne({
-        _id: npc.skills,
-      })
-        .lean({ virtuals: true, defaults: true })
-        .cacheQuery({
-          cacheKey: `${npc.id}-skills`,
-          ttl: 60 * 60 * 24 * 7,
-        })) as ISkill;
-
-      await this.npcBattleCycleQueue.add(npc, npcSkills);
+    if (!canProceed) {
+      return;
     }
+
+    const npcSkills = (await Skill.findOne({
+      _id: npc.skills,
+    })
+      .lean({ virtuals: true, defaults: true })
+      .cacheQuery({
+        cacheKey: `${npc.id}-skills`,
+        ttl: 60 * 60 * 24 * 7,
+      })) as ISkill;
+
+    await this.npcBattleCycleQueue.add(npc, npcSkills);
   }
 
   @TrackNewRelicTransaction()
