@@ -152,14 +152,6 @@ export class GridManager {
 
     const bounds = this.getSubGridBounds(map, gridCourse);
 
-    if (bounds.startY + bounds.height > tree.length) {
-      throw new Error(`❌ The vertical bounds exceed the grid height for map: ${map}`);
-    }
-
-    if (tree[0] && bounds.startX + bounds.width > tree[0].length) {
-      throw new Error(`❌ The horizontal bounds exceed the grid width for map: ${map}`);
-    }
-
     const solids = new Set();
 
     for (let y = bounds.startY + offset.gridOffsetY; y < bounds.startY + bounds.height + offset.gridOffsetY; y++) {

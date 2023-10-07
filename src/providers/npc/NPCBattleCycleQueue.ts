@@ -103,6 +103,8 @@ export class NPCBattleCycleQueue {
   }
 
   private async execBattleCycle(npc: INPC, npcSkills: ISkill): Promise<void> {
+    console.log(`NPC ${npc.key} (${npc.id}) battle cycle`);
+
     const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
 
     if (!hasLock) {

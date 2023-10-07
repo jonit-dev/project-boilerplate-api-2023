@@ -46,10 +46,10 @@ export class NPCCycleQueue {
     this.worker = new Worker(
       "npc-cycle-queue",
       async (job) => {
-        const { npc, npcSkills } = job.data;
+        const { npc, npcSkills, isFirstCycle } = job.data;
 
         try {
-          await this.execNpcCycle(npc, npcSkills);
+          await this.execNpcCycle(npc, npcSkills, isFirstCycle);
         } catch (err) {
           console.error(`Error processing npc-cycle-queue for NPC ${npc.key}:`, err);
           throw err;
@@ -74,9 +74,9 @@ export class NPCCycleQueue {
     }
   }
 
-  public async add(npc: INPC, npcSkills: ISkill): Promise<void> {
+  public async add(npc: INPC, npcSkills: ISkill, isFirstCycle = true): Promise<void> {
     if (appEnv.general.IS_UNIT_TEST) {
-      await this.execNpcCycle(npc, npcSkills);
+      await this.execNpcCycle(npc, npcSkills, true);
       return;
     }
 
@@ -85,6 +85,7 @@ export class NPCCycleQueue {
       {
         npc,
         npcSkills,
+        isFirstCycle,
       },
       {
         delay: (1600 + random(0, 200)) / (npc.speed * 1.6) / NPC_CYCLE_INTERVAL_RATIO,
@@ -105,6 +106,39 @@ export class NPCCycleQueue {
     }
   }
 
+  private async execNpcCycle(npc: INPC, npcSkills: ISkill, isFirstCycle: boolean): Promise<void> {
+    npc = await NPC.findById(npc._id).lean({
+      virtuals: true,
+      defaults: true,
+    });
+
+    console.log(`NPC ${npc.key} is executing cycle`);
+
+    const shouldNPCBeCleared = this.shouldNPCBeCleared(npc);
+
+    if (shouldNPCBeCleared) {
+      await this.stop(npc);
+      return;
+    }
+
+    if (!isFirstCycle && npc.alignment === NPCAlignment.Hostile && !npc.targetCharacter) {
+      await this.stop(npc);
+      return;
+    }
+
+    await this.friendlyNPCFreezeCheck(npc);
+
+    npc.skills = npcSkills;
+
+    if (await this.specialEffect.isStun(npc)) {
+      return;
+    }
+
+    void this.startCoreNPCBehavior(npc);
+
+    await this.add(npc, npcSkills, false);
+  }
+
   private async stop(npc: INPC): Promise<void> {
     await Character.updateOne({ _id: npc.targetCharacter }, { $unset: { target: 1 } });
     await NPC.updateOne(
@@ -120,30 +154,12 @@ export class NPCCycleQueue {
     );
   }
 
-  private async execNpcCycle(npc: INPC, npcSkills: ISkill): Promise<void> {
-    console.log(`NPC ${npc.key} (${npc._id}) cycle started.`);
+  private shouldNPCBeCleared(npc: INPC): boolean {
+    if (!npc) return true;
 
-    npc = await NPC.findById(npc._id).lean({
-      virtuals: true,
-      defaults: true,
-    });
+    if (!npc.isBehaviorEnabled || npc.health <= 0) return true;
 
-    if (!npc.isBehaviorEnabled) {
-      await this.stop(npc);
-      return;
-    }
-
-    await this.friendlyNPCFreezeCheck(npc);
-
-    npc.skills = npcSkills;
-
-    if (await this.specialEffect.isStun(npc)) {
-      return;
-    }
-
-    void this.startCoreNPCBehavior(npc);
-
-    await this.add(npc, npcSkills);
+    return false;
   }
 
   @TrackNewRelicTransaction()
