@@ -7,7 +7,6 @@ import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCAlignment, NPCTargetType, NPC_MAX_TALKING_DISTANCE_IN_GRID } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { NPC_CYCLES } from "../NPCCycle";
 import { NPCView } from "../NPCView";
 import { NPCDirection } from "./NPCMovement";
 
@@ -34,12 +33,6 @@ export class NPCTarget {
         },
       }
     );
-
-    const npcCycle = NPC_CYCLES.get(npc.id);
-
-    if (npcCycle) {
-      await npcCycle.clear();
-    }
   }
 
   public getTargetDirection(npc: INPC, targetX: number, targetY: number): NPCDirection {

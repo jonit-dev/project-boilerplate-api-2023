@@ -7,7 +7,6 @@ import { NPC_MAX_ACTIVE_NPCS, NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/co
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { Promise } from "bluebird";
 import { provide } from "inversify-binding-decorators";
-import { NPC_CYCLES } from "./NPCCycle";
 import { NPCView } from "./NPCView";
 
 import { NewRelic } from "@providers/analytics/NewRelic";
@@ -80,9 +79,6 @@ export class NPCManager {
 
     if (!npc.isBehaviorEnabled) {
       // prevent double behavior loop
-      if (NPC_CYCLES.has(npc.id)) {
-        return;
-      }
 
       const npcSkills = (await Skill.find({ owner: npc._id }).cacheQuery({
         cacheKey: `npc-${npc.id}-skills`,

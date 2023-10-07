@@ -2,7 +2,6 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
-import { NPC_CYCLES } from "../NPCCycle";
 import { NPCMovement } from "./NPCMovement";
 import { NPCTarget } from "./NPCTarget";
 
@@ -27,12 +26,6 @@ export class NPCMovementMoveAway {
           await this.npcMovement.moveNPC(npc, npc.x, npc.y, newX, newY, oppositeTargetDirection);
         }
       } else {
-        const npcCycle = NPC_CYCLES.get(npc.id);
-
-        if (npcCycle) {
-          await npcCycle.clear();
-        }
-
         await this.npcTarget.tryToSetTarget(npc);
       }
     } catch (error) {

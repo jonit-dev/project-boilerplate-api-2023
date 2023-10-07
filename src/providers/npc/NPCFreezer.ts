@@ -2,7 +2,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import random from "lodash/random";
-import { NPC_CYCLES } from "./NPCCycle";
 
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
@@ -13,8 +12,6 @@ import round from "lodash/round";
 
 @provideSingleton(NPCFreezer)
 export class NPCFreezer {
-  public freezeCheckIntervals: Map<string, NodeJS.Timeout> = new Map();
-
   constructor() {}
 
   public init(): void {
@@ -28,8 +25,6 @@ export class NPCFreezer {
     }
 
     await NPC.updateOne({ _id: npc._id, scene: npc.scene }, { isBehaviorEnabled: false });
-
-    this.freezeCheckIntervals.delete(npc.id);
   }
 
   private setCPUUsageCheckInterval(): void {
@@ -66,7 +61,7 @@ export class NPCFreezer {
         }
       }
 
-      console.log(`TOTAL_ACTIVE_NPCS: ${totalActiveNPCs} - NPC_CYCLES: ${NPC_CYCLES.size} - CPU: ${totalCPUUsage}%`);
+      console.log(`TOTAL_ACTIVE_NPCS: ${totalActiveNPCs} - CPU: ${totalCPUUsage}%`);
 
       await Promise.all(freezeTasks);
     }, checkInterval);
@@ -74,20 +69,15 @@ export class NPCFreezer {
 
   @TrackNewRelicTransaction()
   private async freezeRandomNPC(): Promise<void> {
-    const npcIds = Array.from(NPC_CYCLES.keys());
-    const randomNpcId = random(0, npcIds.length - 1);
-    const npcCycle = NPC_CYCLES.get(npcIds[randomNpcId]);
+    const npcs = await NPC.find({ isBehaviorEnabled: true }).lean().select("id _id key");
 
-    if (!npcCycle) {
-      return;
-    }
+    const randomNPC = npcs[random(0, npcs.length - 1)];
 
-    const npc = await NPC.findById(npcCycle.id).lean().select("id _id key");
-    if (npc) {
+    if (randomNPC) {
       try {
-        await this.freezeNPC(npc as INPC, true);
+        await this.freezeNPC(randomNPC as INPC, true);
       } catch (error) {
-        console.error(`Failed to freeze NPC ${npcCycle.id}: ${error.message}`);
+        console.error(`Failed to freeze NPC ${randomNPC.id}: ${error.message}`);
       }
     }
   }

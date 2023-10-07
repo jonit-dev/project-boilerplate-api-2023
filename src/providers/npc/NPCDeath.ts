@@ -15,7 +15,6 @@ import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/Ne
 import { BattleSocketEvents, CharacterPartyBenefits, IBattleDeath, INPCLoot } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { Types } from "mongoose";
-import { NPC_CYCLES } from "./NPCCycle";
 import { NPCExperience } from "./NPCExperience/NPCExperience";
 import { NPCFreezer } from "./NPCFreezer";
 import { NPCLoot } from "./NPCLoot";
@@ -178,12 +177,6 @@ export class NPCDeath {
   }
 
   private async clearNPCBehavior(npc: INPC): Promise<void> {
-    const npcCycle = NPC_CYCLES.get(npc.id);
-
-    if (npcCycle) {
-      await npcCycle.clear();
-    }
-
     await this.npcTarget.clearTarget(npc);
   }
 

@@ -1,10 +1,12 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { NPC_CYCLE_INTERVAL_RATIO, NPC_FRIENDLY_FREEZE_CHECK_CHANCE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { NPCAlignment, NPCMovementType, NPCPathOrientation, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { Queue, Worker } from "bullmq";
 import { provide } from "inversify-binding-decorators";
@@ -34,7 +36,8 @@ export class NPCCycleQueue {
     private npcMovementMoveTowards: NPCMovementMoveTowards,
     private npcMovementStopped: NPCMovementStopped,
     private npcMovementMoveAway: NPCMovementMoveAway,
-    private npcLoader: NPCLoader
+    private npcLoader: NPCLoader,
+    private newRelic: NewRelic
   ) {
     this.queue = new Queue("npc-cycle-queue", {
       connection: {
@@ -107,12 +110,12 @@ export class NPCCycleQueue {
   }
 
   private async execNpcCycle(npc: INPC, npcSkills: ISkill, isFirstCycle: boolean): Promise<void> {
+    this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Server, "NPCCycles", 1);
+
     npc = await NPC.findById(npc._id).lean({
       virtuals: true,
       defaults: true,
     });
-
-    console.log(`NPC ${npc.key} is executing cycle`);
 
     const shouldNPCBeCleared = this.shouldNPCBeCleared(npc);
 
