@@ -92,6 +92,10 @@ export class CharacterMonitorQueue {
       [callbackId]: callback,
     });
 
+    if (intervalMs < 3000) {
+      intervalMs = 3000;
+    }
+
     await this.add(character, callbackId, intervalMs);
   }
 
