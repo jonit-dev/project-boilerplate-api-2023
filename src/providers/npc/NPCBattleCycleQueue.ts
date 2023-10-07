@@ -173,6 +173,7 @@ export class NPCBattleCycleQueue {
     await this.add(updatedNPC, npcSkills);
   }
 
+  @TrackNewRelicTransaction()
   private async stop(npc: INPC): Promise<void> {
     await this.npcTarget.clearTarget(npc);
     await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);

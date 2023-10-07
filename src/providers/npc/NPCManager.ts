@@ -15,7 +15,9 @@ import { PROMISE_DEFAULT_CONCURRENCY } from "@providers/constants/ServerConstant
 import { Locker } from "@providers/locks/Locker";
 import { MathHelper } from "@providers/math/MathHelper";
 import { RaidManager } from "@providers/raid/RaidManager";
+import { Time } from "@providers/time/Time";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
+import { random } from "lodash";
 import { NPCCycleQueue } from "./NPCCycleQueue";
 
 @provide(NPCManager)
@@ -27,7 +29,8 @@ export class NPCManager {
     private mathHelper: MathHelper,
     private raidManager: RaidManager,
     private npcCycleQueue: NPCCycleQueue,
-    private locker: Locker
+    private locker: Locker,
+    private time: Time
   ) {}
 
   @TrackNewRelicTransaction()
@@ -56,7 +59,14 @@ export class NPCManager {
       }
     }
 
-    await Promise.map(behaviorLoops, (behaviorLoop) => behaviorLoop, { concurrency: PROMISE_DEFAULT_CONCURRENCY });
+    await Promise.map(
+      behaviorLoops,
+      async (behaviorLoop) => {
+        await this.time.waitForMilliseconds(random(1, nearbyNPCs.length || 10));
+        return behaviorLoop;
+      },
+      { concurrency: PROMISE_DEFAULT_CONCURRENCY }
+    );
   }
 
   @TrackNewRelicTransaction()

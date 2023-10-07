@@ -6,7 +6,6 @@ import { MapTransitionTeleport } from "@providers/map/MapTransition/MapTransitio
 import { MathHelper } from "@providers/math/MathHelper";
 import { IPosition, MovementHelper } from "@providers/movement/MovementHelper";
 import { NPCManager } from "@providers/npc/NPCManager";
-import { PM2Helper } from "@providers/server/PM2Helper";
 import { SocketAuth } from "@providers/sockets/SocketAuth";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketChannel } from "@providers/sockets/SocketsTypes";
@@ -50,7 +49,6 @@ export class CharacterNetworkUpdate {
     private characterMovementWarn: CharacterMovementWarn,
     private mathHelper: MathHelper,
     private characterView: CharacterView,
-    private pm2Helper: PM2Helper,
     private newRelic: NewRelic,
     private locker: Locker
   ) {}

@@ -111,6 +111,7 @@ export class NPCCycleQueue {
     }
   }
 
+  @TrackNewRelicTransaction()
   private async execNpcCycle(npc: INPC, npcSkills: ISkill, isFirstCycle: boolean): Promise<void> {
     this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.Server, "NPCCycles", 1);
 
@@ -140,7 +141,6 @@ export class NPCCycleQueue {
     }
 
     void this.startCoreNPCBehavior(npc);
-
     await this.add(npc, npcSkills, false);
   }
 

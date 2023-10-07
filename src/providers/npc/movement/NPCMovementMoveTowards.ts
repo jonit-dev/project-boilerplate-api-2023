@@ -235,11 +235,6 @@ export class NPCMovementMoveTowards {
 
   @TrackNewRelicTransaction()
   private async initBattleCycle(npc: INPC): Promise<void> {
-    if (!npc.targetCharacter) {
-      // try to reset target, if somehow its lost
-      await this.npcTarget.tryToSetTarget(npc);
-    }
-
     const canProceed = await this.locker.lock(`npc-${npc._id}-npc-battle-cycle`);
 
     if (!canProceed) {

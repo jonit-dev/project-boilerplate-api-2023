@@ -1,18 +1,19 @@
 /* eslint-disable no-undef */
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
-import random from "lodash/random";
 
+import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_ACTIVE_NPCS } from "@providers/constants/NPCConstants";
+import { MathHelper } from "@providers/math/MathHelper";
 import { EnvType, NPCAlignment } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
 import round from "lodash/round";
 
 @provideSingleton(NPCFreezer)
 export class NPCFreezer {
-  constructor() {}
+  constructor(private mathHelper: MathHelper) {}
 
   public init(): void {
     this.setCPUUsageCheckInterval();
@@ -30,7 +31,7 @@ export class NPCFreezer {
   private setCPUUsageCheckInterval(): void {
     const start = CPUusage();
     const checkInterval = NPC_FREEZE_CHECK_INTERVAL;
-    const maxCPUUsagePerInstance = 70;
+    const maxCPUUsagePerInstance = 55;
 
     setInterval(async () => {
       const end = CPUusage(start);
@@ -42,14 +43,14 @@ export class NPCFreezer {
       if (totalActiveNPCs >= NPC_MAX_ACTIVE_NPCS) {
         const diff = totalActiveNPCs - NPC_MAX_ACTIVE_NPCS;
         for (let i = 0; i < diff; i++) {
-          freezeTasks.push(this.freezeRandomNPC());
+          freezeTasks.push(this.freezeFarthestTargetingNPC());
         }
       }
 
       if (totalCPUUsage >= maxCPUUsagePerInstance) {
         const freezeCount = Math.ceil(totalActiveNPCs * 0.3);
         for (let i = 0; i < freezeCount; i++) {
-          freezeTasks.push(this.freezeRandomNPC());
+          freezeTasks.push(this.freezeFarthestTargetingNPC());
         }
       }
 
@@ -68,16 +69,46 @@ export class NPCFreezer {
   }
 
   @TrackNewRelicTransaction()
-  private async freezeRandomNPC(): Promise<void> {
-    const npcs = await NPC.find({ isBehaviorEnabled: true }).lean().select("id _id key");
+  private async freezeFarthestTargetingNPC(): Promise<void> {
+    const npcs = await NPC.find({
+      isBehaviorEnabled: true,
+      targetCharacter: {
+        $exists: true,
+      },
+    })
+      .lean()
+      .select("x y targetCharacter");
 
-    const randomNPC = npcs[random(0, npcs.length - 1)];
+    // Batch retrieve all target characters in one go
+    const targetCharacterIds = npcs.map((npc) => npc.targetCharacter);
+    const characters = await Character.find({ _id: { $in: targetCharacterIds } }).lean();
 
-    if (randomNPC) {
+    // Use a map for quick lookup of character by ID
+    const characterMap = new Map(characters.map((char) => [char._id, char]));
+
+    let maxDistance = -Infinity;
+    let npcToFreeze;
+
+    for (const npc of npcs) {
+      const targetCharacter = characterMap.get(npc.targetCharacter);
+      if (!targetCharacter) {
+        continue;
+      }
+
+      const distance = this.mathHelper.getDistanceBetweenPoints(npc.x, npc.y, targetCharacter.x, targetCharacter.y);
+
+      // Update if we find a greater distance
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        npcToFreeze = npc;
+      }
+    }
+
+    if (npcToFreeze) {
       try {
-        await this.freezeNPC(randomNPC as INPC, true);
+        await this.freezeNPC(npcToFreeze as INPC, true);
       } catch (error) {
-        console.error(`Failed to freeze NPC ${randomNPC.id}: ${error.message}`);
+        console.error(`Failed to freeze NPC ${npcToFreeze.id}: ${error.message}`);
       }
     }
   }
