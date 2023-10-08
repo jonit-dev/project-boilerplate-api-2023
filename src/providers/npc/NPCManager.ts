@@ -96,15 +96,13 @@ export class NPCManager {
     }
 
     if (!npc.isBehaviorEnabled) {
-      // prevent double behavior loop
+      await this.setNPCBehavior(npc, true);
 
       const npcSkills = (await Skill.find({ owner: npc._id }).cacheQuery({
         cacheKey: `npc-${npc.id}-skills`,
       })) as unknown as ISkill;
 
       await this.npcCycleQueue.add(npc, npcSkills);
-
-      await this.setNPCBehavior(npc, true);
     }
   }
 

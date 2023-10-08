@@ -22,10 +22,15 @@ export class NPCFreezer {
   @TrackNewRelicTransaction()
   public async freezeNPC(npc: INPC, isForced?: boolean): Promise<void> {
     if (appEnv.general.ENV === EnvType.Development) {
-      console.log(`Freezing NPC ${npc.key} (${npc.id}) ${isForced ? "(FORCED)" : ""}`);
+      console.log(`Freezing NPC ${npc.key} (${npc._id}) ${isForced ? "(FORCED)" : ""}`);
     }
 
-    await NPC.updateOne({ _id: npc._id, scene: npc.scene }, { isBehaviorEnabled: false });
+    await NPC.updateOne(
+      { _id: npc._id },
+      {
+        isBehaviorEnabled: false,
+      }
+    );
   }
 
   private setCPUUsageCheckInterval(): void {
@@ -41,8 +46,9 @@ export class NPCFreezer {
       const freezeTasks: any[] = [];
 
       if (totalActiveNPCs >= NPC_MAX_ACTIVE_NPCS) {
-        const diff = totalActiveNPCs - NPC_MAX_ACTIVE_NPCS;
-        for (let i = 0; i < diff; i++) {
+        const freezeCount = Math.ceil(totalActiveNPCs * 0.2);
+
+        for (let i = 0; i < freezeCount; i++) {
           freezeTasks.push(this.freezeFarthestTargetingNPC());
         }
       }
@@ -77,20 +83,20 @@ export class NPCFreezer {
       },
     })
       .lean()
-      .select("x y targetCharacter");
+      .select("key x y targetCharacter scene");
 
     // Batch retrieve all target characters in one go
     const targetCharacterIds = npcs.map((npc) => npc.targetCharacter);
     const characters = await Character.find({ _id: { $in: targetCharacterIds } }).lean();
 
     // Use a map for quick lookup of character by ID
-    const characterMap = new Map(characters.map((char) => [char._id, char]));
 
     let maxDistance = -Infinity;
     let npcToFreeze;
 
     for (const npc of npcs) {
-      const targetCharacter = characterMap.get(npc.targetCharacter);
+      const targetCharacter = characters.find((character) => String(character._id) === String(npc.targetCharacter));
+
       if (!targetCharacter) {
         continue;
       }

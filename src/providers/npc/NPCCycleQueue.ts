@@ -1,4 +1,3 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
@@ -129,6 +128,7 @@ export class NPCCycleQueue {
 
     if (!isFirstCycle && npc.alignment === NPCAlignment.Hostile && !npc.targetCharacter) {
       await this.stop(npc);
+
       return;
     }
 
@@ -137,6 +137,8 @@ export class NPCCycleQueue {
     npc.skills = npcSkills;
 
     if (await this.specialEffect.isStun(npc)) {
+      await this.stop(npc);
+
       return;
     }
 
@@ -147,7 +149,6 @@ export class NPCCycleQueue {
   private async stop(npc: INPC): Promise<void> {
     await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
 
-    await Character.updateOne({ _id: npc.targetCharacter }, { $unset: { target: 1 } });
     await NPC.updateOne(
       { _id: npc._id },
       {

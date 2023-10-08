@@ -22,11 +22,6 @@ import { NPCTarget } from "./movement/NPCTarget";
 export class NPCBattleCycleQueue {
   private queue: Queue<any, any, string>;
   private worker: Worker;
-  private queueConfig = {
-    delay: NPC_BATTLE_CYCLE_INTERVAL,
-    removeOnComplete: true,
-    removeOnFail: true,
-  };
 
   constructor(
     private newRelic: NewRelic,
@@ -87,7 +82,11 @@ export class NPCBattleCycleQueue {
         npc,
         npcSkills,
       },
-      this.queueConfig
+      {
+        delay: NPC_BATTLE_CYCLE_INTERVAL,
+        removeOnComplete: true,
+        removeOnFail: true,
+      }
     );
   }
 
