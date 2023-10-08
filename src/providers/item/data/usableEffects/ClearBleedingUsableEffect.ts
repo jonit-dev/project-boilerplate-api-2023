@@ -11,7 +11,7 @@ export const clearBleedingUsableEffect: IUsableEffect = {
     const itemUsableEffect = container.get(ItemUsableEffect);
     const entityEffectUse = container.get(EntityEffectUse);
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, 3);
+    await itemUsableEffect.apply(character, EffectableAttribute.Health, 3);
 
     // cure bleeding effect
     await entityEffectUse.clearEntityEffect(EntityEffectBlueprint.Bleeding, character);

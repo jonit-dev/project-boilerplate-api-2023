@@ -22,7 +22,7 @@ export const entityEffectFreezing: IEntityEffect = {
 
     const effectDamage = await calculateEffectDamage.calculateEffectDamage(attacker, target);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
 
     return effectDamage;
   },

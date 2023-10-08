@@ -17,10 +17,10 @@ function createEatingUsableEffect(key: UsableEffectsBlueprint, description: stri
   return {
     key,
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    usableEffect: (character: ICharacter, extraValue: number) => {
+    usableEffect: async (character: ICharacter, extraValue: number) => {
       const itemUsableEffect = container.get(ItemUsableEffect);
       const value = extraValue || recoveryPowerLevels[key];
-      itemUsableEffect.applyEatingEffect(character, value);
+      await itemUsableEffect.applyEatingEffect(character, value);
     },
     usableEffectDescription: description,
   };
@@ -48,7 +48,7 @@ export const superStrongEatingUsableEffect = createEatingUsableEffect(
 
 export const poisonEatingUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.PoisonEatingEffect,
-  usableEffect: (character: ICharacter, extraValue: number) => {
+  usableEffect: async (character: ICharacter, extraValue: number) => {
     const socketMessaging = container.get<SocketMessaging>(SocketMessaging);
     const itemUsableEffect = container.get(ItemUsableEffect);
 
@@ -60,7 +60,7 @@ export const poisonEatingUsableEffect: IUsableEffect = {
 
     socketMessaging.sendErrorMessageToCharacter(character, randomMessages[0]);
     const value = extraValue || recoveryPowerLevels[UsableEffectsBlueprint.PoisonEatingEffect];
-    itemUsableEffect.applyEatingEffect(character, value);
+    await itemUsableEffect.applyEatingEffect(character, value);
   },
   usableEffectDescription: "This item should be cooked. Don't eat it raw or you'll get food poisoning.",
 };

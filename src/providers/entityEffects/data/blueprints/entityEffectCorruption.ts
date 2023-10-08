@@ -22,7 +22,7 @@ export const entityEffectCorruption: IEntityEffect = {
       maxBonusDamage: MagicPower.High,
     });
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
 
     return effectDamage;
   },

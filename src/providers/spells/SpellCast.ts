@@ -151,7 +151,7 @@ export class SpellCast {
       return false;
     }
 
-    this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
+    await this.itemUsableEffect.apply(character, EffectableAttribute.Mana, -1 * spell.manaCost);
     await character.save();
 
     await this.sendPostSpellCastEvents(character, spell, target);

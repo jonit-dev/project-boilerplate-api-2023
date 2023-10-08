@@ -29,7 +29,7 @@ export const entityEffectVineGrasp: IEntityEffect = {
       maxBonusDamage: MagicPower.Medium,
     });
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
 
     if (attacker.type === EntityType.NPC && target.type === EntityType.Character) {
       await characterBuffActivator.enableTemporaryBuff(target as ICharacter, {

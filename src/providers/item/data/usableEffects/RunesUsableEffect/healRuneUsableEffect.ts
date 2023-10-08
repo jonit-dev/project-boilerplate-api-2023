@@ -20,7 +20,7 @@ export const healRuneUsableEffect: IUsableEffectRune = {
 
     const totalAmount = (target.maxHealth * percentage) / 100;
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, totalAmount);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, totalAmount);
   },
 
   usableEffectDescription: "Restores 50-100% of health, based on Magic skill level",

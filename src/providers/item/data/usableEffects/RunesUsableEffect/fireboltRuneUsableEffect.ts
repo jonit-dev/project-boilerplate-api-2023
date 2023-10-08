@@ -25,7 +25,7 @@ export const fireBoltRuneUsableEffect: IUsableEffectRune = {
     let totalPoints = pointModifier * points;
     totalPoints = totalPoints > target.health ? target.health : totalPoints;
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -totalPoints);
     return totalPoints;
   },
   usableEffectDescription:

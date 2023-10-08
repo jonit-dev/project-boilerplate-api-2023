@@ -1,7 +1,9 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { SPELL_AREA_ULTIMATE_BLAST_RADIUS } from "@providers/constants/SpellConstants";
+import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
 import { container } from "@providers/inversify/container";
+import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 import { SpellArea } from "@providers/spells/area-spells/SpellArea";
 import {
   AnimationEffectKeys,
@@ -13,8 +15,6 @@ import {
   SpellsBlueprint,
 } from "@rpg-engine/shared";
 import { SpellCalculator } from "../../abstractions/SpellCalculator";
-import { entityEffectBurning } from "@providers/entityEffects/data/blueprints/entityEffectBurning";
-import { EffectableAttribute, ItemUsableEffect } from "@providers/item/helper/ItemUsableEffect";
 
 export const spellArcaneExplosion: Partial<ISpell> = {
   key: SpellsBlueprint.ArcaneExplosion,
@@ -57,7 +57,7 @@ export const spellArcaneExplosion: Partial<ISpell> = {
       entityEffect: entityEffectBurning,
     });
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, -selfDamage);
+    await itemUsableEffect.apply(character, EffectableAttribute.Health, -selfDamage);
 
     return true;
   },

@@ -30,6 +30,6 @@ export const spellGreaterHealing: Partial<ISpell> = {
 
     const totalAmount = (character.maxHealth * percentage) / 100;
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, totalAmount);
+    await itemUsableEffect.apply(character, EffectableAttribute.Health, totalAmount);
   },
 };

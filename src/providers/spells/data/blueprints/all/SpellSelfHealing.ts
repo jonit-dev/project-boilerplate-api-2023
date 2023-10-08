@@ -29,7 +29,8 @@ export const spellSelfHealing: Partial<ISpell> = {
     });
 
     const totalAmount = (character.maxHealth * percentage) / 100;
+    console.log("totalAmount ", totalAmount);
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, totalAmount);
+    await itemUsableEffect.apply(character, EffectableAttribute.Health, totalAmount);
   },
 };

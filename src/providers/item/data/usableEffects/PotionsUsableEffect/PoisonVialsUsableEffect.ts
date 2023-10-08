@@ -15,7 +15,7 @@ export const lightPoisonVialUsableEffect: IUsableEffectRune = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -2 * points);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -2 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);
@@ -32,7 +32,7 @@ export const moderatePoisonVialUsableEffect: IUsableEffectRune = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -2.5 * points);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -2.5 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);
@@ -49,7 +49,7 @@ export const strongPoisonVialUsableEffect: IUsableEffectRune = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.PoisonRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -3 * points);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -3 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectPoison);
