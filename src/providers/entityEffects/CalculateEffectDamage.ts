@@ -2,9 +2,12 @@ import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
-import { ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER } from "@providers/constants/EntityEffectsConstants";
+import {
+  ENTITY_EFFECT_DAMAGE_FROM_NPC_MODIFIER,
+  ENTITY_EFFECT_DAMAGE_LEVEL_MULTIPLIER,
+} from "@providers/constants/EntityEffectsConstants";
 import { TraitGetter } from "@providers/skill/TraitGetter";
-import { BasicAttribute } from "@rpg-engine/shared";
+import { BasicAttribute, EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import random from "lodash/random";
 
@@ -64,7 +67,9 @@ export class CalculateEffectDamage {
         options
       );
 
-      return effectDamage;
+      const modifier = attacker.type === EntityType.NPC ? ENTITY_EFFECT_DAMAGE_FROM_NPC_MODIFIER : 1;
+
+      return effectDamage * modifier;
     } catch (err) {
       console.error(err);
       return minRawDamage;
