@@ -49,6 +49,8 @@ export class CharacterMonitorQueue {
             1
           );
 
+          await this.locker.lock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
+
           await this.execMonitorCallback(character, callbackId, intervalMs);
         } catch (err) {
           console.error("Error processing character monitor queue", err);
@@ -80,9 +82,9 @@ export class CharacterMonitorQueue {
     callback: CharacterMonitorCallback,
     intervalMs: number = 3000
   ): Promise<void> {
-    const canProceed = await this.locker.lock(`character-monitor-${character._id.toString()}-callback-${callbackId}`);
+    const hasLock = await this.locker.hasLock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
 
-    if (!canProceed) {
+    if (hasLock) {
       return;
     }
 
@@ -115,21 +117,25 @@ export class CharacterMonitorQueue {
   }
 
   public async unwatch(callbackId: string, character: ICharacter): Promise<void> {
-    const currentCallbacks = this.charactersCallbacks.get(character._id.toString());
+    try {
+      const currentCallbacks = this.charactersCallbacks.get(character._id.toString());
 
-    if (!currentCallbacks) {
-      return;
+      if (!currentCallbacks) {
+        return;
+      }
+
+      delete currentCallbacks[callbackId];
+
+      if (Object.keys(currentCallbacks).length === 0) {
+        this.charactersCallbacks.delete(character._id.toString());
+      }
+
+      this.charactersCallbacks.set(character._id.toString(), currentCallbacks);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await this.locker.unlock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
     }
-
-    delete currentCallbacks[callbackId];
-
-    if (Object.keys(currentCallbacks).length === 0) {
-      this.charactersCallbacks.delete(character._id.toString());
-    }
-
-    this.charactersCallbacks.set(character._id.toString(), currentCallbacks);
-
-    await this.locker.unlock(`character-monitor-${character._id.toString()}-callback-${callbackId}`);
   }
 
   public unwatchAll(character: ICharacter): void {
@@ -181,6 +187,8 @@ export class CharacterMonitorQueue {
       callback(updatedCharacter);
 
       await this.add(character, callbackId, intervalMs);
+    } else {
+      await this.unwatch(callbackId, character);
     }
   }
 }
