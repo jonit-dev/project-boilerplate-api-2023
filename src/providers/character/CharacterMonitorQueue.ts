@@ -3,6 +3,7 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
+import { Locker } from "@providers/locks/Locker";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared";
 import { Queue, Worker } from "bullmq";
@@ -23,7 +24,7 @@ export class CharacterMonitorQueue {
     appEnv.general.ENV === EnvType.Development ? "dev" : process.env.pm_id
   }`;
 
-  constructor(private newRelic: NewRelic) {
+  constructor(private newRelic: NewRelic, private locker: Locker) {
     this.queue = new Queue(this.queueName, {
       connection: {
         host: appEnv.database.REDIS_CONTAINER,
@@ -79,6 +80,12 @@ export class CharacterMonitorQueue {
     callback: CharacterMonitorCallback,
     intervalMs: number = 3000
   ): Promise<void> {
+    const canProceed = await this.locker.lock(`character-monitor-${character._id.toString()}-callback-${callbackId}`);
+
+    if (!canProceed) {
+      return;
+    }
+
     const currentCallbackRecord = this.charactersCallbacks.get(character._id.toString());
 
     const isWatching = this.isWatching(callbackId, character);
@@ -107,7 +114,7 @@ export class CharacterMonitorQueue {
     return !!hasCallback;
   }
 
-  public unwatch(callbackId: string, character: ICharacter): void {
+  public async unwatch(callbackId: string, character: ICharacter): Promise<void> {
     const currentCallbacks = this.charactersCallbacks.get(character._id.toString());
 
     if (!currentCallbacks) {
@@ -121,6 +128,8 @@ export class CharacterMonitorQueue {
     }
 
     this.charactersCallbacks.set(character._id.toString(), currentCallbacks);
+
+    await this.locker.unlock(`character-monitor-${character._id.toString()}-callback-${callbackId}`);
   }
 
   public unwatchAll(character: ICharacter): void {
@@ -164,7 +173,7 @@ export class CharacterMonitorQueue {
       })) as ICharacter;
 
       if (!updatedCharacter.isOnline) {
-        this.unwatch(callbackId, character);
+        await this.unwatch(callbackId, character);
         return;
       }
 

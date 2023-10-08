@@ -15,7 +15,7 @@ export const lightBurningVialsUsableEffect: IUsableEffectRune = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -2.5 * points);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -2.5 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);
@@ -32,7 +32,7 @@ export const moderateBurningVialsUsableEffect: IUsableEffectRune = {
 
     const points = await calculateItemUseEffectPoints(MagicsBlueprint.FireRune, caster);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -3.5 * points);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -3.5 * points);
 
     const entityEffectUse = container.get(EntityEffectUse);
     await entityEffectUse.applyEntityEffects(target, caster, entityEffectBurning);

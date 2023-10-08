@@ -126,9 +126,10 @@ export class NPCTarget {
       }
 
       // set target using updateOne
-      await NPC.updateOne({ _id: npc._id }, { $set: { targetCharacter: character._id } });
+      await NPC.updateOne({ _id: npc._id }, { $set: { targetCharacter: character._id, isBehaviorEnabled: true } });
     } catch (error) {
       console.error(error);
+    } finally {
       await this.locker.unlock(`npc-try-set-target-${npc._id}`);
     }
   }

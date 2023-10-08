@@ -10,36 +10,36 @@ import { IUsableEffect, UsableEffectsBlueprint } from "../types";
 // Life potion
 export const lightLifePotionUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.LightLifePotionUsableEffect,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const characterHealthPercentage = round(character.maxHealth * 0.1); // 10% of char max health
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
+    await itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
   },
   usableEffectDescription: "Restores 10% of life",
 };
 
 export const lifePotionUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.LifePotionUsableEffect,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const characterHealthPercentage = round(character.maxHealth * 0.15); // 15% of char max health
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
+    await itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
   },
   usableEffectDescription: "Restores 15% of life",
 };
 
 export const greaterLifePotionUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.GreaterLifePotionUsableEffect,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const characterHealthPercentage = round(character.maxHealth * 0.25); // 25% of char max health
 
-    itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
+    await itemUsableEffect.apply(character, EffectableAttribute.Health, characterHealthPercentage);
   },
   usableEffectDescription: "Restores 25% of life.",
 };
@@ -48,35 +48,35 @@ export const greaterLifePotionUsableEffect: IUsableEffect = {
 
 export const LightManaPotionUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.LightManaPotionUsableEffect,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const characterManaPercentage = round(character.maxMana * 0.1); // 10% of char max mana
 
-    itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
+    await itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
   },
   usableEffectDescription: "Restores 10% of mana",
 };
 
 export const manaPotionUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.ManaPotionUsableEffect,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const characterManaPercentage = round(character.maxMana * 0.15); // 15% of char max mana
 
-    itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
+    await itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
   },
   usableEffectDescription: "Restores 15% of mana",
 };
 export const greaterManaPotionUsableEffect: IUsableEffect = {
   key: UsableEffectsBlueprint.GreaterManaPotionUsableEffect,
-  usableEffect: (character: ICharacter) => {
+  usableEffect: async (character: ICharacter) => {
     const itemUsableEffect = container.get(ItemUsableEffect);
 
     const characterManaPercentage = round(character.maxMana * 0.25); // 25% of char max mana
 
-    itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
+    await itemUsableEffect.apply(character, EffectableAttribute.Mana, characterManaPercentage);
   },
   usableEffectDescription: "Restores 25% of mana.",
 };

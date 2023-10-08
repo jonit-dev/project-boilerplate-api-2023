@@ -1,6 +1,7 @@
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
+import { EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 
 export enum EffectableMaxAttribute {
@@ -16,8 +17,9 @@ export enum EffectableAttribute {
 
 @provide(ItemUsableEffect)
 export class ItemUsableEffect {
-  public apply(target: ICharacter | INPC, attr: EffectableAttribute, value: number): void {
+  public async apply(target: ICharacter | INPC, attr: EffectableAttribute, value: number): Promise<void> {
     target[attr] += value;
+    const updateObj: any = {};
     switch (attr) {
       case EffectableAttribute.Health:
         const maxAttrHealth = EffectableMaxAttribute.Health;
@@ -26,6 +28,7 @@ export class ItemUsableEffect {
         } else if (target[attr] < 0) {
           target[attr] = 0;
         }
+        updateObj[attr] = target[attr];
         break;
 
       case EffectableAttribute.Mana:
@@ -35,6 +38,7 @@ export class ItemUsableEffect {
         } else if (target[attr] < 0) {
           target[attr] = 0;
         }
+        updateObj[attr] = target[attr];
         break;
 
       case EffectableAttribute.Speed:
@@ -42,15 +46,27 @@ export class ItemUsableEffect {
         if (dataCharacter.baseSpeed === MovementSpeed.Slow || dataCharacter.baseSpeed === MovementSpeed.ExtraSlow) {
           dataCharacter.baseSpeed = value;
         }
+        // eslint-disable-next-line dot-notation
+        updateObj["baseSpeed"] = dataCharacter.baseSpeed;
         break;
 
       default:
         break;
     }
+    try {
+      if (target.type === EntityType.Character) {
+        await Character.updateOne({ _id: target._id }, { $set: updateObj });
+      } else {
+        await NPC.updateOne({ _id: target._id }, { $set: updateObj });
+      }
+    } catch (error) {
+      console.error("Failed to update entity:", error);
+      throw error;
+    }
   }
 
-  public applyEatingEffect(character: ICharacter, increase: number): void {
-    this.apply(character, EffectableAttribute.Health, increase);
-    this.apply(character, EffectableAttribute.Mana, increase);
+  public async applyEatingEffect(character: ICharacter, increase: number): Promise<void> {
+    await this.apply(character, EffectableAttribute.Health, increase);
+    await this.apply(character, EffectableAttribute.Mana, increase);
   }
 }

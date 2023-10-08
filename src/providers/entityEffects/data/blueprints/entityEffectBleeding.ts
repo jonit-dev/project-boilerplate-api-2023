@@ -20,7 +20,7 @@ export const entityEffectBleeding: IEntityEffect = {
     const calculateEffectDamage = container.get(CalculateEffectDamage);
     const effectDamage = await calculateEffectDamage.calculateEffectDamage(attacker, target);
 
-    itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
+    await itemUsableEffect.apply(target, EffectableAttribute.Health, -1 * effectDamage);
 
     return effectDamage;
   },
