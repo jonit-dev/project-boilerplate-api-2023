@@ -44,8 +44,8 @@ export class WarriorPassiveHabilities {
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
       const intervalMs = await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Strength, {
-        min: 5000,
-        max: 20000,
+        min: 7000,
+        max: 25000,
         skillAssociation: "reverse",
       });
 

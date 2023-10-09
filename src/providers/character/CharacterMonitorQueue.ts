@@ -80,7 +80,7 @@ export class CharacterMonitorQueue {
     callbackId: string,
     character: ICharacter,
     callback: CharacterMonitorCallback,
-    intervalMs: number = 3000
+    intervalMs: number = 7000
   ): Promise<void> {
     const hasLock = await this.locker.hasLock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
 

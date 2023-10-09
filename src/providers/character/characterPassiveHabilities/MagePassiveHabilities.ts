@@ -42,8 +42,8 @@ export class MagePassiveHabilities {
       const manaRegenAmount = Math.max(Math.floor(magicLvl / 3), 4);
 
       const intervalMs = await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Magic, {
-        max: 30000,
-        min: 5000,
+        max: 25000,
+        min: 7000,
         skillAssociation: "reverse",
       });
 
