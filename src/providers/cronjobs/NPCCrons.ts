@@ -1,5 +1,6 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import { NPCSpawn } from "@providers/npc/NPCSpawn";
 import { NPCRaidActivator } from "@providers/raid/NPCRaidActivator";
 import { NPCRaidSpawn } from "@providers/raid/NPCRaidSpawn";
@@ -15,7 +16,8 @@ export class NPCCrons {
     private npcSpawn: NPCSpawn,
     private newRelic: NewRelic,
     private npcRaidSpawn: NPCRaidSpawn,
-    private npcRaidActivator: NPCRaidActivator
+    private npcRaidActivator: NPCRaidActivator,
+    private npcFreezer: NPCFreezer
   ) {}
 
   public schedule(): void {
@@ -49,6 +51,11 @@ export class NPCCrons {
     // Run every hour
     nodeCron.schedule("0 */6 * * *", async () => {
       await this.npcRaidActivator.activateRaids();
+    });
+
+    // Run every 10 minutes
+    nodeCron.schedule("*/10 * * * *", async () => {
+      await this.npcFreezer.freezeNPCsWithoutCharactersAround();
     });
   }
 }

@@ -208,7 +208,7 @@ export class CharacterMonitorQueue {
     // execute character callback
     const characterCallbacks = this.charactersCallbacks.get(character._id.toString());
 
-    console.log("execMonitorCallback", character._id.toString(), callbackId, intervalMs);
+    console.log("CharacterMonitorCallback: ", character._id.toString(), callbackId, intervalMs);
 
     const callback = characterCallbacks?.[callbackId];
 

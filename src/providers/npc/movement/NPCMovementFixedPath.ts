@@ -1,9 +1,9 @@
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { MapHelper } from "@providers/map/MapHelper";
 import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-// eslint-disable-next-line no-unused-vars
-import { MapHelper } from "@providers/map/MapHelper";
 import { NPCFreezer } from "../NPCFreezer";
+// eslint-disable-next-line no-unused-vars
 import { NPCMovement } from "./NPCMovement";
 
 @provide(NPCMovementFixedPath)
@@ -24,7 +24,7 @@ export class NPCMovementFixedPath {
       if (!shortestPath) {
         // throw new Error("No shortest path found!");
 
-        await this.npcFreezer.freezeNPC(npc);
+        await this.npcFreezer.freezeNPC(npc, "NPCMovementFixedPath: No shortest path found!");
 
         return;
       }

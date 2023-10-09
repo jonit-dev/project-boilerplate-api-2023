@@ -3,7 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { NPC_MAX_ACTIVE_NPCS, NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
+import { NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { Promise } from "bluebird";
 import { provide } from "inversify-binding-decorators";
@@ -19,6 +19,7 @@ import { Time } from "@providers/time/Time";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { random } from "lodash";
 import { NPCCycleQueue } from "./NPCCycleQueue";
+import { NPCFreezer } from "./NPCFreezer";
 
 @provide(NPCManager)
 export class NPCManager {
@@ -30,11 +31,14 @@ export class NPCManager {
     private raidManager: RaidManager,
     private npcCycleQueue: NPCCycleQueue,
     private locker: Locker,
-    private time: Time
+    private time: Time,
+    private npcFreezer: NPCFreezer
   ) {}
 
   @TrackNewRelicTransaction()
   public async startNearbyNPCsBehaviorLoop(character: ICharacter): Promise<void> {
+    const maxActiveNPCs = await this.npcFreezer.maxActiveNPCs();
+
     const nearbyNPCs = await this.npcView.getNPCsInView(character, { isBehaviorEnabled: false });
 
     let totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
@@ -50,7 +54,7 @@ export class NPCManager {
         continue;
       }
 
-      if (totalActiveNPCs <= NPC_MAX_ACTIVE_NPCS) {
+      if (totalActiveNPCs <= maxActiveNPCs) {
         // watch out for max NPCs active limit so we don't fry our CPU
         behaviorLoops.push(this.startBehaviorLoop(npc));
         totalActiveNPCs++;

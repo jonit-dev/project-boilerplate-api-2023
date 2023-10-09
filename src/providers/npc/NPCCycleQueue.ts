@@ -172,17 +172,7 @@ export class NPCCycleQueue {
   private async stop(npc: INPC): Promise<void> {
     await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
 
-    await NPC.updateOne(
-      { _id: npc._id },
-      {
-        $set: {
-          isBehaviorEnabled: false,
-        },
-        $unset: {
-          targetCharacter: 1,
-        },
-      }
-    );
+    await this.npcFreezer.freezeNPC(npc, "NPCCycle stop");
   }
 
   private shouldNPCBeCleared(npc: INPC): boolean {
@@ -201,7 +191,7 @@ export class NPCCycleQueue {
       if (n <= NPC_FRIENDLY_FREEZE_CHECK_CHANCE) {
         const nearbyCharacters = await this.npcView.getCharactersInView(npc);
         if (!nearbyCharacters.length) {
-          await this.npcFreezer.freezeNPC(npc);
+          await this.npcFreezer.freezeNPC(npc, "friendlyNPCFreezeCheck");
         }
       }
     }
