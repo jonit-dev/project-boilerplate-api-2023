@@ -26,7 +26,7 @@ export class WarriorPassiveHabilities {
       return;
     }
 
-    const { _id, skills, health, maxHealth } = character;
+    const { _id, skills } = character;
 
     if (character.class !== CharacterClass.Warrior) {
       await this.characterMonitorQueue.unwatch("health-regen", character);
@@ -43,66 +43,64 @@ export class WarriorPassiveHabilities {
 
       const healthRegenAmount = Math.max(Math.floor(strengthLvl / 3), 4);
 
-      if (health < maxHealth) {
-        const intervalMs = await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Strength, {
-          min: 5000,
-          max: 20000,
-          skillAssociation: "reverse",
-        });
+      const intervalMs = await this.spellCalculator.calculateBasedOnSkillLevel(character, BasicAttribute.Strength, {
+        min: 5000,
+        max: 20000,
+        skillAssociation: "reverse",
+      });
 
-        await this.characterMonitorQueue.watch(
-          "health-regen",
-          character,
-          async () => {
-            await this.newRelic.trackTransaction(
-              NewRelicTransactionCategory.Interval,
-              "WarriorAutoRegenHealthHandler",
-              async () => {
-                try {
-                  const refreshCharacter = (await Character.findById(_id)
-                    .lean()
-                    .select("_id health maxHealth")) as ICharacter;
+      await this.characterMonitorQueue.watch(
+        "health-regen",
+        character,
+        async () => {
+          await this.newRelic.trackTransaction(
+            NewRelicTransactionCategory.Interval,
+            "WarriorAutoRegenHealthHandler",
+            async () => {
+              try {
+                const refreshCharacter = (await Character.findById(_id)
+                  .lean()
+                  .select("_id health maxHealth")) as ICharacter;
 
-                  if (refreshCharacter.health === refreshCharacter.maxHealth) {
-                    return;
-                  }
-
-                  const updatedCharacter = (await Character.findByIdAndUpdate(
-                    _id,
-                    {
-                      health: Math.min(refreshCharacter.health + healthRegenAmount, refreshCharacter.maxHealth),
-                    },
-                    {
-                      new: true,
-                    }
-                  )
-                    .lean()
-                    .select("_id health channelId")) as ICharacter;
-
-                  if (updatedCharacter.health === updatedCharacter.maxHealth) {
-                    return;
-                  }
-
-                  const payload: ICharacterAttributeChanged = {
-                    targetId: updatedCharacter._id,
-                    health: updatedCharacter.health,
-                  };
-
-                  this.socketMessaging.sendEventToUser(
-                    updatedCharacter.channelId!,
-                    CharacterSocketEvents.AttributeChanged,
-                    payload
-                  );
-                } catch (err) {
-                  console.error("Error during health regeneration interval:", err);
-                  await this.characterMonitorQueue.unwatch("health-regen", character);
+                if (refreshCharacter.health >= refreshCharacter.maxHealth) {
+                  return;
                 }
+
+                const updatedCharacter = (await Character.findByIdAndUpdate(
+                  _id,
+                  {
+                    health: Math.min(refreshCharacter.health + healthRegenAmount, refreshCharacter.maxHealth),
+                  },
+                  {
+                    new: true,
+                  }
+                )
+                  .lean()
+                  .select("_id health channelId")) as ICharacter;
+
+                if (updatedCharacter.health === updatedCharacter.maxHealth) {
+                  return;
+                }
+
+                const payload: ICharacterAttributeChanged = {
+                  targetId: updatedCharacter._id,
+                  health: updatedCharacter.health,
+                };
+
+                this.socketMessaging.sendEventToUser(
+                  updatedCharacter.channelId!,
+                  CharacterSocketEvents.AttributeChanged,
+                  payload
+                );
+              } catch (err) {
+                console.error("Error during health regeneration interval:", err);
+                await this.characterMonitorQueue.unwatch("health-regen", character);
               }
-            );
-          },
-          intervalMs
-        );
-      }
+            }
+          );
+        },
+        intervalMs
+      );
     } catch (err) {
       console.error(err);
     }

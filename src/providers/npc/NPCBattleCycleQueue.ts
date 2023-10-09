@@ -76,9 +76,16 @@ export class NPCBattleCycleQueue {
       return;
     }
 
+    const isJobBeingProcessed = await this.isJobBeingProcessed(npc._id);
+
+    if (isJobBeingProcessed) {
+      return;
+    }
+
     await this.queue.add(
       "npc-battle-cycle-queue",
       {
+        npcId: npc._id,
         npc,
         npcSkills,
       },
@@ -176,6 +183,17 @@ export class NPCBattleCycleQueue {
   private async stop(npc: INPC): Promise<void> {
     await this.npcTarget.clearTarget(npc);
     await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
+  }
+
+  private async isJobBeingProcessed(npcId: string): Promise<boolean> {
+    const existingJobs = await this.queue.getJobs(["waiting", "active", "delayed"]);
+    const isJobExisting = existingJobs.some((job) => job.data?.npcId === npcId);
+
+    if (isJobExisting) {
+      return true; // Don't enqueue a new job if one with the same callbackId already exists
+    }
+
+    return false;
   }
 
   @TrackNewRelicTransaction()

@@ -84,9 +84,16 @@ export class NPCCycleQueue {
       return;
     }
 
+    const isJobBeingProcessed = await this.isJobBeingProcessed(npc._id);
+
+    if (isJobBeingProcessed) {
+      return;
+    }
+
     await this.queue.add(
       "npc-cycle-queue",
       {
+        npcId: npc._id,
         npc,
         npcSkills,
         isFirstCycle,
@@ -108,6 +115,17 @@ export class NPCCycleQueue {
         console.error(`Error removing job ${job?.id}:`, err.message);
       }
     }
+  }
+
+  private async isJobBeingProcessed(npcId: string): Promise<boolean> {
+    const existingJobs = await this.queue.getJobs(["waiting", "active", "delayed"]);
+    const isJobExisting = existingJobs.some((job) => job.data?.npcId === npcId);
+
+    if (isJobExisting) {
+      return true; // Don't enqueue a new job if one with the same callbackId already exists
+    }
+
+    return false;
   }
 
   @TrackNewRelicTransaction()

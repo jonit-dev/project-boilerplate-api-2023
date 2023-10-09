@@ -88,24 +88,37 @@ export class CharacterMonitorQueue {
       return;
     }
 
-    const currentCallbackRecord = this.charactersCallbacks.get(character._id.toString());
+    await this.locker.lock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
 
-    const isWatching = this.isWatching(callbackId, character);
+    const isJobBeingProcessed = await this.isJobBeingProcessed(callbackId);
 
-    if (isWatching) {
+    if (isJobBeingProcessed) {
       return;
     }
 
-    this.charactersCallbacks.set(character._id.toString(), {
-      ...currentCallbackRecord,
-      [callbackId]: callback,
-    });
+    try {
+      const currentCallbackRecord = this.charactersCallbacks.get(character._id.toString());
 
-    if (intervalMs < 3000) {
-      intervalMs = 3000;
+      const isWatching = this.isWatching(callbackId, character);
+
+      if (isWatching) {
+        return;
+      }
+
+      this.charactersCallbacks.set(character._id.toString(), {
+        ...currentCallbackRecord,
+        [callbackId]: callback,
+      });
+
+      if (intervalMs < 3000) {
+        intervalMs = 3000;
+      }
+
+      await this.add(character, callbackId, intervalMs);
+    } catch (error) {
+      console.error(error);
+      await this.unwatch(callbackId, character);
     }
-
-    await this.add(character, callbackId, intervalMs);
   }
 
   public isWatching(callbackId: string, character: ICharacter): boolean {
@@ -140,6 +153,17 @@ export class CharacterMonitorQueue {
 
   public unwatchAll(character: ICharacter): void {
     this.charactersCallbacks.delete(character._id);
+  }
+
+  private async isJobBeingProcessed(callbackId: string): Promise<boolean> {
+    const existingJobs = await this.queue.getJobs(["waiting", "active", "delayed"]);
+    const isJobExisting = existingJobs.some((job) => job.data?.callbackId === callbackId);
+
+    if (isJobExisting) {
+      return true; // Don't enqueue a new job if one with the same callbackId already exists
+    }
+
+    return false;
   }
 
   private async add(character: ICharacter, callbackId: string, intervalMs: number): Promise<void> {
@@ -179,6 +203,13 @@ export class CharacterMonitorQueue {
       })) as ICharacter;
 
       if (!updatedCharacter.isOnline) {
+        await this.unwatch(callbackId, character);
+        return;
+      }
+
+      const hasLock = await this.locker.hasLock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
+
+      if (!hasLock) {
         await this.unwatch(callbackId, character);
         return;
       }
