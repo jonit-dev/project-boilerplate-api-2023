@@ -117,9 +117,14 @@ export class NPCCycleQueue {
     }
   }
 
+  public async shutdown(): Promise<void> {
+    await this.queue.close();
+    await this.worker.close();
+  }
+
   private async isJobBeingProcessed(npcId: string): Promise<boolean> {
     const existingJobs = await this.queue.getJobs(["waiting", "active", "delayed"]);
-    const isJobExisting = existingJobs.some((job) => job.data?.npcId === npcId);
+    const isJobExisting = existingJobs.some((job) => job?.data?.npcId === npcId);
 
     if (isJobExisting) {
       return true; // Don't enqueue a new job if one with the same callbackId already exists

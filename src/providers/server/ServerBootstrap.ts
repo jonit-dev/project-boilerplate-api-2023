@@ -10,19 +10,20 @@ import { PushNotificationHelper } from "@providers/pushNotification/PushNotifica
 import { Seeder } from "@providers/seeds/Seeder";
 
 import { HitTarget } from "@providers/battle/HitTarget";
+import { CharacterMonitorQueue } from "@providers/character/CharacterMonitorQueue";
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { DiscordBot } from "@providers/discord/DiscordBot";
 import { blueprintManager } from "@providers/inversify/container";
 import { Locker } from "@providers/locks/Locker";
 import { NPCBattleCycleQueue } from "@providers/npc/NPCBattleCycleQueue";
+import { NPCCycleQueue } from "@providers/npc/NPCCycleQueue";
 import { NPCFreezer } from "@providers/npc/NPCFreezer";
 import PartyManagement from "@providers/party/PartyManagement";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import SpellSilence from "@providers/spells/data/logic/mage/druid/SpellSilence";
 import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { HeapMonitor } from "./HeapMonitor";
 import { PM2Helper } from "./PM2Helper";
 
 @provide(ServerBootstrap)
@@ -38,8 +39,6 @@ export class ServerBootstrap {
     private spellSilence: SpellSilence,
     private characterTextureChange: CharacterTextureChange,
     private pathfindingResults: PathfindingResults,
-
-    private heapMonitor: HeapMonitor,
     private npcFreezer: NPCFreezer,
     private locker: Locker,
     private partyManagement: PartyManagement,
@@ -47,7 +46,9 @@ export class ServerBootstrap {
     private hitTarget: HitTarget,
     private discordBot: DiscordBot,
     private socketSessionControl: SocketSessionControl,
-    private npcBattleCycleQueue: NPCBattleCycleQueue
+    private npcBattleCycleQueue: NPCBattleCycleQueue,
+    private characterMonitorQueue: CharacterMonitorQueue,
+    private npcCycleQueue: NPCCycleQueue
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -63,8 +64,33 @@ export class ServerBootstrap {
     }
   }
 
-  public performMultipleInstancesOperations(): void {
+  public async performMultipleInstancesOperations(): Promise<void> {
     this.discordBot.initialize();
+
+    await this.queueShutdownHandling();
+
+    await this.clearAllQueues();
+  }
+
+  public queueShutdownHandling(): void {
+    const execQueueShutdown = async (): Promise<void> => {
+      await this.npcBattleCycleQueue.shutdown();
+      await this.npcCycleQueue.shutdown();
+      await this.characterMonitorQueue.shutdown();
+      await this.hitTarget.shutdown();
+      await this.pathfindingQueue.shutdown();
+    };
+
+    process.on("SIGTERM", async () => {
+      await execQueueShutdown();
+
+      process.exit(0);
+    });
+
+    process.on("SIGINT", async () => {
+      await execQueueShutdown();
+      process.exit(0);
+    });
   }
 
   private async execOneTimeOperations(): Promise<void> {
@@ -100,14 +126,16 @@ export class ServerBootstrap {
 
     this.npcFreezer.init();
 
-    await this.clearAllQueues();
-
     await this.locker.clear();
   }
 
   private async clearAllQueues(): Promise<void> {
-    await this.pathfindingQueue.clearAllJobs();
     await this.npcBattleCycleQueue.clearAllJobs();
+    await this.npcCycleQueue.clearAllJobs();
+
+    await this.characterMonitorQueue.clearAllJobs();
+
+    await this.pathfindingQueue.clearAllJobs();
     await this.hitTarget.clearAllQueueJobs();
     console.log("🧹 BullMQ queues cleared...");
   }

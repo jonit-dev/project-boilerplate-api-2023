@@ -65,17 +65,6 @@ export class PathfindingQueue {
     this.queue.on("error", (error) => {
       console.error("Error in the pathfindingQueue:", error);
     });
-
-    process.on("SIGTERM", async () => {
-      await this.shutdown();
-      process.exit(0);
-    });
-
-    process.on("SIGINT", async () => {
-      console.log("Received SIGINT. Gracefully shutting down...");
-      await this.shutdown();
-      process.exit(0);
-    });
   }
 
   public async clearAllJobs(): Promise<void> {
@@ -112,7 +101,7 @@ export class PathfindingQueue {
     );
   }
 
-  private async shutdown(): Promise<void> {
+  public async shutdown(): Promise<void> {
     await this.queue.close();
     await this.worker.close();
   }

@@ -155,9 +155,25 @@ export class CharacterMonitorQueue {
     this.charactersCallbacks.delete(character._id);
   }
 
+  public async clearAllJobs(): Promise<void> {
+    const jobs = await this.queue.getJobs(["waiting", "active", "delayed", "paused"]);
+    for (const job of jobs) {
+      try {
+        await job?.remove();
+      } catch (err) {
+        console.error(`Error removing job ${job?.id}:`, err.message);
+      }
+    }
+  }
+
+  public async shutdown(): Promise<void> {
+    await this.queue.close();
+    await this.worker.close();
+  }
+
   private async isJobBeingProcessed(callbackId: string): Promise<boolean> {
     const existingJobs = await this.queue.getJobs(["waiting", "active", "delayed"]);
-    const isJobExisting = existingJobs.some((job) => job.data?.callbackId === callbackId);
+    const isJobExisting = existingJobs.some((job) => job?.data?.callbackId === callbackId);
 
     if (isJobExisting) {
       return true; // Don't enqueue a new job if one with the same callbackId already exists

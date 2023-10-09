@@ -113,16 +113,6 @@ export class HitTarget {
       // log details
       console.log(job);
     });
-
-    process.on("SIGTERM", async () => {
-      await this.shutdown();
-      process.exit(0);
-    });
-
-    process.on("SIGINT", async () => {
-      await this.shutdown();
-      process.exit(0);
-    });
   }
 
   @TrackNewRelicTransaction()
@@ -173,7 +163,7 @@ export class HitTarget {
     }
   }
 
-  private async shutdown(): Promise<void> {
+  public async shutdown(): Promise<void> {
     await this.npcQueue.close();
     await this.characterQueue.close();
     await this.worker.close();
