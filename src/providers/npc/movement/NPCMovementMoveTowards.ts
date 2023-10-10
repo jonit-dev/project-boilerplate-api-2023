@@ -235,6 +235,10 @@ export class NPCMovementMoveTowards {
 
   @TrackNewRelicTransaction()
   private async initBattleCycle(npc: INPC): Promise<void> {
+    if (!npc.isAlive || !npc.targetCharacter || !npc.isBehaviorEnabled) {
+      return;
+    }
+
     const canProceed = await this.locker.lock(`npc-${npc._id}-npc-battle-cycle`);
 
     if (!canProceed) {

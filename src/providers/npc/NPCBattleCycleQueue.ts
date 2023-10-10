@@ -60,8 +60,9 @@ export class NPCBattleCycleQueue {
     );
 
     if (!appEnv.general.IS_UNIT_TEST) {
-      this.worker.on("failed", (job, err) => {
+      this.worker.on("failed", async (job, err) => {
         console.log(`npc-battle-cycle-queue job ${job?.id} failed with error ${err.message}`);
+        await this.locker.unlock(`npc-${job?.data?.npcId}-npc-battle-cycle`);
       });
 
       this.queue.on("error", (error) => {
@@ -114,74 +115,79 @@ export class NPCBattleCycleQueue {
   }
 
   private async execBattleCycle(npc: INPC, npcSkills: ISkill): Promise<void> {
-    const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
+    try {
+      const hasLock = await this.locker.hasLock(`npc-${npc._id}-npc-battle-cycle`);
 
-    if (!hasLock) {
-      return;
+      if (!hasLock) {
+        return;
+      }
+
+      this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "NPCBattleCycle", 1);
+
+      const result = await Promise.all([
+        NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
+        Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),
+      ]);
+
+      const targetCharacter = result[1] as ICharacter;
+
+      const isUnderRange = this.movementHelper.isUnderRange(
+        npc.x,
+        npc.y,
+        targetCharacter.x,
+        targetCharacter.y,
+        npc.maxRangeInGridCells || NPC_MIN_DISTANCE_TO_ACTIVATE
+      );
+
+      if (!targetCharacter || targetCharacter.health <= 0 || targetCharacter.scene !== npc.scene || !isUnderRange) {
+        await this.stop(npc);
+        return;
+      }
+
+      const updatedNPC = result[0] as INPC;
+      updatedNPC.skills = npcSkills;
+
+      if (!updatedNPC.isBehaviorEnabled) {
+        await this.stop(npc);
+        return;
+      }
+
+      const hasNoTarget = !updatedNPC.targetCharacter?.toString();
+      const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
+
+      if (hasNoTarget || hasDifferentTarget || !targetCharacter) {
+        await this.stop(npc);
+        return;
+      }
+
+      const characterSkills = (await Skill.findOne({
+        owner: targetCharacter._id,
+      })
+        .lean()
+        .cacheQuery({
+          cacheKey: `${targetCharacter._id}-skills`,
+        })) as ISkill;
+
+      targetCharacter.skills = characterSkills;
+
+      const isTargetInvisible = await this.specialEffect.isInvisible(targetCharacter);
+
+      if (
+        updatedNPC?.alignment === NPCAlignment.Hostile &&
+        targetCharacter?.health > 0 &&
+        updatedNPC.health > 0 &&
+        !isTargetInvisible
+      ) {
+        // if reached target and alignment is enemy, lets hit it
+        await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
+        await this.tryToSwitchToRandomTarget(npc);
+      }
+
+      await this.add(updatedNPC, npcSkills);
+    } catch (error) {
+      console.error(error);
+      await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
     }
-
-    this.newRelic.trackMetric(NewRelicMetricCategory.Count, NewRelicSubCategory.NPCs, "NPCBattleCycle", 1);
-
-    const result = await Promise.all([
-      NPC.findById(npc.id).lean({ virtuals: true, defaults: true }),
-      Character.findById(npc.targetCharacter).lean({ virtuals: true, defaults: true }),
-    ]);
-
-    const targetCharacter = result[1] as ICharacter;
-
-    const isUnderRange = this.movementHelper.isUnderRange(
-      npc.x,
-      npc.y,
-      targetCharacter.x,
-      targetCharacter.y,
-      npc.maxRangeInGridCells || NPC_MIN_DISTANCE_TO_ACTIVATE
-    );
-
-    if (!targetCharacter || targetCharacter.health <= 0 || targetCharacter.scene !== npc.scene || !isUnderRange) {
-      await this.stop(npc);
-      return;
-    }
-
-    const updatedNPC = result[0] as INPC;
-    updatedNPC.skills = npcSkills;
-
-    if (!updatedNPC.isBehaviorEnabled) {
-      await this.stop(npc);
-      return;
-    }
-
-    const hasNoTarget = !updatedNPC.targetCharacter?.toString();
-    const hasDifferentTarget = updatedNPC.targetCharacter?.toString() !== targetCharacter?.id;
-
-    if (hasNoTarget || hasDifferentTarget || !targetCharacter) {
-      await this.stop(npc);
-      return;
-    }
-
-    const characterSkills = (await Skill.findOne({
-      owner: targetCharacter._id,
-    })
-      .lean()
-      .cacheQuery({
-        cacheKey: `${targetCharacter._id}-skills`,
-      })) as ISkill;
-
-    targetCharacter.skills = characterSkills;
-
-    const isTargetInvisible = await this.specialEffect.isInvisible(targetCharacter);
-
-    if (
-      updatedNPC?.alignment === NPCAlignment.Hostile &&
-      targetCharacter?.health > 0 &&
-      updatedNPC.health > 0 &&
-      !isTargetInvisible
-    ) {
-      // if reached target and alignment is enemy, lets hit it
-      await this.battleAttackTarget.checkRangeAndAttack(updatedNPC, targetCharacter);
-      await this.tryToSwitchToRandomTarget(npc);
-    }
-
-    await this.add(updatedNPC, npcSkills);
   }
 
   @TrackNewRelicTransaction()
