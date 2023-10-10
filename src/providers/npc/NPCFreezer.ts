@@ -3,6 +3,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPC_FREEZE_CHECK_INTERVAL, NPC_MAX_ACTIVE_NPC_PER_CHARACTER } from "@providers/constants/NPCConstants";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
+import { Locker } from "@providers/locks/Locker";
 import { MathHelper } from "@providers/math/MathHelper";
 import { NPCAlignment } from "@rpg-engine/shared";
 import CPUusage from "cpu-percentage";
@@ -13,7 +14,7 @@ const MAX_CPU_USAGE_PER_INSTANCE = 60;
 
 @provideSingleton(NPCFreezer)
 export class NPCFreezer {
-  constructor(private mathHelper: MathHelper, private npcView: NPCView) {}
+  constructor(private mathHelper: MathHelper, private npcView: NPCView, private locker: Locker) {}
 
   public init(): void {
     this.monitorNPCsAndFreezeIfNeeded();
@@ -21,22 +22,34 @@ export class NPCFreezer {
 
   @TrackNewRelicTransaction()
   public async freezeNPC(npc: INPC, reason?: string): Promise<void> {
-    if (!npc.isBehaviorEnabled) {
-      return;
-    }
+    try {
+      const canProceed = await this.locker.lock(`npc-freeze-${npc._id}`);
 
-    console.log(`❄️ Freezing NPC ${npc.key} (${npc._id}) ${reason ? `- Reason: ${reason}` : ""}`);
-    await NPC.updateOne(
-      { _id: npc._id },
-      {
-        $set: {
-          isBehaviorEnabled: false,
-        },
-        $unset: {
-          targetCharacter: 1,
-        },
+      if (!canProceed) {
+        return;
       }
-    );
+
+      if (!npc.isBehaviorEnabled) {
+        return;
+      }
+
+      console.log(`❄️ Freezing NPC ${npc.key} (${npc._id}) ${reason ? `- Reason: ${reason}` : ""}`);
+      await NPC.updateOne(
+        { _id: npc._id },
+        {
+          $set: {
+            isBehaviorEnabled: false,
+          },
+          $unset: {
+            targetCharacter: 1,
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await this.locker.unlock(`npc-freeze-${npc._id}`);
+    }
   }
 
   @TrackNewRelicTransaction()
