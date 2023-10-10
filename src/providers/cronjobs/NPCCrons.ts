@@ -53,8 +53,8 @@ export class NPCCrons {
       await this.npcRaidActivator.activateRaids();
     });
 
-    // Run every 10 minutes
-    nodeCron.schedule("*/10 * * * *", async () => {
+    // Run every 5 minutes
+    nodeCron.schedule("*/5 * * * *", async () => {
       await this.npcFreezer.freezeNPCsWithoutCharactersAround();
     });
   }
