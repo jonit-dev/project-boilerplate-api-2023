@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterView } from "@providers/character/CharacterView";
 import { appEnv } from "@providers/config/env";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
@@ -42,7 +43,8 @@ export class NPCMovement {
     private inMemoryHashTable: InMemoryHashTable,
     private pathfindingQueue: PathfindingQueue,
     private pathfindingResults: PathfindingResults,
-    private pathfinder: Pathfinder
+    private pathfinder: Pathfinder,
+    private newRelic: NewRelic
   ) {}
 
   public isNPCAtPathPosition(npc: INPC, gridX: number, gridY: number): boolean {
@@ -223,34 +225,34 @@ export class NPCMovement {
       throw new Error("Job ID is required!");
     }
 
-    return new Promise((resolve, reject) => {
-      try {
-        let tries = 0;
+    let interval: NodeJS.Timeout;
+    let tries = 0;
 
-        const interval = setInterval(async () => {
-          const npcPath = await this.pathfindingResults.getResult(jobId);
+    return new Promise<number[][]>((resolve, reject) => {
+      interval = setInterval(async () => {
+        let npcPath: number[][] | null = null;
+
+        try {
+          npcPath = await this.pathfindingResults.getResult(jobId);
 
           if (npcPath) {
             clearInterval(interval);
-
             await this.pathfindingResults.deleteResult(jobId);
-
             resolve(npcPath);
+          } else {
+            tries++;
+            if (tries > PATHFINDING_MAX_TRIES) {
+              clearInterval(interval);
+              await this.pathfindingResults.deleteResult(jobId);
+              reject(new Error("Error while trying to fetch pathfinding result for NPC. Timeout!"));
+            }
           }
-
-          tries++;
-
-          if (tries > PATHFINDING_MAX_TRIES) {
-            clearInterval(interval);
-            await this.pathfindingResults.deleteResult(jobId);
-
-            reject(new Error("Error while trying to fetch pathfinding result for NPC. Timeout!"));
-          }
-        }, 1);
-      } catch (error) {
-        console.log(error);
-        reject(error);
-      }
+        } catch (error) {
+          clearInterval(interval);
+          console.error(error);
+          reject(error);
+        }
+      }, 250);
     });
   }
 }
