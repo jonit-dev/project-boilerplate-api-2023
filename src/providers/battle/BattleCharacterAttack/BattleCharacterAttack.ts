@@ -150,11 +150,15 @@ export class BattleCharacterAttack {
       const checkRangeAndAttack = await this.battleAttackTarget.checkRangeAndAttack(character, target);
       if (checkRangeAndAttack) {
         // check for skull
-        if (
-          target.type === "Character" &&
-          this.characterSkull.checkForUnjustifiedAttack(character, target as ICharacter)
-        ) {
-          await this.characterSkull.updateWhiteSkull(character._id.toString(), target._id.toString());
+        if (target.type === "Character") {
+          const isAttackUnjustified = await this.characterSkull.checkForUnjustifiedAttack(
+            character as ICharacter,
+            target as ICharacter
+          );
+          if (isAttackUnjustified) {
+            // If the attack is not justified, the caster gains a 'skull'
+            await this.characterSkull.updateWhiteSkull(character.id, target.id);
+          }
         }
         return true;
       } else {
