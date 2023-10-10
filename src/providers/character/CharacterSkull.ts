@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { CharacterParty } from "@entities/ModuleCharacter/CharacterPartyModel";
 import { CharacterPvPKillLog } from "@entities/ModuleCharacter/CharacterPvPKillLogModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -13,8 +14,40 @@ export class CharacterSkull {
     private readonly socketMessaging: SocketMessaging
   ) {}
 
-  public checkForUnjustifiedAttack(character: ICharacter, target: ICharacter): boolean {
-    return target.hasSkull !== true && target.faction === character.faction;
+  public async checkForUnjustifiedAttack(character: ICharacter, target: ICharacter): Promise<boolean> {
+    // Check if the caster is in a party
+    const isCharacterAndTargetInParty = await this.isCharacterAndTargetOnTheSameParty(
+      character as ICharacter,
+      target as ICharacter
+    );
+
+    return target.hasSkull !== true && target.faction === character.faction && isCharacterAndTargetInParty !== true;
+  }
+
+  private async isCharacterAndTargetOnTheSameParty(character: ICharacter, target: ICharacter): Promise<boolean> {
+    // First, find a party where the character is the leader and target is a member
+    const partyWithCharacterAsLeader = await CharacterParty.findOne({
+      "leader._id": character._id,
+      "members._id": target._id,
+    }).lean();
+
+    // If found, it means they are in the same party
+    if (partyWithCharacterAsLeader) {
+      return true;
+    }
+
+    // Next, find a party where the target is the leader and character is a member
+    const partyWithTargetAsLeader = await CharacterParty.findOne({
+      "leader._id": target._id,
+      "members._id": character._id,
+    }).lean();
+
+    // If found, it means they are in the same party
+    if (partyWithTargetAsLeader) {
+      return true;
+    }
+    // If neither condition is met, then they are not in the same party
+    return false;
   }
 
   @TrackNewRelicTransaction()

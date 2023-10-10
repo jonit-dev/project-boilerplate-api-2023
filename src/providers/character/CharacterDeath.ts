@@ -115,7 +115,7 @@ export class CharacterDeath {
         const characterDeathLog = new CharacterPvPKillLog({
           killer: characterKiller._id.toString(),
           target: character._id.toString(),
-          isJustify: !this.characterSkull.checkForUnjustifiedAttack(characterKiller, character),
+          isJustify: !(await this.characterSkull.checkForUnjustifiedAttack(characterKiller, character)),
           x: character.x,
           y: character.y,
           createdAt: new Date(),

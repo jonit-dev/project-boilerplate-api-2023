@@ -37,6 +37,7 @@ describe("UseWithEntityValidation.ts", () => {
   let characterSkills: ISkill;
   let targetCharacterSkills: ISkill;
   let item1: IItem;
+  let healRune: IItem;
   let inventory: IItem;
   let inventoryContainer: IItemContainer;
   let sendEventToUserMock: jest.SpyInstance;
@@ -54,6 +55,8 @@ describe("UseWithEntityValidation.ts", () => {
     ];
 
     item1 = items[1];
+
+    healRune = await unitTestHelper.createMockItemFromBlueprint(MagicsBlueprint.HealRune);
 
     await unitTestHelper.addItemsToContainer(inventoryContainer, 6, items);
   };
@@ -299,6 +302,28 @@ describe("UseWithEntityValidation.ts", () => {
 
     expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
       message: `Sorry, '${apple.name}' cannot be used with target.`,
+      type: "error",
+    });
+  });
+
+  it("should fail validation if trying to apply 'HealRune' on an NPC", async () => {
+    characterSkills = testCharacter.skills as unknown as ISkill;
+    characterSkills.magic.level = 10;
+    characterSkills.level = 10;
+    await characterSkills.save();
+
+    await useWithEntity.execute(
+      {
+        itemId: healRune._id,
+        entityId: testNPC._id,
+        entityType: EntityType.NPC,
+      },
+      testCharacter
+    );
+
+    expect(sendEventToUserMock).toBeCalledTimes(1);
+    expect(sendEventToUserMock).toHaveBeenLastCalledWith(testCharacter.channelId, UISocketEvents.ShowMessage, {
+      message: "Sorry, 'Healing Rune' can not be apply on NPC.",
       type: "error",
     });
   });

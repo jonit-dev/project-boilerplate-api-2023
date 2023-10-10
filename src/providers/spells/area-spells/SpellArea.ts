@@ -283,7 +283,7 @@ export class SpellArea {
     }
 
     // Checks if the attack is justified
-    const isAttackUnjustified = this.characterSkull.checkForUnjustifiedAttack(
+    const isAttackUnjustified = await this.characterSkull.checkForUnjustifiedAttack(
       caster as ICharacter,
       target as ICharacter
     );

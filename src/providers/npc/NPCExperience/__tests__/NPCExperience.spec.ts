@@ -1,6 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
-import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { MODE_EXP_MULTIPLIER } from "@providers/constants/SkillConstants";
 import { container, unitTestHelper } from "@providers/inversify/container";
 import { Modes, calculateXPToNextLevel } from "@rpg-engine/shared";
@@ -47,6 +47,8 @@ describe("NPCExperience.spec.ts | releaseXP test cases", () => {
     jest.useFakeTimers({
       advanceTimers: true,
     });
+
+    jest.spyOn(NPC, "updateOne");
   });
 
   afterEach(() => {
@@ -78,5 +80,23 @@ describe("NPCExperience.spec.ts | releaseXP test cases", () => {
     expect(updatedSkills.experience).toBe(expectedExperience);
     expect(updatedSkills.xpToNextLevel).toBe(xpToLvl4 - expectedExperience);
     expect(testNPC.xpToRelease?.length).toBe(0);
+  });
+
+  it("should update NPC when xp is in range", async () => {
+    // @ts-ignore
+    jest.spyOn(npcExperience.experienceLimiter, "isXpInRange").mockReturnValue(true);
+
+    await npcExperience.recordXPinBattle(testCharacter, testNPC, 50);
+
+    expect(NPC.updateOne).toHaveBeenCalledWith({ _id: testNPC.id }, { xpToRelease: testNPC.xpToRelease });
+  });
+
+  it("should NOT update NPC when xp is not in range", async () => {
+    // @ts-ignore
+    jest.spyOn(npcExperience.experienceLimiter, "isXpInRange").mockReturnValue(false);
+
+    await npcExperience.recordXPinBattle(testCharacter, testNPC, 50);
+
+    expect(NPC.updateOne).not.toHaveBeenCalled();
   });
 });

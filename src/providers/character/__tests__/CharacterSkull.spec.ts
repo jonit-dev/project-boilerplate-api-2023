@@ -25,32 +25,41 @@ describe("CharacterSkull.ts", () => {
     });
   });
 
-  it("should know if target is unjustify attack", () => {
+  it("should know if target is unjustify attack", async () => {
     testCharacter.faction = CharacterFactions.LifeBringer;
     testCharacter.hasSkull = false;
     testTargetCharacter.faction = CharacterFactions.LifeBringer;
     testTargetCharacter.hasSkull = false;
-    const isTargetUnjustifiedAttack = characterSkull.checkForUnjustifiedAttack(testCharacter, testTargetCharacter);
+    const isTargetUnjustifiedAttack = await characterSkull.checkForUnjustifiedAttack(
+      testCharacter,
+      testTargetCharacter
+    );
 
     expect(isTargetUnjustifiedAttack).toBeTruthy();
   });
 
-  it("should know if target is not unjustify attack when faction is not the same", () => {
+  it("should know if target is not unjustify attack when faction is not the same", async () => {
     testCharacter.faction = CharacterFactions.LifeBringer;
     testCharacter.hasSkull = false;
     testTargetCharacter.faction = CharacterFactions.ShadowWalker;
     testTargetCharacter.hasSkull = false;
-    const isTargetUnjustifiedAttack = characterSkull.checkForUnjustifiedAttack(testCharacter, testTargetCharacter);
+    const isTargetUnjustifiedAttack = await characterSkull.checkForUnjustifiedAttack(
+      testCharacter,
+      testTargetCharacter
+    );
 
     expect(isTargetUnjustifiedAttack).toBeFalsy;
   });
 
-  it("should know if target is not unjustify attack when target has skull", () => {
+  it("should know if target is not unjustify attack when target has skull", async () => {
     testCharacter.faction = CharacterFactions.LifeBringer;
     testCharacter.hasSkull = false;
     testTargetCharacter.faction = CharacterFactions.LifeBringer;
     testTargetCharacter.hasSkull = true;
-    const isTargetUnjustifiedAttack = characterSkull.checkForUnjustifiedAttack(testCharacter, testTargetCharacter);
+    const isTargetUnjustifiedAttack = await characterSkull.checkForUnjustifiedAttack(
+      testCharacter,
+      testTargetCharacter
+    );
 
     expect(isTargetUnjustifiedAttack).toBeFalsy;
   });
