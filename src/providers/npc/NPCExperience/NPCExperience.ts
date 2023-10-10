@@ -42,6 +42,7 @@ import uniqBy from "lodash/uniqBy";
 import { Types } from "mongoose";
 import { clearCacheForKey } from "speedgoose";
 import { v4 as uuidv4 } from "uuid";
+import { NPCExperienceLimiter } from "./NPCExperienceLimiter";
 
 @provide(NPCExperience)
 export class NPCExperience {
@@ -59,7 +60,8 @@ export class NPCExperience {
     private locker: Locker,
     private partyManagement: PartyManagement,
     private newRelic: NewRelic,
-    private discordBot: DiscordBot
+    private discordBot: DiscordBot,
+    private experienceLimiter: NPCExperienceLimiter
   ) {}
 
   /**
@@ -198,7 +200,11 @@ export class NPCExperience {
             },
           ];
         }
-        await NPC.updateOne({ _id: target.id }, { xpToRelease: target.xpToRelease });
+
+        const isXpInRange = this.experienceLimiter.isXpInRange(target);
+        if (isXpInRange) {
+          await NPC.updateOne({ _id: target.id }, { xpToRelease: target.xpToRelease });
+        }
       }
     } catch (error) {
       console.error(error);

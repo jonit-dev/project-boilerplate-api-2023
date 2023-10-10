@@ -29,6 +29,7 @@ import {
   IItemContainer,
   IUseWithEntity,
   ItemSocketEvents,
+  MagicsBlueprint,
   NPCAlignment,
   UseWithSocketEvents,
 } from "@rpg-engine/shared";
@@ -109,6 +110,11 @@ export class UseWithEntity {
     }
 
     if (!this.characterValidation.hasBasicValidation(caster)) {
+      return false;
+    }
+
+    if (blueprint.key === MagicsBlueprint.HealRune && target.type === EntityType.NPC) {
+      this.socketMessaging.sendErrorMessageToCharacter(caster, `Sorry, '${blueprint.name}' can not be apply on NPC.`);
       return false;
     }
 
