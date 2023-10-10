@@ -25,7 +25,7 @@ import {
   ItemSubType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import { ItemUseCycle } from "./ItemUseCycle";
+import { ItemUseCycleQueue } from "./ItemUseCycleQueue";
 import { AvailableBlueprints } from "./data/types/itemsBlueprintTypes";
 
 @provide(ItemUse)
@@ -41,7 +41,8 @@ export class ItemUse {
     private characterItemInventory: CharacterItemInventory,
     private characterInventory: CharacterInventory,
     private characterFoodConsumption: CharacterFoodConsumption,
-    private newRelic: NewRelic
+    private newRelic: NewRelic,
+    private itemUseCycleQueue: ItemUseCycleQueue
   ) {}
 
   @TrackNewRelicTransaction()
@@ -76,9 +77,9 @@ export class ItemUse {
     }
 
     if (useItem && useItem.subType === ItemSubType.Food && useItem.healthRecovery) {
-      this.applyItemUsage(bluePrintItem, character.id, useItem.healthRecovery);
+      await this.applyItemUsage(bluePrintItem, character.id, useItem.healthRecovery);
     } else {
-      this.applyItemUsage(bluePrintItem, character.id);
+      await this.applyItemUsage(bluePrintItem, character.id);
     }
 
     const rarity = useItem.rarity || undefined;
@@ -117,10 +118,14 @@ export class ItemUse {
     return true;
   }
 
-  private applyItemUsage(bluePrintItem: Partial<IItem>, characterId: string, healthRecovery?: number): void {
-    const intervals = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
+  private async applyItemUsage(
+    bluePrintItem: Partial<IItem>,
+    characterId: string,
+    healthRecovery?: number
+  ): Promise<void> {
+    const iterations = bluePrintItem.subType === ItemSubType.Food ? 5 : 1;
 
-    new ItemUseCycle(async () => {
+    await this.itemUseCycleQueue.start(characterId, bluePrintItem.key!, iterations, 10 * 1000, async () => {
       await this.newRelic.trackTransaction(NewRelicTransactionCategory.Interval, "ItemUseCycle", async () => {
         const character = await Character.findOne({ _id: characterId });
 
@@ -139,7 +144,11 @@ export class ItemUse {
           }
         }
       });
-    }, intervals);
+    });
+
+    // new ItemUseCycle(async () => {
+
+    // }, intervals);
   }
 
   private async getInventoryContainer(character: ICharacter): Promise<IItemContainer | null> {

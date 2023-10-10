@@ -15,6 +15,7 @@ import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { DiscordBot } from "@providers/discord/DiscordBot";
 import { blueprintManager } from "@providers/inversify/container";
+import { ItemUseCycleQueue } from "@providers/item/ItemUseCycleQueue";
 import { Locker } from "@providers/locks/Locker";
 import { NPCBattleCycleQueue } from "@providers/npc/NPCBattleCycleQueue";
 import { NPCCycleQueue } from "@providers/npc/NPCCycleQueue";
@@ -48,7 +49,8 @@ export class ServerBootstrap {
     private socketSessionControl: SocketSessionControl,
     private npcBattleCycleQueue: NPCBattleCycleQueue,
     private characterMonitorQueue: CharacterMonitorQueue,
-    private npcCycleQueue: NPCCycleQueue
+    private npcCycleQueue: NPCCycleQueue,
+    private itemUseCycleQueue: ItemUseCycleQueue
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -79,6 +81,7 @@ export class ServerBootstrap {
       await this.characterMonitorQueue.shutdown();
       await this.hitTarget.shutdown();
       await this.pathfindingQueue.shutdown();
+      await this.itemUseCycleQueue.shutdown();
     };
 
     process.on("SIGTERM", async () => {
@@ -132,11 +135,11 @@ export class ServerBootstrap {
   private async clearAllQueues(): Promise<void> {
     await this.npcBattleCycleQueue.clearAllJobs();
     await this.npcCycleQueue.clearAllJobs();
-
     await this.characterMonitorQueue.clearAllJobs();
-
     await this.pathfindingQueue.clearAllJobs();
     await this.hitTarget.clearAllQueueJobs();
+    await this.itemUseCycleQueue.clearAllJobs();
+
     console.log("🧹 BullMQ queues cleared...");
   }
 }
