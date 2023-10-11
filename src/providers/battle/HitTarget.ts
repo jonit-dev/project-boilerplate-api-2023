@@ -330,7 +330,9 @@ export class HitTarget {
     }
 
     if (battleEvent === BattleEventType.Miss && target.type === "Character") {
-      remainingPromises.push(this.skillIncrease.increaseShieldingSP(target as ICharacter));
+      remainingPromises.push(
+        this.skillIncrease.increaseBasicAttributeSP(target as ICharacter, BasicAttribute.Dexterity)
+      );
     }
 
     remainingPromises.push(this.warnCharacterIfNotInView(attacker as ICharacter, target));
