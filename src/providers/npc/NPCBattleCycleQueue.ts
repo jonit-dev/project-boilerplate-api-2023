@@ -48,6 +48,8 @@ export class NPCBattleCycleQueue {
           await this.execBattleCycle(npc, npcSkills);
         } catch (err) {
           console.error(`Error processing npc-battle-cycle-queue for NPC ${npc.key}:`, err);
+          await this.locker.unlock(`npc-${job?.data?.npcId}-npc-battle-cycle`);
+
           throw err;
         }
       },
@@ -72,30 +74,35 @@ export class NPCBattleCycleQueue {
   }
 
   public async add(npc: INPC, npcSkills: ISkill): Promise<void> {
-    if (appEnv.general.IS_UNIT_TEST) {
-      await this.execBattleCycle(npc, npcSkills);
-      return;
-    }
-
-    const isJobBeingProcessed = await this.isJobBeingProcessed(npc._id);
-
-    if (isJobBeingProcessed) {
-      return;
-    }
-
-    await this.queue.add(
-      "npc-battle-cycle-queue",
-      {
-        npcId: npc._id,
-        npc,
-        npcSkills,
-      },
-      {
-        delay: NPC_BATTLE_CYCLE_INTERVAL,
-        removeOnComplete: true,
-        removeOnFail: true,
+    try {
+      if (appEnv.general.IS_UNIT_TEST) {
+        await this.execBattleCycle(npc, npcSkills);
+        return;
       }
-    );
+
+      const isJobBeingProcessed = await this.isJobBeingProcessed(npc._id);
+
+      if (isJobBeingProcessed) {
+        return;
+      }
+
+      await this.queue.add(
+        "npc-battle-cycle-queue",
+        {
+          npcId: npc._id,
+          npc,
+          npcSkills,
+        },
+        {
+          delay: NPC_BATTLE_CYCLE_INTERVAL,
+          removeOnComplete: true,
+          removeOnFail: true,
+        }
+      );
+    } catch (error) {
+      console.error(error);
+      await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
+    }
   }
 
   public async clearAllJobs(): Promise<void> {
