@@ -5,6 +5,7 @@ import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import { appEnv } from "@providers/config/env";
+import { Locker } from "@providers/locks/Locker";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { UISocketEvents } from "@rpg-engine/shared";
 import { EntityAttackType, EntityType } from "@rpg-engine/shared/dist/types/entity.types";
@@ -17,7 +18,11 @@ import { EntityEffectBlueprint } from "./data/types/entityEffectBlueprintTypes";
 
 @provide(EntityEffectUse)
 export class EntityEffectUse {
-  constructor(private socketMessaging: SocketMessaging, private characterWeapon: CharacterWeapon) {}
+  constructor(
+    private socketMessaging: SocketMessaging,
+    private characterWeapon: CharacterWeapon,
+    private locker: Locker
+  ) {}
 
   @TrackNewRelicTransaction()
   public async applyEntityEffects(
@@ -146,7 +151,7 @@ export class EntityEffectUse {
     appliedEffects.push({ key: entityEffect.key, lastUpdated: new Date().getTime() });
     target.appliedEntityEffects = appliedEffects;
     await this.updateTargetInDatabase(target);
-    this.startEntityEffectCycle(entityEffect, target, attacker);
+    await this.startEntityEffectCycle(entityEffect, target, attacker);
   }
 
   private async updateTargetInDatabase(target: ICharacter | INPC): Promise<void> {
@@ -159,15 +164,25 @@ export class EntityEffectUse {
     }
   }
 
-  private startEntityEffectCycle(
+  private async startEntityEffectCycle(
     entityEffect: IEntityEffect,
     target: ICharacter | INPC,
     attacker: ICharacter | INPC
-  ): void {
+  ): Promise<void> {
     if (appEnv.general.IS_UNIT_TEST) {
       //! This avoids the creation of EntityEffectCycle during unit tests because it was causing a character model buff timeout issue (I have no idea why)
       return;
     }
+
+    const canProceed = await this.locker.lock(
+      `entity-effect-cycle-${entityEffect.key}-attacker-${attacker._id}-target-${target._id}`
+    );
+
+    if (!canProceed) {
+      console.log("locked!");
+      return;
+    }
+
     new EntityEffectCycle(entityEffect, target._id, target.type, attacker._id, attacker.type);
   }
 }
