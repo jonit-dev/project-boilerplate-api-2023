@@ -89,6 +89,7 @@ describe("SpellCalculator", () => {
     const damageWithoutLevel = await spellCalculator.spellDamageCalculator(testCharacter, BasicAttribute.Magic, {
       minSkillMultiplier: minMultiplier,
       maxSkillMultiplier: maxMultiplier,
+      bonusDamage: true,
     });
 
     expect(damageWithoutLevel).toBeGreaterThanOrEqual(expectedMinDamage);
@@ -101,6 +102,7 @@ describe("SpellCalculator", () => {
       level: true,
       minLevelMultiplier: 0.1,
       maxLevelMultiplier: 0.9,
+      bonusDamage: true,
     });
 
     const expectedMinDamageWithLevel = expectedMinDamage + 10 * 0.1; // 26

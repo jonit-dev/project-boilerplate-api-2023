@@ -89,8 +89,11 @@ export class SpellCalculator {
       level?: boolean;
       minLevelMultiplier?: number;
       maxLevelMultiplier?: number;
+      bonusDamage?: boolean;
     }
   ): Promise<number> {
+    const { bonusDamage = false } = options || {};
+
     const minSkillMultiplier = options?.minSkillMultiplier || SPELL_CALCULATOR_DEFAULT_MIN_SKILL_MULTIPLIER;
     const maxSkillMultiplier = options?.maxSkillMultiplier || SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER;
 
@@ -107,7 +110,13 @@ export class SpellCalculator {
       throw new Error("The minimum value cannot be less than 1.");
     }
 
-    return this.generateRandomDamage(minTotalValue, maxTotalValue);
+    let damage = this.generateRandomDamage(minTotalValue, maxTotalValue);
+
+    if (!bonusDamage) {
+      damage /= 2.5;
+    }
+
+    return damage;
   }
 
   private async getSkillLevel(character: ICharacter, skillName: SkillsAvailable): Promise<number> {

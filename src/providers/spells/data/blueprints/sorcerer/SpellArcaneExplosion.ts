@@ -39,13 +39,13 @@ export const spellArcaneExplosion: Partial<ISpell> = {
 
     const skillDamage = await spellCalculator.spellDamageCalculator(character, BasicAttribute.Magic, {
       minSkillMultiplier: 3.2,
-      maxSkillMultiplier: 4.5,
+      maxSkillMultiplier: 5.8,
       level: true,
       minLevelMultiplier: 0.8,
-      maxLevelMultiplier: 1.5,
+      maxLevelMultiplier: 2.5,
     });
 
-    let selfDamage = skillDamage * 0.1;
+    let selfDamage = skillDamage * 2.5 * 0.1;
 
     if (selfDamage >= character.health) {
       selfDamage = character.health - 1;
