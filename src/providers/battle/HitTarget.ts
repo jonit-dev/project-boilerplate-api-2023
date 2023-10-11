@@ -216,7 +216,9 @@ export class HitTarget {
         baseDamage += bonusDamage * BONUS_DAMAGE_MULTIPLIER;
       }
 
-      const damage = this.battleDamageCalculator.getCriticalHitDamageIfSucceed(baseDamage);
+      let damage = this.battleDamageCalculator.getCriticalHitDamageIfSucceed(baseDamage);
+      const maxDamage = target.health;
+      damage = Math.min(damage, maxDamage);
 
       const damageRelatedPromises: any[] = [];
 
