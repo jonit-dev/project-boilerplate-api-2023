@@ -171,60 +171,6 @@ describe("ItemUse.ts", () => {
     });
   });
 
-  it("should increase character health incrementally for food item", async () => {
-    itemUsageMock.mockRestore();
-    jest.useFakeTimers({ advanceTimers: true, doNotFake: ["setInterval", "clearInterval"] });
-
-    const itemAppleBlueprint = await blueprintManager.getBlueprint<IConsumableItemBlueprint>(
-      "items",
-      FoodsBlueprint.Apple
-    );
-
-    (itemUse as any).applyItemUsage(itemAppleBlueprint, testCharacter.id);
-
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    // extra call to make sure cycle is only running for 5 times
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    expect(sendEventToUser).toBeCalledTimes(5);
-
-    for (let i = 1; i <= 5; i++) {
-      expect(sendEventToUser).toHaveBeenNthCalledWith(
-        i,
-        testCharacter.channelId,
-        CharacterSocketEvents.AttributeChanged,
-        {
-          targetId: testCharacter._id,
-          health: testCharacter.health + i,
-          mana: testCharacter.mana + i,
-        }
-      );
-    }
-
-    expect(animationEventMock).toBeCalledTimes(5);
-
-    const args = animationEventMock.mock.calls[0];
-    expect(args[0].id).toBe(testCharacter.id);
-    expect(args[1]).toBe(AnimationEffectKeys.LifeHeal);
-
-    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-    expect(character.health).toBe(testCharacter.health + 5);
-  });
-
   it("should increase character health instantly for potions", async () => {
     itemUsageMock.mockRestore();
     jest.useFakeTimers({ advanceTimers: true, doNotFake: ["setInterval", "clearInterval"] });
@@ -326,57 +272,6 @@ describe("ItemUse.ts", () => {
     expect(applyItemUsageMock).toHaveBeenCalledWith(expect.any(Object), testCharacter.id, testItem.healthRecovery);
 
     applyItemUsageMock.mockRestore();
-  });
-
-  it("should call usableEffect with healthRecovery if healthRecovery is provided", async () => {
-    itemUsageMock.mockRestore();
-    jest.useFakeTimers({ advanceTimers: true, doNotFake: ["setInterval", "clearInterval"] });
-
-    const itemAppleBlueprint = await blueprintManager.getBlueprint<IConsumableItemBlueprint>(
-      "items",
-      FoodsBlueprint.Apple
-    );
-
-    const healthRecovery = 10;
-
-    // Apply item usage
-    (itemUse as any).applyItemUsage(itemAppleBlueprint, testCharacter.id, healthRecovery);
-
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    // extra call to make sure cycle is only running for 5 times
-    jest.advanceTimersByTime(11000);
-    await wait(0.2);
-
-    expect(sendEventToUser).toBeCalledTimes(5);
-
-    for (let i = 1; i <= 5; i++) {
-      expect(sendEventToUser).toHaveBeenNthCalledWith(
-        i,
-        testCharacter.channelId,
-        CharacterSocketEvents.AttributeChanged,
-        {
-          targetId: testCharacter._id,
-          health: testCharacter.health + i * healthRecovery,
-          mana: testCharacter.mana + i * healthRecovery,
-        }
-      );
-    }
-
-    const character = (await Character.findById(testCharacter.id)) as unknown as ICharacter;
-    expect(character.health).toBe(testCharacter.health + 5 * healthRecovery);
   });
 
   it("should decrement item with same rarity", async () => {

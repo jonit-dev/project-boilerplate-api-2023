@@ -252,7 +252,7 @@ export class NPCMovement {
           console.error(error);
           reject(error);
         }
-      }, 250);
+      }, 1);
     });
   }
 }
