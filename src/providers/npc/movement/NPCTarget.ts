@@ -35,6 +35,7 @@ export class NPCTarget {
         },
       }
     );
+    await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
   }
 
   public getTargetDirection(npc: INPC, targetX: number, targetY: number): NPCDirection {

@@ -7,18 +7,18 @@ import { BattleAttackTarget } from "@providers/battle/BattleAttackTarget/BattleA
 import { appEnv } from "@providers/config/env";
 import { NPC_BATTLE_CYCLE_INTERVAL, NPC_MIN_DISTANCE_TO_ACTIVATE } from "@providers/constants/NPCConstants";
 import { SpecialEffect } from "@providers/entityEffects/SpecialEffect";
+import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { Locker } from "@providers/locks/Locker";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { NPCAlignment } from "@rpg-engine/shared";
 import { Queue, Worker } from "bullmq";
-import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
 import { NPCView } from "./NPCView";
 import { ICharacterHealth } from "./movement/NPCMovementMoveTowards";
 import { NPCTarget } from "./movement/NPCTarget";
 
-@provide(NPCBattleCycleQueue)
+@provideSingleton(NPCBattleCycleQueue)
 export class NPCBattleCycleQueue {
   private queue: Queue<any, any, string>;
   private worker: Worker;
@@ -200,7 +200,6 @@ export class NPCBattleCycleQueue {
   @TrackNewRelicTransaction()
   private async stop(npc: INPC): Promise<void> {
     await this.npcTarget.clearTarget(npc);
-    await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
   }
 
   private async isJobBeingProcessed(npcId: string): Promise<boolean> {

@@ -182,7 +182,7 @@ export class NPCMovementMoveTowards {
       );
 
       if (isInRange) {
-        await this.initBattleCycle(npc);
+        await this.initBattleCycle(npc, targetCharacter);
       }
     }
   }
@@ -234,8 +234,13 @@ export class NPCMovementMoveTowards {
   }
 
   @TrackNewRelicTransaction()
-  private async initBattleCycle(npc: INPC): Promise<void> {
+  private async initBattleCycle(npc: INPC, targetCharacter: ICharacter): Promise<void> {
     if (!npc.isAlive || !npc.targetCharacter || !npc.isBehaviorEnabled) {
+      return;
+    }
+
+    if (!targetCharacter.isOnline || targetCharacter.isBanned || targetCharacter.health <= 0) {
+      await this.npcTarget.clearTarget(npc);
       return;
     }
 
