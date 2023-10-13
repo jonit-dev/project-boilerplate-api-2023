@@ -209,7 +209,7 @@ export class ItemCraftable {
       await this.animationEffect.sendAnimationEventToCharacter(character, AnimationEffectKeys.SkillLevelUp);
     } else {
       const failureMessages = shuffle([
-        "Sorry, you failed to craft the item. You gained some experience though!",
+        "Sorry, you failed to craft the item.",
         "Hmm... you couldn't get it right. At least you tried!",
         "You almost got the item correctly, but failed.",
         "You failed to craft the item. You should try again!",
