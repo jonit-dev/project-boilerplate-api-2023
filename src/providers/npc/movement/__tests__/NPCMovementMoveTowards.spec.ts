@@ -166,6 +166,7 @@ describe("NPCMovementMoveTowards.ts", () => {
     it("should correctly call this.initBattleCycle(npc)", async () => {
       testNPC.alignment = NPCAlignment.Hostile;
       testNPC.targetCharacter = testCharacter._id;
+      testNPC.isBehaviorEnabled = true;
       await testNPC.save();
 
       testCharacter.x = FromGridX(14);
@@ -177,7 +178,7 @@ describe("NPCMovementMoveTowards.ts", () => {
 
       await npcMovementMoveTowards.startMoveTowardsMovement(testNPC);
 
-      expect(spy).toHaveBeenCalledWith(testNPC);
+      expect(spy).toHaveBeenCalledWith(testNPC, expect.objectContaining({ _id: testCharacter._id }));
     });
 
     describe("NPCMovementMoveTowards", () => {
