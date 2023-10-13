@@ -80,6 +80,12 @@ export class NPCFreezer {
 
   private monitorNPCsAndFreezeIfNeeded(): void {
     setInterval(async () => {
+      const canCheck = await this.locker.lock("npc-freeze-check", 1000);
+
+      if (!canCheck) {
+        return;
+      }
+
       const totalCPUUsage = round(CPUusage().percent);
       const totalActiveNPCs = await NPC.countDocuments({ isBehaviorEnabled: true });
 
