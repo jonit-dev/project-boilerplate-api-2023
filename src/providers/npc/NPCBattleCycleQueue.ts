@@ -74,6 +74,12 @@ export class NPCBattleCycleQueue {
   }
 
   public async add(npc: INPC, npcSkills: ISkill): Promise<void> {
+    const canProceed = await this.locker.lock(`npc-${npc._id}-npc-add-battle-queue`);
+
+    if (!canProceed) {
+      return;
+    }
+
     try {
       if (appEnv.general.IS_UNIT_TEST) {
         await this.execBattleCycle(npc, npcSkills);
@@ -102,6 +108,8 @@ export class NPCBattleCycleQueue {
     } catch (error) {
       console.error(error);
       await this.locker.unlock(`npc-${npc._id}-npc-battle-cycle`);
+    } finally {
+      await this.locker.unlock(`npc-${npc._id}-npc-add-battle-queue`);
     }
   }
 
