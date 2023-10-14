@@ -8,7 +8,7 @@ export class CronJobScheduler {
 
   public uniqueSchedule(id: string, cronString: string, task: Function): void {
     const scheduledTask = nodeCron.schedule(cronString, async () => {
-      const canProceed = await this.locker.lock(`cron-job-unique-schedule-${id}`, 2000);
+      const canProceed = await this.locker.lock(`cron-job-unique-schedule-${id}`);
 
       if (!canProceed) {
         return;
