@@ -179,7 +179,6 @@ export class EntityEffectUse {
     );
 
     if (!canProceed) {
-      console.log("locked!");
       return;
     }
 

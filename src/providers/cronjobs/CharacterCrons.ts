@@ -1,6 +1,7 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterLastAction } from "@providers/character/CharacterLastAction";
+import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import {
@@ -18,7 +19,7 @@ export class CharacterCrons {
     private socketMessaging: SocketMessaging,
     private characterLastAction: CharacterLastAction,
     private newRelic: NewRelic,
-
+    private socketAdapter: SocketAdapter,
     private socketSessionControl: SocketSessionControl
   ) {}
 
@@ -115,6 +116,9 @@ export class CharacterCrons {
         );
 
         (await Character.findByIdAndUpdate({ _id: character._id }, { isOnline: false })) as ICharacter;
+
+        // leave character channel
+        await this.socketAdapter.getChannelById(character.channelId!)?.leave(character.channelId!);
 
         await this.socketSessionControl.deleteSession(character._id!);
 
