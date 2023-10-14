@@ -28,12 +28,12 @@ type CharacterRankingSkill = {
   top3: TopSkillEntry[];
 };
 
-@provide(TopLevelCrons)
-export class TopLevelCrons {
+@provide(RankingCrons)
+export class RankingCrons {
   constructor(private discordBot: DiscordBot) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 5 * * 0", async () => {
+    nodeCron.schedule("0 2 * * *", async () => {
       await this.topLevelGlobal();
       await this.topLevelClass();
       await this.topLevelBySkillType();
@@ -69,11 +69,9 @@ export class TopLevelCrons {
       }
     });
 
-    const channel = "achievements";
     const title = "Top 3 Global Level!";
-    const color = Colors.Aqua;
 
-    await this.discordBot.sendMessageWithColor(message, channel, title, color);
+    await this.discordBot.sendMessageWithColor(message, "achievements", title, Colors.Purple);
   }
 
   private async topLevelClass(): Promise<void> {
@@ -115,9 +113,6 @@ export class TopLevelCrons {
       },
     ]).exec();
 
-    const channel = "achievements";
-    const color = Colors.Aqua;
-
     for (const ranking of top3ForClass) {
       let message = "";
 
@@ -126,7 +121,7 @@ export class TopLevelCrons {
         message += `${index + 1}- Name: [${char.name}] - Level: [${char.level}]\n`;
       });
 
-      await this.discordBot.sendMessageWithColor(message, channel, title, color);
+      await this.discordBot.sendMessageWithColor(message, "rankings", title, Colors.Gold);
     }
   }
 
@@ -187,9 +182,6 @@ export class TopLevelCrons {
       top3ForAllSkills.push({ skill: skill, top3: top3ForSkill });
     }
 
-    const channel = "achievements";
-    const color = Colors.Aqua;
-
     for (const ranking of top3ForAllSkills) {
       let message = "";
 
@@ -198,7 +190,7 @@ export class TopLevelCrons {
         message += `${index + 1}- Name: [${char.name}] - Level: [${char.level}]\n`;
       });
 
-      await this.discordBot.sendMessageWithColor(message, channel, title, color);
+      await this.discordBot.sendMessageWithColor(message, "rankings", title, Colors.Aqua);
     }
   }
 }

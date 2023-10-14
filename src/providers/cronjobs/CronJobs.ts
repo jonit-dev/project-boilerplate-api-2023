@@ -13,8 +13,8 @@ import { ItemDeleteCrons } from "./ItemDeleteCrons";
 import { MacroCaptchaCrons } from "./MacroCaptchaCrons";
 import { MarketplaceCrons } from "./MarketplaceCrons";
 import { NPCCrons } from "./NPCCrons";
+import { RankingCrons } from "./RankingCrons";
 import { TotalAvailableGold } from "./TotalAvailableGold";
-import { TopLevelCrons } from "./TopLevelCrons";
 
 @provide(Cronjob)
 export class Cronjob {
@@ -32,7 +32,7 @@ export class Cronjob {
     private macroCaptchaCrons: MacroCaptchaCrons,
     private totalAvailableGold: TotalAvailableGold,
     private marketplaceCrons: MarketplaceCrons,
-    private topLevelCrons: TopLevelCrons
+    private rankingCrons: RankingCrons
   ) {}
 
   public start(): void {
@@ -73,7 +73,7 @@ export class Cronjob {
           this.macroCaptchaCrons.schedule();
           this.totalAvailableGold.schedule();
           this.marketplaceCrons.schedule();
-          this.topLevelCrons.schedule();
+          this.rankingCrons.schedule();
         }
         break;
     }
