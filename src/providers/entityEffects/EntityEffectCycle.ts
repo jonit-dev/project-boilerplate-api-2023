@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
@@ -24,6 +25,7 @@ export class EntityEffectCycle {
     this.execute(entityEffect, entityEffect.totalDurationMs ?? -1, targetId, targetType, attackerId, attackerType);
   }
 
+  @TrackNewRelicTransaction()
   private async execute(
     entityEffect: IEntityEffect,
     remainingDurationMs: number,

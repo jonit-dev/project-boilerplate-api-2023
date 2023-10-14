@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { EnvType } from "@rpg-engine/shared";
@@ -83,6 +84,7 @@ export class ItemUseCycleQueue {
     await this.worker.close();
   }
 
+  @TrackNewRelicTransaction()
   public async start(
     characterId: string,
     itemKey: string,
