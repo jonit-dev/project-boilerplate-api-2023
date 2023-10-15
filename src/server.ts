@@ -3,7 +3,6 @@ import "reflect-metadata";
 import "express-async-errors";
 
 import { appEnv } from "@providers/config/env";
-import { SetBullInterval } from "@providers/interval/SetBullInterval";
 import {
   cronJobs,
   database,
@@ -44,35 +43,6 @@ const server = app.listen(port, async () => {
 
       await database.initialize();
       await redisManager.connect();
-
-      const bull1 = new SetBullInterval({
-        uniqueId: "bull-1",
-        jobFunc: (data): void => {
-          console.log("My name is", data.name);
-        },
-        interval: 1000,
-        data: { name: "Hello world" },
-      });
-      await bull1.start();
-
-      setTimeout(async () => {
-        await bull1.stop();
-      }, 6500);
-
-      const bull2 = new SetBullInterval({
-        uniqueId: "bull-2",
-        jobFunc: (data): void => {
-          console.log("I like", data.name);
-        },
-        interval: 3000,
-        data: { name: "Apple" },
-      });
-
-      await bull2.start();
-
-      setTimeout(async () => {
-        await bull2.stop();
-      }, 9200);
 
       cronJobs.start();
       await socketAdapter.init(appEnv.socket.type);
