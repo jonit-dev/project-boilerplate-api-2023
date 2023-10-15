@@ -21,7 +21,8 @@ export class EntityEffectUse {
   constructor(
     private socketMessaging: SocketMessaging,
     private characterWeapon: CharacterWeapon,
-    private locker: Locker
+    private locker: Locker,
+    private entityEffectCycle: EntityEffectCycle
   ) {}
 
   @TrackNewRelicTransaction()
@@ -182,6 +183,6 @@ export class EntityEffectUse {
       return;
     }
 
-    new EntityEffectCycle(entityEffect, target._id, target.type, attacker._id, attacker.type);
+    await this.entityEffectCycle.start(entityEffect, target._id, target.type, attacker._id, attacker.type);
   }
 }
