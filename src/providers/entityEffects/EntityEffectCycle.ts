@@ -75,7 +75,7 @@ export class EntityEffectCycle {
             await this.recordNPCExperience(attacker, target, damage);
           }
 
-          await this.updateEffectsAndState(attacker!, target, entityEffect, damage, remainingDurationMs, attackerId);
+          await this.updateEffectsAndState(attacker!, target, entityEffect, remainingDurationMs, attackerId);
         }
       );
     } catch (error) {
@@ -132,7 +132,6 @@ export class EntityEffectCycle {
     attacker: IEntity,
     target: IEntity,
     entityEffect: IEntityEffect,
-    damage: number,
     remainingDurationMs: number,
     attackerId: string
   ): Promise<void> {
@@ -144,7 +143,7 @@ export class EntityEffectCycle {
       target.appliedEntityEffects![currentEffectIndex].lastUpdated = new Date().getTime();
       target.markModified("appliedEntityEffects");
     }
-    const isAlive = await this.applyCharacterChanges(target, entityEffect, damage);
+    const isAlive = await this.applyCharacterChanges(target, entityEffect);
     if (!isAlive) {
       await this.handleDeath(target);
     }
@@ -159,63 +158,59 @@ export class EntityEffectCycle {
     }, entityEffect.intervalMs);
   }
 
-  private async getTarget(targetId: string, targetType: string, attacker?: boolean): Promise<ICharacter | INPC | null> {
-    let target: ICharacter | INPC | null = null;
-    if (targetType === EntityType.NPC) {
-      target = (await NPC.findOne({ _id: targetId }).populate("skills")) as unknown as INPC;
-    } else if (targetType === EntityType.Character) {
-      if (attacker) {
-        target = (await Character.findOne({ _id: targetId }).populate("skills")) as unknown as ICharacter;
-      } else {
-        target = (await Character.findOne({ _id: targetId })) as ICharacter;
-      }
+  private async findEntityById(
+    targetId: string,
+    entityType: string,
+    populateSkills = false
+  ): Promise<ICharacter | INPC | null> {
+    const entityModel = entityType === EntityType.NPC ? NPC : Character;
+    const query = entityModel.findOne({ _id: targetId });
+    if (populateSkills) {
+      query.populate("skills");
     }
-
-    return target;
+    return await query;
   }
 
-  private async stop(entityEffectKey: string, attackerId: string, targetId: string): Promise<void> {
+  private async updateEntity(entity: ICharacter | INPC, updates: any): Promise<void> {
+    const entityModel = entity.type === EntityType.Character ? Character : NPC;
+    await entityModel.updateOne({ _id: entity.id }, { $set: updates });
+  }
+
+  private async unlockEntityEffectCycle(entityEffectKey: string, attackerId: string, targetId: string): Promise<void> {
     await locker.unlock(`entity-effect-cycle-${entityEffectKey}-attacker-${attackerId}-target-${targetId}`);
   }
 
-  private async applyCharacterChanges(
-    target: ICharacter | INPC,
-    entityEffect: IEntityEffect,
-    effectDamage: number
-  ): Promise<boolean> {
+  private async getTarget(targetId: string, targetType: string, attacker?: boolean): Promise<ICharacter | INPC | null> {
+    return await this.findEntityById(targetId, targetType, attacker);
+  }
+
+  private async stop(entityEffectKey: string, attackerId: string, targetId: string): Promise<void> {
+    await this.unlockEntityEffectCycle(entityEffectKey, attackerId, targetId);
+  }
+
+  private async applyCharacterChanges(target: ICharacter | INPC, entityEffect: IEntityEffect): Promise<boolean> {
     if (!target.isAlive) {
       await this.handleDeath(target);
       return false;
     }
 
-    if (target.type === "Character") {
-      await Character.updateOne(
-        { _id: target.id },
-        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
-      );
-    }
-    if (target.type === "NPC") {
-      await NPC.updateOne(
-        { _id: target.id },
-        { $set: { appliedEntityEffects: target.appliedEntityEffects, health: target.health } }
-      );
-    }
+    await this.updateEntity(target, {
+      appliedEntityEffects: target.appliedEntityEffects,
+      health: target.health,
+    });
 
-    this.sendAnimationEvent(target, entityEffect.targetAnimationKey);
-    this.sendAttributeChangedEvent(target);
+    this.sendAnimationEvent(target, entityEffect.targetAnimationKey as AnimationEffectKeys);
+    await this.sendAttributeChangedEvent(target as ICharacter);
 
     return true;
   }
 
-  private sendAnimationEvent(target: ICharacter | INPC, effectKey: string): void {
-    if (target.type === EntityType.Character) {
-      this.animationEffect.sendAnimationEventToCharacter(target as ICharacter, effectKey as AnimationEffectKeys);
-    } else {
-      this.animationEffect.sendAnimationEventToNPC(target as INPC, effectKey);
-    }
+  private sendAnimationEvent(target, effectKey: AnimationEffectKeys): void {
+    const method = target.type === EntityType.Character ? "sendAnimationEventToCharacter" : "sendAnimationEventToNPC";
+    this.animationEffect[method](target, effectKey);
   }
 
-  private async sendAttributeChangedEvent(target: ICharacter | INPC): Promise<void> {
+  private async sendAttributeChangedEvent(target: ICharacter): Promise<void> {
     const payload: ICharacterAttributeChanged = {
       targetId: target._id,
       health: target.health,
@@ -223,29 +218,15 @@ export class EntityEffectCycle {
       speed: target.speed,
     };
 
-    if (target.type === EntityType.Character) {
-      const character = target as ICharacter;
-
-      this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.AttributeChanged, payload);
-      await this.socketMessaging.sendEventToCharactersAroundCharacter(
-        character,
-        CharacterSocketEvents.AttributeChanged,
-        payload
-      );
-    } else {
-      await this.socketMessaging.sendEventToCharactersAroundNPC(
-        target as INPC,
-        CharacterSocketEvents.AttributeChanged,
-        payload
-      );
-    }
+    const eventMethod =
+      target.type === EntityType.Character ? "sendEventToCharactersAroundCharacter" : "sendEventToCharactersAroundNPC";
+    this.socketMessaging.sendEventToUser(target.channelId!, CharacterSocketEvents.AttributeChanged, payload);
+    await this.socketMessaging[eventMethod](target as any, CharacterSocketEvents.AttributeChanged, payload);
   }
 
   private async handleDeath(target: ICharacter | INPC): Promise<void> {
-    if (target.type === EntityType.Character) {
-      await this.characterDeath.handleCharacterDeath(null, target as ICharacter);
-    } else {
-      await this.npcDeath.handleNPCDeath(target as INPC);
-    }
+    const handler =
+      target.type === EntityType.Character ? this.characterDeath.handleCharacterDeath : this.npcDeath.handleNPCDeath;
+    await handler.call(this, null, target);
   }
 }
