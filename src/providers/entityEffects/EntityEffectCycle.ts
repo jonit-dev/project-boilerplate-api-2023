@@ -138,43 +138,65 @@ export class EntityEffectCycle {
     attacker: IEntity,
     target: IEntity,
     entityEffect: IEntityEffect,
-
     attackerId: string
   ): Promise<void> {
-    let remainingDurationMs = await this.entityEffectDurationControl.getDuration(
-      entityEffect.key,
-      target._id,
-      attackerId
-    );
+    try {
+      const remainingDurationMs = await this.entityEffectDurationControl.getDuration(
+        entityEffect.key,
+        target._id,
+        attackerId
+      );
 
-    if (!remainingDurationMs) {
-      await this.stop(entityEffect.key, attackerId, target._id);
-      return;
-    }
+      // Robust exit condition 1: Stop if the duration is null
+      if (remainingDurationMs === null || typeof remainingDurationMs === "undefined") {
+        await this.stop(entityEffect.key, attackerId, target._id);
+        return;
+      }
 
-    const runAgain = remainingDurationMs === -1 || remainingDurationMs >= entityEffect.intervalMs;
-    if (!runAgain) {
-      target.appliedEntityEffects = target.appliedEntityEffects!.filter((e) => e.key !== entityEffect.key);
-    } else {
+      const runAgain = remainingDurationMs > 0 && remainingDurationMs >= entityEffect.intervalMs;
+
+      if (!runAgain) {
+        target.appliedEntityEffects = target.appliedEntityEffects!.filter((e) => e.key !== entityEffect.key);
+        await this.stop(entityEffect.key, attackerId, target._id);
+        return;
+      }
+
       const currentEffectIndex = target.appliedEntityEffects!.findIndex((effect) => effect.key === entityEffect.key);
       target.appliedEntityEffects![currentEffectIndex].lastUpdated = new Date().getTime();
       target.markModified("appliedEntityEffects");
-    }
-    const isAlive = await this.applyCharacterChanges(target, entityEffect);
-    if (!isAlive) {
-      await this.handleDeath(target);
-    }
-    if (!runAgain || !isAlive) {
+
+      const isAlive = await this.applyCharacterChanges(target, entityEffect);
+
+      // Robust exit condition 2: Stop if the target is not alive
+      if (!isAlive) {
+        await this.handleDeath(target);
+        await this.stop(entityEffect.key, attackerId, target._id);
+        return;
+      }
+
+      const newRemainingDurationMs = remainingDurationMs - entityEffect.intervalMs;
+      await this.entityEffectDurationControl.setDuration(
+        entityEffect.key,
+        target._id,
+        attackerId,
+        newRemainingDurationMs
+      );
+
+      // set a minimum interval MS to avoid setTimeout causing spikes
+      if (!entityEffect.intervalMs || entityEffect.intervalMs <= 1000) {
+        entityEffect.intervalMs = 1000;
+      }
+
+      // Only set the timeout if the conditions are met.
+      if (runAgain && isAlive) {
+        setTimeout(async () => {
+          await this.execute(entityEffect, target._id, target.type, attackerId, attacker.type);
+        }, entityEffect.intervalMs);
+      }
+    } catch (error) {
+      console.error(`Error in updateEffectsAndState: ${error}`);
       await this.stop(entityEffect.key, attackerId, target._id);
-      return;
     }
-    remainingDurationMs = remainingDurationMs === -1 ? -1 : remainingDurationMs - entityEffect.intervalMs;
-
-    await this.entityEffectDurationControl.setDuration(entityEffect.key, target._id, attackerId, remainingDurationMs);
-
-    setTimeout(async () => {
-      await this.execute(entityEffect, target._id, target.type, attackerId, attacker.type);
-    }, entityEffect.intervalMs);
   }
 
   private async findEntityById(
