@@ -119,6 +119,8 @@ export class NPCFreezer {
 
       console.log(`TOTAL_ACTIVE_NPCS: ${totalActiveNPCs} / MAX_ACTIVE_NPCS: ${maxActiveNPCs} - CPU: ${totalCPUUsage}%`);
       await Promise.all(freezeTasks);
+
+      await this.locker.unlock("npc-freeze-check");
     }, NPC_FREEZE_CHECK_INTERVAL);
   }
 

@@ -4,10 +4,10 @@ import { Queue, Worker } from "bullmq";
 
 interface IIntervalOptions {
   jobName?: string;
-  jobFunc: (data: any) => Promise<void> | void;
+  jobFunc: (data: Record<string, unknown>) => Promise<void> | void;
   interval: number;
   uniqueId: string;
-  data: any;
+  data: Record<string, unknown>;
 }
 
 export class SetBullInterval {
@@ -18,26 +18,23 @@ export class SetBullInterval {
     },
   };
 
-  private queue: Queue;
-  private worker: Worker;
-  private queueName: string;
-  private uniqueId: string;
-  private jobFunc: (data: any) => Promise<void> | void;
-  private interval: number;
-  private data: any;
+  private queue?: Queue;
+  private worker?: Worker;
+  private readonly queueName: string;
+  private readonly jobFunc: (data: Record<string, unknown>) => Promise<void> | void;
+  private readonly interval: number;
+  private readonly data: Record<string, unknown>;
 
   constructor(options: IIntervalOptions) {
     const { jobFunc, interval, uniqueId, data } = options;
 
     this.jobFunc = jobFunc;
     this.interval = interval;
-    this.uniqueId = uniqueId;
     this.data = data;
+    this.queueName = `set-bull-interval-${uniqueId}`;
   }
 
   public async start(): Promise<void> {
-    this.queueName = `set-bull-interval-${this.uniqueId}`;
-
     const canProceed = await locker.lock(this.queueName);
 
     if (!canProceed) {
@@ -54,7 +51,7 @@ export class SetBullInterval {
         try {
           await this.jobFunc(job.data);
 
-          await this.queue.add(this.queueName, job.data, {
+          await this.queue!.add(this.queueName, job.data, {
             delay: this.interval,
             removeOnComplete: true,
             removeOnFail: true,
@@ -72,6 +69,20 @@ export class SetBullInterval {
       removeOnComplete: true,
       removeOnFail: true,
     });
+
+    process.on("SIGTERM", this.gracefulShutdown.bind(this));
+    process.on("SIGINT", this.gracefulShutdown.bind(this));
+  }
+
+  private async gracefulShutdown(): Promise<void> {
+    console.log("Gracefully shutting down...");
+    try {
+      await this.stop(); // Stop queue and worker
+    } catch (error) {
+      console.error("An error occurred during graceful shutdown:", error);
+    } finally {
+      process.exit(0);
+    }
   }
 
   public async stop(): Promise<void> {
@@ -79,15 +90,17 @@ export class SetBullInterval {
       throw new Error("Queue or worker not initialized. Did you forget to .start()?");
     }
 
-    // stop queue and worker
-    await Promise.all([this.queue?.close(), this.worker?.close()]);
-
+    await Promise.all([this.queue.close(), this.worker.close()]);
     await locker.unlock(this.queueName);
   }
 
   private async cleanupJobs(): Promise<void> {
     try {
-      const jobs = await this.queue.getJobs(["active", "waiting", "delayed", "failed", "completed"]);
+      const jobs = await this.queue?.getJobs(["active", "waiting", "delayed", "failed", "completed"]);
+
+      if (!jobs) {
+        return;
+      }
 
       for (const job of jobs) {
         await job?.remove();
