@@ -80,7 +80,7 @@ export class NPCFreezer {
 
   private monitorNPCsAndFreezeIfNeeded(): void {
     setInterval(async () => {
-      const canCheck = await this.locker.lock("npc-freeze-check");
+      const canCheck = await this.locker.lock("npc-freeze-check", 1000);
 
       if (!canCheck) {
         return;
@@ -119,8 +119,6 @@ export class NPCFreezer {
 
       console.log(`TOTAL_ACTIVE_NPCS: ${totalActiveNPCs} / MAX_ACTIVE_NPCS: ${maxActiveNPCs} - CPU: ${totalCPUUsage}%`);
       await Promise.all(freezeTasks);
-
-      await this.locker.unlock("npc-freeze-check");
     }, NPC_FREEZE_CHECK_INTERVAL);
   }
 
