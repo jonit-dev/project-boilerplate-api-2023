@@ -13,6 +13,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { AnimationEffectKeys, CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { EntityEffectDurationControl } from "./EntityEffectDurationControl";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 
 type IEntity = ICharacter | INPC;
@@ -25,7 +26,8 @@ export class EntityEffectCycle {
     private socketMessaging: SocketMessaging,
     private animationEffect: AnimationEffect,
     private characterDeath: CharacterDeath,
-    private npcDeath: NPCDeath
+    private npcDeath: NPCDeath,
+    private entityEffectDurationControl: EntityEffectDurationControl
   ) {}
 
   public async start(
@@ -35,9 +37,16 @@ export class EntityEffectCycle {
     attackerId: string,
     attackerType: string
   ): Promise<void> {
+    await this.entityEffectDurationControl.setDuration(
+      entityEffect.key,
+      targetId,
+      attackerId,
+      entityEffect.totalDurationMs ?? -1
+    );
+
     await this.execute(
       entityEffect,
-      entityEffect.totalDurationMs ?? -1,
+
       targetId,
       targetType,
       attackerId,
@@ -48,7 +57,7 @@ export class EntityEffectCycle {
   @TrackNewRelicTransaction()
   private async execute(
     entityEffect: IEntityEffect,
-    remainingDurationMs: number,
+
     targetId: string,
     targetType: string,
     attackerId: string,
@@ -73,7 +82,7 @@ export class EntityEffectCycle {
             await this.recordNPCExperience(attacker, target, damage);
           }
 
-          await this.updateEffectsAndState(attacker!, target, entityEffect, remainingDurationMs, attackerId);
+          await this.updateEffectsAndState(attacker!, target, entityEffect, attackerId);
         }
       );
     } catch (error) {
@@ -130,9 +139,20 @@ export class EntityEffectCycle {
     attacker: IEntity,
     target: IEntity,
     entityEffect: IEntityEffect,
-    remainingDurationMs: number,
+
     attackerId: string
   ): Promise<void> {
+    let remainingDurationMs = await this.entityEffectDurationControl.getDuration(
+      entityEffect.key,
+      target._id,
+      attackerId
+    );
+
+    if (!remainingDurationMs) {
+      await this.stop(entityEffect.key, attackerId, target._id);
+      return;
+    }
+
     const runAgain = remainingDurationMs === -1 || remainingDurationMs >= entityEffect.intervalMs;
     if (!runAgain) {
       target.appliedEntityEffects = target.appliedEntityEffects!.filter((e) => e.key !== entityEffect.key);
@@ -150,9 +170,12 @@ export class EntityEffectCycle {
       return;
     }
     remainingDurationMs = remainingDurationMs === -1 ? -1 : remainingDurationMs - entityEffect.intervalMs;
+
+    await this.entityEffectDurationControl.setDuration(entityEffect.key, target._id, attackerId, remainingDurationMs);
+
     const timer = container.get(TimerWrapper);
     timer.setTimeout(async () => {
-      await this.execute(entityEffect, remainingDurationMs, target._id, target.type, attackerId, attacker.type);
+      await this.execute(entityEffect, target._id, target.type, attackerId, attacker.type);
     }, entityEffect.intervalMs);
   }
 
@@ -184,6 +207,7 @@ export class EntityEffectCycle {
 
   private async stop(entityEffectKey: string, attackerId: string, targetId: string): Promise<void> {
     await this.unlockEntityEffectCycle(entityEffectKey, attackerId, targetId);
+    await this.entityEffectDurationControl.clear(entityEffectKey, targetId, attackerId);
   }
 
   private async applyCharacterChanges(target: ICharacter | INPC, entityEffect: IEntityEffect): Promise<boolean> {

@@ -14,6 +14,7 @@ import { CharacterMonitorQueue } from "@providers/character/CharacterMonitorQueu
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { DiscordBot } from "@providers/discord/DiscordBot";
+import { EntityEffectDurationControl } from "@providers/entityEffects/EntityEffectDurationControl";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemUseCycleQueue } from "@providers/item/ItemUseCycleQueue";
 import { Locker } from "@providers/locks/Locker";
@@ -50,7 +51,8 @@ export class ServerBootstrap {
     private npcBattleCycleQueue: NPCBattleCycleQueue,
     private characterMonitorQueue: CharacterMonitorQueue,
     private npcCycleQueue: NPCCycleQueue,
-    private itemUseCycleQueue: ItemUseCycleQueue
+    private itemUseCycleQueue: ItemUseCycleQueue,
+    private entityEffectDuration: EntityEffectDurationControl
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -119,6 +121,7 @@ export class ServerBootstrap {
     await this.inMemoryHashTable.deleteAll("load-craftable-items");
     await this.inMemoryHashTable.deleteAll("channel-bound-events");
     await this.inMemoryHashTable.deleteAll("raids");
+    await this.entityEffectDuration.clearAll();
 
     // Firebase-admin setup, that push notification requires.
     PushNotificationHelper.initialize();
