@@ -1,5 +1,4 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
-import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 
 import { CharacterTextureChange } from "@providers/character/CharacterTextureChange";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
@@ -10,6 +9,7 @@ import { PushNotificationHelper } from "@providers/pushNotification/PushNotifica
 import { Seeder } from "@providers/seeds/Seeder";
 
 import { HitTarget } from "@providers/battle/HitTarget";
+import { CharacterConsumptionControl } from "@providers/character/CharacterConsumptionControl";
 import { CharacterMonitorQueue } from "@providers/character/CharacterMonitorQueue";
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
@@ -34,7 +34,7 @@ export class ServerBootstrap {
     private npcManager: NPCManager,
     private seeder: Seeder,
     private characterConnection: CharacterConnection,
-    private characterFoodConsumption: CharacterFoodConsumption,
+    private characterConsumptionControl: CharacterConsumptionControl,
     private pathfindingQueue: PathfindingQueue,
     private characterBuffActivator: CharacterBuffActivator,
     private spellSilence: SpellSilence,
@@ -104,7 +104,7 @@ export class ServerBootstrap {
     await this.npcManager.disableNPCBehaviors();
 
     await this.characterConnection.resetCharacterAttributes();
-    await this.characterFoodConsumption.clearAllFoodConsumption();
+    await this.characterConsumptionControl.clearAllItemConsumption();
     await this.characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
     await this.partyManagement.clearAllParties();
 
