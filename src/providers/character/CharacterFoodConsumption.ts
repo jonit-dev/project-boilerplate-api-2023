@@ -33,6 +33,8 @@ export class CharacterFoodConsumption {
     await this.inMemoryHashTable.set("character-food-consumption", characterId, foodConsumption + 1);
 
     setTimeout(async () => {
+      const foodConsumption = Number(await this.inMemoryHashTable.get("character-food-consumption", characterId)) || 0;
+
       await this.inMemoryHashTable.set("character-food-consumption", characterId, foodConsumption - 1);
     }, FOOD_CONSUMPTION_INTERVAL);
   }
