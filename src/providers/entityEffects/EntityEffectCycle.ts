@@ -15,8 +15,6 @@ import { AnimationEffectKeys, CharacterSocketEvents, EntityType, ICharacterAttri
 import { provide } from "inversify-binding-decorators";
 import { IEntityEffect } from "./data/blueprints/entityEffect";
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
 type IEntity = ICharacter | INPC;
 @provide(EntityEffectCycle)
 export class EntityEffectCycle {
@@ -153,8 +151,8 @@ export class EntityEffectCycle {
     }
     remainingDurationMs = remainingDurationMs === -1 ? -1 : remainingDurationMs - entityEffect.intervalMs;
     const timer = container.get(TimerWrapper);
-    timer.setTimeout(() => {
-      this.execute(entityEffect, remainingDurationMs, target._id, target.type, attackerId, attacker.type);
+    timer.setTimeout(async () => {
+      await this.execute(entityEffect, remainingDurationMs, target._id, target.type, attackerId, attacker.type);
     }, entityEffect.intervalMs);
   }
 
@@ -166,7 +164,7 @@ export class EntityEffectCycle {
     const entityModel = entityType === EntityType.NPC ? NPC : Character;
     const query = entityModel.findOne({ _id: targetId });
     if (populateSkills) {
-      query.populate("skills");
+      await query.populate("skills");
     }
     return await query;
   }
@@ -199,15 +197,15 @@ export class EntityEffectCycle {
       health: target.health,
     });
 
-    this.sendAnimationEvent(target, entityEffect.targetAnimationKey as AnimationEffectKeys);
+    await this.sendAnimationEvent(target, entityEffect.targetAnimationKey as AnimationEffectKeys);
     await this.sendAttributeChangedEvent(target as ICharacter);
 
     return true;
   }
 
-  private sendAnimationEvent(target, effectKey: AnimationEffectKeys): void {
+  private async sendAnimationEvent(target, effectKey: AnimationEffectKeys): Promise<void> {
     const method = target.type === EntityType.Character ? "sendAnimationEventToCharacter" : "sendAnimationEventToNPC";
-    this.animationEffect[method](target, effectKey);
+    await this.animationEffect[method](target, effectKey);
   }
 
   private async sendAttributeChangedEvent(target: ICharacter): Promise<void> {
