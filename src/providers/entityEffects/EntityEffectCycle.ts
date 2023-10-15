@@ -165,11 +165,11 @@ export class EntityEffectCycle {
       target.appliedEntityEffects![currentEffectIndex].lastUpdated = new Date().getTime();
       target.markModified("appliedEntityEffects");
 
-      const isAlive = await this.applyCharacterChanges(target, entityEffect);
+      const isAlive = await this.applyCharacterChanges(attacker, target, entityEffect);
 
       // Robust exit condition 2: Stop if the target is not alive
       if (!isAlive) {
-        await this.handleDeath(target);
+        await this.handleDeath(attacker, target);
         await this.stop(entityEffect.key, attackerId, target._id);
         return;
       }
@@ -230,9 +230,13 @@ export class EntityEffectCycle {
     await this.entityEffectDurationControl.clear(entityEffectKey, targetId, attackerId);
   }
 
-  private async applyCharacterChanges(target: ICharacter | INPC, entityEffect: IEntityEffect): Promise<boolean> {
+  private async applyCharacterChanges(
+    attacker: IEntity,
+    target: IEntity,
+    entityEffect: IEntityEffect
+  ): Promise<boolean> {
     if (!target.isAlive) {
-      await this.handleDeath(target);
+      await this.handleDeath(attacker, target);
       return false;
     }
 
@@ -266,9 +270,14 @@ export class EntityEffectCycle {
     await this.socketMessaging[eventMethod](target as any, CharacterSocketEvents.AttributeChanged, payload);
   }
 
-  private async handleDeath(target: ICharacter | INPC): Promise<void> {
-    const handler =
-      target.type === EntityType.Character ? this.characterDeath.handleCharacterDeath : this.npcDeath.handleNPCDeath;
-    await handler.call(this, null, target);
+  private async handleDeath(attacker: IEntity, target: IEntity): Promise<void> {
+    switch (target.type) {
+      case EntityType.Character:
+        await this.characterDeath.handleCharacterDeath(attacker, target as ICharacter);
+        break;
+      case EntityType.NPC:
+        await this.npcDeath.handleNPCDeath(target as INPC);
+        break;
+    }
   }
 }
