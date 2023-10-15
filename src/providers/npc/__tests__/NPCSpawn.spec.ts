@@ -137,20 +137,29 @@ describe("NPCSpawn", () => {
   });
 
   describe("calculateSpawnTime", () => {
-    it("should correctly calculate spawn time based on the strength level", () => {
-      // testing lower boundary
+    it("should generate a spawn time between 1 to 3 minutes", () => {
+      const spawnTime = npcSpawn.calculateSpawnTime(10);
+      const currentTime = dayjs().toDate();
+      const diffInMinutes = dayjs(spawnTime).diff(currentTime, "minutes");
+
+      expect(diffInMinutes).toBeGreaterThanOrEqual(1);
+      expect(diffInMinutes).toBeLessThanOrEqual(3);
+    });
+
+    it("should correctly calculate spawn time based on the strength level, capped at 3 minutes", () => {
+      // Testing lower boundary
       let spawnTime = npcSpawn.calculateSpawnTime(1);
       let expectedTime = dayjs().add(1, "minutes").toDate();
       expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
 
-      // testing middle value
-      spawnTime = npcSpawn.calculateSpawnTime(30); // strengthLevel of 30 should result in spawnTime of 5 minutes
+      // Testing middle value
+      spawnTime = npcSpawn.calculateSpawnTime(30); // Should be capped at 3 minutes
       expectedTime = dayjs().add(3, "minutes").toDate();
       expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
 
-      // testing upper boundary
-      spawnTime = npcSpawn.calculateSpawnTime(200); // should be capped at 10 minutes
-      expectedTime = dayjs().add(10, "minutes").toDate();
+      // Testing upper boundary
+      spawnTime = npcSpawn.calculateSpawnTime(200); // Should be capped at 3 minutes
+      expectedTime = dayjs().add(3, "minutes").toDate();
       expect(spawnTime.getMinutes()).toEqual(expectedTime.getMinutes());
     });
   });
