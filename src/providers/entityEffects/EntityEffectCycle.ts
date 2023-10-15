@@ -5,8 +5,7 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
-import { TimerWrapper } from "@providers/helpers/TimerWrapper";
-import { container, locker } from "@providers/inversify/container";
+import { locker } from "@providers/inversify/container";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { NPCExperience } from "@providers/npc/NPCExperience/NPCExperience";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -173,8 +172,7 @@ export class EntityEffectCycle {
 
     await this.entityEffectDurationControl.setDuration(entityEffect.key, target._id, attackerId, remainingDurationMs);
 
-    const timer = container.get(TimerWrapper);
-    timer.setTimeout(async () => {
+    setTimeout(async () => {
       await this.execute(entityEffect, target._id, target.type, attackerId, attacker.type);
     }, entityEffect.intervalMs);
   }
