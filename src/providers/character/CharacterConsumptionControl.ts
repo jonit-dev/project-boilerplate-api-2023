@@ -25,8 +25,8 @@ export class CharacterConsumptionControl {
       max: BASE_MAX_USABLE_CONSUMPTION,
     },
     [ItemSubType.Potion]: {
-      timeout: BASE_CONSUMPTION_INTERVAL * 0.7,
-      max: BASE_MAX_USABLE_CONSUMPTION * 1.2,
+      timeout: BASE_CONSUMPTION_INTERVAL * 0.5,
+      max: BASE_MAX_USABLE_CONSUMPTION * 2,
     },
   } as Record<ItemSubType, IConsumptionMetadata>;
 
@@ -35,7 +35,10 @@ export class CharacterConsumptionControl {
     const canConsume = await this.isCharacterAbleToConsume(character._id, itemSubtype);
 
     if (!canConsume) {
-      this.socketMessaging.sendErrorMessageToCharacter(character, `Sorry, you can't consume more ${itemSubtype}`);
+      this.socketMessaging.sendErrorMessageToCharacter(
+        character,
+        `Sorry, you can't consume more ${itemSubtype.toLowerCase()}. Please wait...`
+      );
       return false;
     }
 
