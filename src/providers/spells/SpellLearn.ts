@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISkill, ISpell } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -12,6 +13,7 @@ import { spellsBlueprints } from "./data/blueprints/index";
 export class SpellLearn {
   constructor(private socketMessaging: SocketMessaging, private spellValidation: SpellValidation) {}
 
+  @TrackNewRelicTransaction()
   public async learnLatestSkillLevelSpells(characterId: string, notifyUser: boolean): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
     const skills = (await Skill.findById(character.skills)

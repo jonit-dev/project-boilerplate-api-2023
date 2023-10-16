@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
 import { NPCMovement } from "./NPCMovement";
@@ -9,6 +10,7 @@ import { NPCTarget } from "./NPCTarget";
 export class NPCMovementMoveAway {
   constructor(private npcMovement: NPCMovement, private npcTarget: NPCTarget, private movementHelper: MovementHelper) {}
 
+  @TrackNewRelicTransaction()
   public async startMovementMoveAway(npc: INPC): Promise<void> {
     try {
       const targetCharacter = (await Character.findById(npc.targetCharacter).lean()) as ICharacter;

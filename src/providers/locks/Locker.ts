@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { provide } from "inversify-binding-decorators";
 
@@ -5,6 +6,7 @@ import { provide } from "inversify-binding-decorators";
 export class Locker {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
+  @TrackNewRelicTransaction()
   public async lock(key: string, ttlSeconds?: number): Promise<boolean> {
     //* atomic setNx operation. If the key already exists, it will return false.
     const result = await this.inMemoryHashTable.setNx("locks", key, true);

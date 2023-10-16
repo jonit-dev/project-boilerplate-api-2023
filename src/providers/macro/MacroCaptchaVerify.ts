@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterBan } from "@providers/character/CharacterBan";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -13,6 +14,7 @@ export class MacroCaptchaVerify {
     private characterBan: CharacterBan
   ) {}
 
+  @TrackNewRelicTransaction()
   public async startCaptchaVerification(character: ICharacter, code: string): Promise<boolean> {
     if (!this.characterValidation.hasBasicValidation(character)) {
       this.socketMessaging.sendErrorMessageToCharacter(character);

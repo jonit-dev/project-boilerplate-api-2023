@@ -78,6 +78,7 @@ export class NPCCycleQueue {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async add(npc: INPC, npcSkills: ISkill, isFirstCycle = true): Promise<void> {
     if (appEnv.general.IS_UNIT_TEST) {
       await this.execNpcCycle(npc, npcSkills, true);

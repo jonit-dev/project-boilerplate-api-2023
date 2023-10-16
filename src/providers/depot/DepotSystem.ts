@@ -1,12 +1,13 @@
-import { provide } from "inversify-binding-decorators";
+import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { IItemContainer as IItemContainerModel, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
-import { SocketMessaging } from "@providers/sockets/SocketMessaging";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterItemSlots } from "@providers/character/characterItems/CharacterItemSlots";
 import { CharacterItemStack } from "@providers/character/characterItems/CharacterItemStack";
-import { ItemContainer, IItemContainer as IItemContainerModel } from "@entities/ModuleInventory/ItemContainerModel";
-import { IItem } from "@entities/ModuleInventory/ItemModel";
-import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IEquipmentAndInventoryUpdatePayload, ItemSocketEvents } from "@rpg-engine/shared";
+import { provide } from "inversify-binding-decorators";
 
 @provide(DepotSystem)
 export class DepotSystem {
@@ -22,6 +23,7 @@ export class DepotSystem {
    * @param npcId
    * @returns NPC entity if validation pass
    */
+  @TrackNewRelicTransaction()
   public async npcBasicValidation(npcId: string): Promise<INPC> {
     const npc = await NPC.findOne({
       _id: npcId,
@@ -37,6 +39,7 @@ export class DepotSystem {
     return npc;
   }
 
+  @TrackNewRelicTransaction()
   public async removeFromContainer(containerId: string, item: IItem): Promise<IItemContainerModel> {
     const fromContainer = (await ItemContainer.findById(containerId)) as unknown as IItemContainerModel;
 
@@ -53,6 +56,7 @@ export class DepotSystem {
     return fromContainer;
   }
 
+  @TrackNewRelicTransaction()
   public async addItemToContainer(
     character: ICharacter,
     item: IItem,

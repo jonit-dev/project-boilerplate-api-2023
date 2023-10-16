@@ -25,6 +25,7 @@ export class CharacterTarget {
     await this.battleCycle.stop(character._id);
   }
 
+  @TrackNewRelicTransaction()
   public async setFocusOnCharacter(npc: INPC, character: ICharacter): Promise<void> {
     await NPC.updateOne(
       {

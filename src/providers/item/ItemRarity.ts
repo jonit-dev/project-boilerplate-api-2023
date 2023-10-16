@@ -123,6 +123,7 @@ export class ItemRarity {
     return rarityBuff;
   }
 
+  @TrackNewRelicTransaction()
   public async setItemRarityOnCraft(
     character: ICharacter,
     item: IItem,
@@ -156,6 +157,7 @@ export class ItemRarity {
     return rarityAttackDefense;
   }
 
+  @TrackNewRelicTransaction()
   public async setItemRarityOnFoodCraft(
     character: ICharacter,
     item: IItem,

@@ -2,6 +2,7 @@ import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel"
 import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel";
 import { ISkill } from "@entities/ModuleCharacter/SkillsModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
 import {
   DAMAGE_ATTRIBUTE_WEIGHT,
@@ -25,18 +26,22 @@ export class SkillStatsCalculator {
     private characterWeapon: CharacterWeapon
   ) {}
 
+  @TrackNewRelicTransaction()
   public async getAttack(skill: ISkill): Promise<number> {
     return await this.getTotalAttackOrDefense(skill, true);
   }
 
+  @TrackNewRelicTransaction()
   public async getMagicAttack(skill: ISkill): Promise<number> {
     return await this.getTotalAttackOrDefense(skill, true, true);
   }
 
+  @TrackNewRelicTransaction()
   public async getDefense(skill: ISkill): Promise<number> {
     return await this.getTotalAttackOrDefense(skill, false);
   }
 
+  @TrackNewRelicTransaction()
   public async getMagicDefense(skill: ISkill): Promise<number> {
     return await this.getTotalAttackOrDefense(skill, false, true);
   }

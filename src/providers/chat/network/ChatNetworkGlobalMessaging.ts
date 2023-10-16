@@ -134,6 +134,7 @@ export class ChatNetworkGlobalMessaging {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async getChatLogsInZone(character: ICharacter, limit: number = 20): Promise<IChatMessageReadPayload> {
     const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
       character.x,

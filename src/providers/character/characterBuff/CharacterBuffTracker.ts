@@ -79,12 +79,14 @@ export class CharacterBuffTracker {
     return buffs;
   }
 
+  @TrackNewRelicTransaction()
   public async getBuffByItemKey(character: ICharacter, itemKey: string): Promise<ICharacterItemBuff | undefined> {
     const buff = (await CharacterBuff.findOne({ owner: character._id, itemKey }).lean()) as ICharacterItemBuff;
 
     return buff;
   }
 
+  @TrackNewRelicTransaction()
   public async getBuff(characterId: string, buffId: string): Promise<ICharacterBuff | undefined> {
     const buff = (await CharacterBuff.findOne({ _id: buffId, owner: characterId })
       .lean()

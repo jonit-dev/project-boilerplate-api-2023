@@ -76,6 +76,7 @@ export class CharacterMonitorQueue {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async watch(
     callbackId: string,
     character: ICharacter,
@@ -129,6 +130,7 @@ export class CharacterMonitorQueue {
     return !!hasCallback;
   }
 
+  @TrackNewRelicTransaction()
   public async unwatch(callbackId: string, character: ICharacter): Promise<void> {
     try {
       const currentCallbacks = this.charactersCallbacks.get(character._id.toString());

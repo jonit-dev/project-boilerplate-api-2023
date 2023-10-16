@@ -1,4 +1,5 @@
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { IItem } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemLoader } from "./ItemLoader";
@@ -7,6 +8,7 @@ import { ItemLoader } from "./ItemLoader";
 export class ItemSeeder {
   constructor(private itemLoader: ItemLoader) {}
 
+  @TrackNewRelicTransaction()
   public async seed(): Promise<void> {
     const itemSeedData = await this.itemLoader.loadItemSeedData();
 

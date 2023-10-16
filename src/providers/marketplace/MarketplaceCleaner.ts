@@ -11,6 +11,7 @@ import { provide } from "inversify-binding-decorators";
 export class MarketplaceCleaner {
   constructor(private depotFinder: DepotFinder, private characterItemContainer: CharacterItemContainer) {}
 
+  @TrackNewRelicTransaction()
   public async clean(): Promise<void> {
     console.log("Cleaning marketplace junk...");
     const totalCleaned1 = await this.deleteItemsFromInactiveCharacters();

@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { HashGenerator } from "@providers/hash/HashGenerator";
 import { provide } from "inversify-binding-decorators";
@@ -6,6 +7,7 @@ import { provide } from "inversify-binding-decorators";
 export class ContainerSlotsCaching {
   constructor(private inMemoryHashTable: InMemoryHashTable, private hashGenerator: HashGenerator) {}
 
+  @TrackNewRelicTransaction()
   public async setSlotsHash(id: string, payload: Record<string, unknown>): Promise<void> {
     // generate and save a hash, so we can keep track if the slots changed
     const slotsHash = this.hashGenerator.generateHash(payload);

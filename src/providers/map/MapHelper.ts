@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BlueprintNamespaces } from "@providers/blueprint/BlueprintManager";
 import { blueprintManager } from "@providers/inversify/container";
 import { ITiledObject, MapLayers } from "@rpg-engine/shared";
@@ -24,6 +25,7 @@ export class MapHelper {
     return highest;
   };
 
+  @TrackNewRelicTransaction()
   public async mergeBlueprintWithTiledProps<T>(
     tiledData: ITiledObject,
     mapName: string,

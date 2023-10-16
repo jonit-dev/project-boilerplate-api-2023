@@ -1,5 +1,6 @@
 /* eslint-disable promise/always-return */
 import { Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
 import { provide } from "inversify-binding-decorators";
 import * as path from "path";
@@ -18,6 +19,7 @@ const csvWriter = createCsvWriter({
 
 @provide(ItemReportGenerator)
 export class ItemReportGenerator {
+  @TrackNewRelicTransaction()
   public async exec(): Promise<void> {
     console.log("Starting to generate items report...");
     const items = await Item.find({}).lean(); // Assuming Item.find({}) returns a Promise that resolves to an array of items

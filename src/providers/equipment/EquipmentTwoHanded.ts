@@ -83,6 +83,7 @@ export class EquipmentTwoHanded {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async hasTwoHandedItemEquippedOnArms(equipment: IEquipmentSet): Promise<boolean> {
     const leftHandItem = await Item.findById(equipment.leftHand);
     const rightHandItem = await Item.findById(equipment.rightHand);
@@ -93,6 +94,7 @@ export class EquipmentTwoHanded {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async hasOneHandedItemEquippedOnArms(equipment: IEquipmentSet): Promise<boolean> {
     const leftHandItem = await Item.findById(equipment.leftHand);
     const rightHandItem = await Item.findById(equipment.rightHand);
@@ -108,6 +110,7 @@ export class EquipmentTwoHanded {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async hasShieldEquipped(equipment: IEquipmentSet): Promise<boolean> {
     const leftHandItem = await Item.findById(equipment.leftHand);
     const rightHandItem = await Item.findById(equipment.rightHand);

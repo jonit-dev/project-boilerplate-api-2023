@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import {
   SPELL_CALCULATOR_DEFAULT_MAX_SKILL_MULTIPLIER,
   SPELL_CALCULATOR_DEFAULT_MIN_SKILL_MULTIPLIER,
@@ -35,6 +36,7 @@ interface ISpellDamageOptions {
 export class SpellCalculator {
   constructor(private linearInterpolation: LinearInterpolation, private traitGetter: TraitGetter) {}
 
+  @TrackNewRelicTransaction()
   public async getQuantityBasedOnSkillLevel(
     character: ICharacter,
     skillName: SkillsAvailable,
@@ -57,6 +59,7 @@ export class SpellCalculator {
     return itemsToCreate;
   }
 
+  @TrackNewRelicTransaction()
   public async calculateBasedOnSkillLevel(
     character: ICharacter,
     skillName: SkillsAvailable,

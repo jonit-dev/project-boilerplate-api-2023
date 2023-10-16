@@ -3,6 +3,7 @@ import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { MovementHelper } from "@providers/movement/MovementHelper";
 import { provide } from "inversify-binding-decorators";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import random from "lodash/random";
 import shuffle from "lodash/shuffle";
@@ -12,6 +13,7 @@ import { NPCDirection, NPCMovement } from "./NPCMovement";
 export class NPCMovementRandomPath {
   constructor(private movementHelper: MovementHelper, private NPCMovement: NPCMovement) {}
 
+  @TrackNewRelicTransaction()
   public async startRandomMovement(npc: INPC): Promise<boolean | undefined> {
     try {
       const stopChance = appEnv.general.IS_UNIT_TEST ? 100 : random(0, 100);

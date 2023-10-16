@@ -185,6 +185,7 @@ export class MovementHelper {
    * @param character character from which nearby grid points will be searched
    * @param pointsAmount amount of grid points to return
    */
+  @TrackNewRelicTransaction()
   public async getNearbyGridPoints(character: ICharacter, pointsAmount: number): Promise<IPosition[]> {
     const result: IPosition[] = [];
     const circundatingPoints = this.mathHelper.getCircundatingGridPoints(

@@ -6,6 +6,7 @@ import {
   QuestObjectiveKill,
 } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { IQuest, QuestType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
@@ -15,6 +16,7 @@ import { QuestLoader } from "./QuestLoader";
 export class QuestSeeder {
   constructor(private questLoader: QuestLoader) {}
 
+  @TrackNewRelicTransaction()
   public async seed(): Promise<void> {
     const questSeedData = await this.questLoader.loadQuestSeedData();
 

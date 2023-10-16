@@ -11,6 +11,7 @@ import {
 } from "@entities/ModuleQuest/QuestObjectiveModel";
 import { IQuestRecord, QuestRecord } from "@entities/ModuleQuest/QuestRecordModel";
 import { IQuestReward, QuestReward } from "@entities/ModuleQuest/QuestRewardModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterItems, IItemByKeyResult } from "@providers/character/characterItems/CharacterItems";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
 import { EquipmentSlots } from "@providers/equipment/EquipmentSlots";
@@ -56,6 +57,7 @@ export class QuestSystem {
     private characterItems: CharacterItems
   ) {}
 
+  @TrackNewRelicTransaction()
   public async updateQuests(type: QuestType, character: ICharacter, targetKey: string): Promise<void> {
     const objectivesData = await this.getObjectivesData(character, type);
     if (_.isEmpty(objectivesData)) {

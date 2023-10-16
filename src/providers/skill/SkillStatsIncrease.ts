@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ISkill, Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterClassBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterClassBonusOrPenalties";
 import { CharacterRaceBonusOrPenalties } from "@providers/character/characterBonusPenalties/CharacterRaceBonusOrPenalties";
 import { CharacterBuffTracker } from "@providers/character/characterBuff/CharacterBuffTracker";
@@ -25,6 +26,7 @@ export class SkillStatsIncrease {
     private characterBuffTracker: CharacterBuffTracker
   ) {}
 
+  @TrackNewRelicTransaction()
   public async increaseMaxManaMaxHealth(characterId: Types.ObjectId): Promise<void> {
     const character = (await Character.findById(characterId).lean()) as ICharacter;
     const skills = (await Skill.findById(character.skills).lean()) as ISkill;

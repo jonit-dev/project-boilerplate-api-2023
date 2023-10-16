@@ -3,6 +3,7 @@ import { provide } from "inversify-binding-decorators";
 
 // pull map versions
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import mapVersions from "../../../public/config/map-versions.json";
 
 interface IGridCoordinates {
@@ -25,6 +26,7 @@ interface ICachedPathfinding {
 export class PathfindingCaching {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
+  @TrackNewRelicTransaction()
   public async set(map: string, gridCoordinates: IGridCoordinates, calculatedPathfinding: number[][]): Promise<void> {
     const mapVersion = this.getMapVersion(map);
 
@@ -42,6 +44,7 @@ export class PathfindingCaching {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async get(map: string, gridCoordinates: IGridCoordinates): Promise<number[][] | undefined> {
     const isCacheOld = await this.hasOldCache(map, gridCoordinates);
 

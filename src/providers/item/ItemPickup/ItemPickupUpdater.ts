@@ -38,6 +38,7 @@ export class ItemPickupUpdater {
     await this.characterWeight.updateCharacterWeight(character);
   }
 
+  @TrackNewRelicTransaction()
   public async refreshEquipmentIfInventoryItem(character: ICharacter): Promise<void> {
     const equipmentSlots = await this.equipmentSlots.getEquipmentSlots(
       character._id,
@@ -59,6 +60,7 @@ export class ItemPickupUpdater {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async sendContainerRead(itemContainer: IItemContainer, character: ICharacter): Promise<void> {
     if (character && itemContainer) {
       const type = await this.itemContainerHelper.getContainerType(itemContainer);

@@ -29,6 +29,7 @@ export class EntityEffectCycle {
     private entityEffectDurationControl: EntityEffectDurationControl
   ) {}
 
+  @TrackNewRelicTransaction()
   public async start(
     entityEffect: IEntityEffect,
     targetId: string,

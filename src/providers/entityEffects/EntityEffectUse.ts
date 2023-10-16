@@ -44,6 +44,7 @@ export class EntityEffectUse {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async clearEntityEffect(effectKey: EntityEffectBlueprint, target: ICharacter | INPC): Promise<void> {
     if (!target.appliedEntityEffects) {
       return;
@@ -66,6 +67,7 @@ export class EntityEffectUse {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async clearAllEntityEffects(target: ICharacter | INPC): Promise<void> {
     const updateData = { $unset: { appliedEntityEffects: 1 } } as any;
 

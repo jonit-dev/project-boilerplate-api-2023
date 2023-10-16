@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { provide } from "inversify-binding-decorators";
 import { availableRaids } from "./NPCAvailableRaids";
 import { IRaid, RaidManager } from "./RaidManager";
@@ -6,6 +7,7 @@ import { IRaid, RaidManager } from "./RaidManager";
 export class NPCRaidSeeder {
   constructor(private raid: RaidManager) {}
 
+  @TrackNewRelicTransaction()
   public async seed(): Promise<void> {
     const raids: IRaid[] = availableRaids;
 

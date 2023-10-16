@@ -301,6 +301,7 @@ export class ItemDrop {
     return true;
   }
 
+  @TrackNewRelicTransaction()
   public async dropItems(items: IItem[], droppintPoints: IPosition[], scene: string): Promise<void> {
     for (const i in droppintPoints) {
       items[i].x = FromGridX(droppintPoints[i].x);

@@ -73,6 +73,7 @@ export class NPCBattleCycleQueue {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async add(npc: INPC, npcSkills: ISkill): Promise<void> {
     const canProceed = await this.locker.lock(`npc-${npc._id}-npc-add-battle-queue`);
 

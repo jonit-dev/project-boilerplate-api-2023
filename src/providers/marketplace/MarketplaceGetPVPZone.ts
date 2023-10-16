@@ -1,4 +1,5 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MapNonPVPZone } from "@providers/map/MapNonPVPZone";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { MarketplaceSocketEvents } from "@rpg-engine/shared";
@@ -8,6 +9,7 @@ import { provide } from "inversify-binding-decorators";
 export class MarketplaceGetPVPZone {
   constructor(private socketMessaging: SocketMessaging, private mapNonPVPZone: MapNonPVPZone) {}
 
+  @TrackNewRelicTransaction()
   public async isNonPVPZone(characterId: string): Promise<void> {
     const character = await Character.findById(characterId);
     if (!character) {

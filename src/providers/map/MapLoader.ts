@@ -1,4 +1,5 @@
 import { MapModel } from "@entities/ModuleSystem/MapModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { UNIT_TESTING_MAPS } from "@providers/constants/MapConstants";
 import { STATIC_PATH } from "@providers/constants/PathConstants";
@@ -20,6 +21,7 @@ export class MapLoader {
   public static maps: Map<string, ITiled> = new Map();
   constructor(private gridManager: GridManager) {}
 
+  @TrackNewRelicTransaction()
   public async init(): Promise<void> {
     // get all map names
 

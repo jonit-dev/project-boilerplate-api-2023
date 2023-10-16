@@ -1,6 +1,7 @@
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { provide } from "inversify-binding-decorators";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import mapVersions from "../../../../public/config/map-versions.json";
 
 interface IMapStoredGridInfo {
@@ -12,6 +13,7 @@ interface IMapStoredGridInfo {
 export class MapGridSolidsStorage {
   constructor(private inMemoryHashTable: InMemoryHashTable) {}
 
+  @TrackNewRelicTransaction()
   public async setGridSolids(map: string, grid: number[][]): Promise<void> {
     const version = this.getMapVersion(map);
 

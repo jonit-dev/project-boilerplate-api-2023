@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { provide } from "inversify-binding-decorators";
 
@@ -53,6 +54,7 @@ export class RaidManager {
     return await this.queryRaids({ status: true });
   }
 
+  @TrackNewRelicTransaction()
   public async queryRaids(query: Partial<IRaid>): Promise<IRaid[]> {
     const raids = Object.values(await this.getAllRaids());
 

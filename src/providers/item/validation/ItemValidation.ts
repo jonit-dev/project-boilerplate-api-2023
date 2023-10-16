@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { IItemContainer } from "@rpg-engine/shared";
@@ -9,6 +10,7 @@ import { provide } from "inversify-binding-decorators";
 export class ItemValidation {
   constructor(private socketMessaging: SocketMessaging, private characterInventory: CharacterInventory) {}
 
+  @TrackNewRelicTransaction()
   public async isItemInCharacterInventory(character: ICharacter, itemId: string): Promise<boolean> {
     const inventory = await this.characterInventory.getInventory(character);
 

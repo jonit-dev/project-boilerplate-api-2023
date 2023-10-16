@@ -97,6 +97,7 @@ export class CharacterWeight {
     return result;
   }
 
+  @TrackNewRelicTransaction()
   public async getWeightRatio(character: ICharacter, item: IItem): Promise<number> {
     const weight = await this.getWeight(character);
     const maxWeight = await this.getMaxWeight(character);

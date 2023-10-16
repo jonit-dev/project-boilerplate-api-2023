@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ISpell, SpellSocketEvents } from "@rpg-engine/shared";
@@ -11,6 +12,7 @@ import { NamespaceRedisControl } from "./data/types/SpellsBlueprintTypes";
 export default class SpellCoolDown {
   constructor(private inMemoryHashtable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async haveSpellCooldown(characterId: Types.ObjectId, magicWords: string): Promise<boolean> {
     this.validateArguments(characterId, magicWords);
 
@@ -22,6 +24,7 @@ export default class SpellCoolDown {
     return hasSpellCooldown;
   }
 
+  @TrackNewRelicTransaction()
   public async setSpellCooldown(characterId: Types.ObjectId, magicWords: string, cooldown: number): Promise<boolean> {
     this.validateArguments(characterId, magicWords, cooldown);
 

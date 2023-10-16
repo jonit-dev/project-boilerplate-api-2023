@@ -18,6 +18,7 @@ export class ItemMissingReferenceCleaner {
     private itemOwnership: ItemOwnership
   ) {}
 
+  @TrackNewRelicTransaction()
   public async clearMissingReferences(character: ICharacter): Promise<void> {
     await this.cleanupMissingEquipmentReferences(character);
     await this.cleanupMissingInventoryReferences(character);

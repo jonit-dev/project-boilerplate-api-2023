@@ -8,6 +8,7 @@ import { NPCManager } from "@providers/npc/NPCManager";
 import { PushNotificationHelper } from "@providers/pushNotification/PushNotificationHelper";
 import { Seeder } from "@providers/seeds/Seeder";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { HitTarget } from "@providers/battle/HitTarget";
 import { CharacterConsumptionControl } from "@providers/character/CharacterConsumptionControl";
 import { CharacterMonitorQueue } from "@providers/character/CharacterMonitorQueue";
@@ -56,6 +57,7 @@ export class ServerBootstrap {
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
+  @TrackNewRelicTransaction()
   public async performOneTimeOperations(): Promise<void> {
     if (appEnv.general.ENV === EnvType.Development) {
       // in dev we always want to execute it.. since we dont have pm2
@@ -68,6 +70,7 @@ export class ServerBootstrap {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async performMultipleInstancesOperations(): Promise<void> {
     this.discordBot.initialize();
 

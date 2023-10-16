@@ -29,6 +29,7 @@ import {
 import { provide } from "inversify-binding-decorators";
 import { CharacterView } from "../CharacterView";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { BattleTargeting } from "@providers/battle/BattleTargeting";
 import { socketEventsBinderControl } from "@providers/inversify/container";
 import { ItemMissingReferenceCleaner } from "@providers/item/cleaner/ItemMissingReferenceCleaner";
@@ -201,6 +202,7 @@ export class CharacterNetworkCreate {
     );
   }
 
+  @TrackNewRelicTransaction()
   public async sendCreationMessageToCharacters(
     emitterChannelId: string,
     dataFromServer: ICharacterCreateFromServer,

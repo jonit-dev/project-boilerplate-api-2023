@@ -1,5 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { MapControlTimeModel } from "@entities/ModuleSystem/MapControlTimeModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { AvailableWeather, IControlTime, PeriodOfDay, WeatherSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -19,6 +20,7 @@ export class MapControlTime {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async controlTime(time: string, periodOfDay: PeriodOfDay): Promise<IControlTime> {
     const onlineCharacters = await Character.find({ isOnline: true });
 

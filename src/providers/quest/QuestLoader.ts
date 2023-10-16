@@ -1,4 +1,5 @@
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MapLoader } from "@providers/map/MapLoader";
 import { MapObjectsLoader } from "@providers/map/MapObjectsLoader";
 import { IQuest } from "@rpg-engine/shared";
@@ -17,6 +18,7 @@ interface IQuestSeedData extends Omit<IQuest, "_id"> {}
 export class QuestLoader {
   constructor(private mapObjectsLoader: MapObjectsLoader) {}
 
+  @TrackNewRelicTransaction()
   public async loadQuestSeedData(): Promise<IQuestSeedData[]> {
     const questSeedData: IQuestSeedData[] = [];
 

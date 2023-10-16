@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { DISCORD_CHANNEL_IDS, DiscordChannelName } from "@providers/constants/DiscordConstants";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
@@ -65,6 +66,7 @@ export class DiscordBot {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async sendMessage(message: string, channelName: DiscordChannelName): Promise<void> {
     try {
       console.log("🤖 Discord bot - Sending message: ", message, `Channel: ${channelName}`);
@@ -86,6 +88,7 @@ export class DiscordBot {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async sendMessageWithColor(
     message: string,
     channelName: DiscordChannelName,

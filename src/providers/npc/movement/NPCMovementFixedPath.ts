@@ -4,12 +4,14 @@ import { FromGridX, FromGridY, ToGridX, ToGridY } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { NPCFreezer } from "../NPCFreezer";
 // eslint-disable-next-line no-unused-vars
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { NPCMovement } from "./NPCMovement";
 
 @provide(NPCMovementFixedPath)
 export class NPCMovementFixedPath {
   constructor(private NPCMovement: NPCMovement, private npcFreezer: NPCFreezer, private mapHelper: MapHelper) {}
 
+  @TrackNewRelicTransaction()
   public async startFixedPathMovement(npc: INPC, endGridX: number, endGridY: number): Promise<void> {
     try {
       const shortestPath = await this.NPCMovement.getShortestPathNextPosition(

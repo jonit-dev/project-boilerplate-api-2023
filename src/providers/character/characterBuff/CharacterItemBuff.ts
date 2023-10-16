@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { blueprintManager } from "@providers/inversify/container";
 import { AvailableBlueprints } from "@providers/item/data/types/itemsBlueprintTypes";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -16,6 +17,7 @@ export class CharacterItemBuff {
     private socketMessaging: SocketMessaging
   ) {}
 
+  @TrackNewRelicTransaction()
   public async enableItemBuff(character: ICharacter, item: IItem): Promise<void> {
     const itemBlueprint = await blueprintManager.getBlueprint<IEquippableItemBlueprint>(
       "items",
@@ -61,6 +63,7 @@ export class CharacterItemBuff {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async disableItemBuff(character: ICharacter, itemId: string): Promise<void> {
     try {
       const itemBuffs = await this.characterBuffTracker.getBuffByItemId(character._id, itemId);

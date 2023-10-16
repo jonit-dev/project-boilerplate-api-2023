@@ -1,3 +1,4 @@
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { itemsBlueprintIndex } from "@providers/item/data";
@@ -32,6 +33,7 @@ export class BlueprintManager {
     ]);
   }
 
+  @TrackNewRelicTransaction()
   public async getBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints): Promise<T> {
     const blueprint = await this.inMemoryHashTable.get(`blueprint-${namespace}`, key);
 
@@ -55,20 +57,24 @@ export class BlueprintManager {
     return blueprint as T;
   }
 
+  @TrackNewRelicTransaction()
   public async getAllBlueprintKeys(namespace: BlueprintNamespaces): Promise<string[]> {
     return await this.inMemoryHashTable.getAllKeys(`blueprint-${namespace}`);
   }
 
+  @TrackNewRelicTransaction()
   public async getAllBlueprintValues<T>(namespace: BlueprintNamespaces): Promise<T[]> {
     const blueprints = (await this.inMemoryHashTable.getAll<T>(`blueprint-${namespace}`)) as Record<string, T>;
 
     return Object.values(blueprints);
   }
 
+  @TrackNewRelicTransaction()
   public async setBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints, data: T): Promise<void> {
     await this.inMemoryHashTable.set(`blueprint-${namespace}`, key, data);
   }
 
+  @TrackNewRelicTransaction()
   public async updateBlueprint<T>(namespace: BlueprintNamespaces, key: AvailableBlueprints, data: T): Promise<void> {
     const blueprint = await this.getBlueprint<T>(namespace, key);
 

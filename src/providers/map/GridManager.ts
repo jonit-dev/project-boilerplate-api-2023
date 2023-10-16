@@ -4,6 +4,7 @@ import PF from "pathfinding";
 import { MapSolids } from "./MapSolids";
 import { MapGridSolidsStorage } from "./storage/MapGridSolidsStorage";
 
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import mapVersions from "../../../public/config/map-versions.json";
 import { MapProperties } from "./MapProperties";
 
@@ -49,6 +50,7 @@ export class GridManager {
     return !!this.grids.get(map);
   }
 
+  @TrackNewRelicTransaction()
   public async generateGridSolids(map: string): Promise<void> {
     const bounds = this.mapProperties.getMapDimensions(map, true);
     const offset = this.mapProperties.getMapOffset(bounds.startX, bounds.startY)!;
@@ -99,6 +101,7 @@ export class GridManager {
     this.grids.set(map, tree);
   }
 
+  @TrackNewRelicTransaction()
   public async isWalkable(map: string, gridX: number, gridY: number): Promise<boolean | undefined> {
     try {
       const grid = await this.getGrid(map);
@@ -117,6 +120,7 @@ export class GridManager {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async setWalkable(map: string, gridX: number, gridY: number, walkable: boolean): Promise<void> {
     try {
       const grid = await this.getGrid(map);

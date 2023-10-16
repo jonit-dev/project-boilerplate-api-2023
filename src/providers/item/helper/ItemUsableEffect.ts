@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { MovementSpeed } from "@providers/constants/MovementConstants";
 import { EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -17,6 +18,7 @@ export enum EffectableAttribute {
 
 @provide(ItemUsableEffect)
 export class ItemUsableEffect {
+  @TrackNewRelicTransaction()
   public async apply(target: ICharacter | INPC, attr: EffectableAttribute, value: number): Promise<void> {
     target[attr] += value;
     const updateObj: any = {};
@@ -65,6 +67,7 @@ export class ItemUsableEffect {
     }
   }
 
+  @TrackNewRelicTransaction()
   public async applyEatingEffect(character: ICharacter, increase: number): Promise<void> {
     await this.apply(character, EffectableAttribute.Health, increase);
     await this.apply(character, EffectableAttribute.Mana, increase);

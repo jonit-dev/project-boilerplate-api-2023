@@ -1,5 +1,6 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NPCSocketEvents } from "@rpg-engine/shared";
@@ -16,6 +17,7 @@ export class NPCMovementStopped {
     private characterView: CharacterView
   ) {}
 
+  @TrackNewRelicTransaction()
   public async startMovementStopped(npc: INPC): Promise<void> {
     try {
       const targetCharacter = await Character.findById(npc.targetCharacter).lean();

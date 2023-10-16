@@ -14,6 +14,7 @@ export class CharacterSkull {
     private readonly socketMessaging: SocketMessaging
   ) {}
 
+  @TrackNewRelicTransaction()
   public async checkForUnjustifiedAttack(character: ICharacter, target: ICharacter): Promise<boolean> {
     // Check if the caster is in a party
     const isCharacterAndTargetInParty = await this.isCharacterAndTargetOnTheSameParty(
@@ -142,6 +143,7 @@ export class CharacterSkull {
     await this.sendSkullEventToUser(character);
   }
 
+  @TrackNewRelicTransaction()
   public async updateSkullAfterKill(characterId: string): Promise<void> {
     const character = await Character.findById(characterId);
     if (!character) {

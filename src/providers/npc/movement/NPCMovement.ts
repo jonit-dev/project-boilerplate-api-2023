@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterView } from "@providers/character/CharacterView";
 import { appEnv } from "@providers/config/env";
 import { NPC_CAN_ATTACK_IN_NON_PVP_ZONE } from "@providers/constants/NPCConstants";
@@ -55,6 +56,7 @@ export class NPCMovement {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async moveNPC(
     npc: INPC,
     oldX: number,
@@ -153,6 +155,7 @@ export class NPCMovement {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async getShortestPathNextPosition(
     npc: INPC,
     target: ICharacter | null,

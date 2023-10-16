@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { MacroSocketEvents } from "@rpg-engine/shared";
@@ -9,6 +10,7 @@ import svgCaptcha from "svg-captcha";
 export class MacroCaptchaSend {
   constructor(private socketMessaging: SocketMessaging, private characterValidation: CharacterValidation) {}
 
+  @TrackNewRelicTransaction()
   public async sendAndStartCaptchaVerification(character: ICharacter): Promise<boolean> {
     if (!this.characterValidation.hasBasicValidation(character)) {
       this.socketMessaging.sendErrorMessageToCharacter(character);
@@ -33,6 +35,7 @@ export class MacroCaptchaSend {
     return false;
   }
 
+  @TrackNewRelicTransaction()
   public async generateAndSendCaptcha(character: ICharacter): Promise<boolean> {
     const captcha = svgCaptcha.create({
       size: 6,
