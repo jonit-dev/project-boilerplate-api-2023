@@ -83,6 +83,7 @@ export class SpellCalculator {
     return maxInterpolatedValue;
   }
 
+  @TrackNewRelicTransaction()
   public async spellDamageCalculator(
     character: ICharacter,
     skillName: SkillsAvailable,
@@ -149,6 +150,7 @@ export class SpellCalculator {
     return characterLevel;
   }
 
+  @TrackNewRelicTransaction()
   public async getCharacterSkill(character: ICharacter): Promise<ISkill> {
     const skills = (await Skill.findOne({ _id: character.skills })
       .lean({

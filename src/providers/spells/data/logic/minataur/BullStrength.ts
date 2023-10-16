@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { characterBuffActivator } from "@providers/inversify/container";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import {
@@ -16,6 +17,7 @@ import { provide } from "inversify-binding-decorators";
 export class BullStrength {
   constructor(private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async handleBullStrength(character: ICharacter, buffPercentage: number, timeout: number): Promise<void> {
     try {
       if (!character || character.race !== ShadowWalkerRaces.Minotaur) {

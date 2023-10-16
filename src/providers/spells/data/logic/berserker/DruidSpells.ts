@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, ICharacterAttributeChanged, SpellsBlueprint } from "@rpg-engine/shared";
@@ -9,6 +10,7 @@ import { NamespaceRedisControl } from "../../types/SpellsBlueprintTypes";
 export class DruidSpells {
   constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async handleShapeShift(character: ICharacter, textureKey: string, intervalInSecs: number): Promise<void> {
     const namespace = `${NamespaceRedisControl.CharacterSpell}:${character._id}`;
     const key: SpellsBlueprint = SpellsBlueprint.DruidShapeshift;

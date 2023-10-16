@@ -16,6 +16,7 @@ export class Bloodthirst {
     private traitGetter: TraitGetter
   ) {}
 
+  @TrackNewRelicTransaction()
   public async handleBerserkerAttack(character: ICharacter, damage: number): Promise<void> {
     try {
       if (!character || character.class !== CharacterClass.Berserker || character.health === character.maxHealth) {

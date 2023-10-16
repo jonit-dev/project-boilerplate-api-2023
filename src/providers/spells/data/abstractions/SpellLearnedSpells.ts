@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { ILearnedSpellsRead, ISpell, IUIShowMessage, SpellSocketEvents, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,6 +10,7 @@ import { spellsBlueprints } from "../blueprints";
 export class SpellLearnedSpells {
   constructor(private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async sendCharacterLearnedSpellsInfoEvent(character: ICharacter): Promise<void> {
     const { learnedSpells } = character;
     const learnedSpellsArr: ISpell[] = [];

@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { provide } from "inversify-binding-decorators";
@@ -10,6 +11,7 @@ export default class SpellSilence {
 
   constructor(private inMemoryHashTable: InMemoryHashTable, private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async silenceCharacter(character: ICharacter, target: ICharacter | INPC, duration: number): Promise<void> {
     if (!(await this.isSilent(target))) {
       await this.inMemoryHashTable.set(this.silenceKey, target.id, true);

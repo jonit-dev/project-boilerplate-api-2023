@@ -1,4 +1,5 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { LinearInterpolation } from "@providers/math/LinearInterpolation";
 import { SkillsAvailable } from "@providers/skill/SkillTypes";
 import { TraitGetter } from "@providers/skill/TraitGetter";
@@ -16,6 +17,7 @@ export class ManaDrain {
     private traitGetter: TraitGetter
   ) {}
 
+  @TrackNewRelicTransaction()
   public async handleManaDrain(attacker: ICharacter, target: ICharacter): Promise<boolean> {
     try {
       if (attacker._id.toString() === target._id.toString()) {

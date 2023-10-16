@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterDeath } from "@providers/character/CharacterDeath";
 import { NPCDeath } from "@providers/npc/NPCDeath";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
@@ -14,6 +15,7 @@ export class Execution {
     private socketMessaging: SocketMessaging
   ) {}
 
+  @TrackNewRelicTransaction()
   public async handleBerserkerExecution(attacker: ICharacter, target: ICharacter | INPC): Promise<void> {
     const targetId = target._id;
     const targetType = target.type as EntityType;

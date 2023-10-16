@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { BasicAttribute, CharacterSocketEvents, EntityType, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -15,6 +16,7 @@ interface IHealRange {
 export class SpellHeal {
   constructor(private socketMessaging: SocketMessaging, private spellCalculator: SpellCalculator) {}
 
+  @TrackNewRelicTransaction()
   public async healTarget(caster: ICharacter, target: ICharacter | INPC, range: IHealRange): Promise<void> {
     const { min, max } = range;
 

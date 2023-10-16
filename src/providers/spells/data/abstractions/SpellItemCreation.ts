@@ -1,4 +1,5 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
@@ -28,6 +29,7 @@ export class SpellItemCreation {
     private animationEffect: AnimationEffect
   ) {}
 
+  @TrackNewRelicTransaction()
   public async createItem(character: ICharacter, options: ISpellItemCreationOptions): Promise<boolean> {
     const { itemToCreate, itemToConsume } = options;
 
