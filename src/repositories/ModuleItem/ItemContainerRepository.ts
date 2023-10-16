@@ -1,6 +1,7 @@
 import { IItemContainer, ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CRUD } from "@providers/mongoDB/MongoCRUDGeneric";
 import { provide } from "inversify-binding-decorators";
 
@@ -10,6 +11,7 @@ export class ItemContainerRepository extends CRUD {
     super(analyticsHelper);
   }
 
+  @TrackNewRelicTransaction()
   public async createItemContainer(
     parentItem: IItem,
     itemContainerProps: Partial<IItemContainer>

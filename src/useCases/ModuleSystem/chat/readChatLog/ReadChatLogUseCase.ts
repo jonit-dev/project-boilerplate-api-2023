@@ -1,4 +1,5 @@
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketTransmissionZone } from "@providers/sockets/SocketTransmissionZone";
 import { GRID_HEIGHT, GRID_WIDTH, IChatMessage, SOCKET_TRANSMISSION_ZONE_WIDTH } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -8,6 +9,7 @@ import { Model } from "mongoose";
 export class ReadChatLogUseCase {
   constructor(private socketTransmissionZone: SocketTransmissionZone) {}
 
+  @TrackNewRelicTransaction()
   public async getChatLogInZone(chatLogZone): Promise<IChatMessage[]> {
     const socketTransmissionZone = this.socketTransmissionZone.calculateSocketTransmissionZone(
       chatLogZone.x,

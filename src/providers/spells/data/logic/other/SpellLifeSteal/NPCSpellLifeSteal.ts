@@ -1,5 +1,6 @@
 import { Character, ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC, NPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { CharacterSocketEvents, INPCAttributeChanged, NPCSocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
@@ -9,6 +10,7 @@ import _ from "lodash";
 export class NPCSpellLifeSteal {
   constructor(private socketMessaging: SocketMessaging) {}
 
+  @TrackNewRelicTransaction()
   public async performLifeSteal(caster: INPC, target: ICharacter): Promise<void> {
     // make sure we have an updated caster to avoid maxHealth overflow!
     caster = (await NPC.findById(caster._id).lean()) as INPC;

@@ -1,5 +1,6 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { EntityType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { CharacterSpellLifeSteal } from "./CharacterSpellLifeSteal";
@@ -9,6 +10,7 @@ import { NPCSpellLifeSteal } from "./NPCSpellLifeSteal";
 export class SpellLifeSteal {
   constructor(private npcSpellLifeSteal: NPCSpellLifeSteal, private characterSpellLifeSteal: CharacterSpellLifeSteal) {}
 
+  @TrackNewRelicTransaction()
   public async performLifeSteal(caster: ICharacter | INPC, target: ICharacter | INPC): Promise<void> {
     switch (caster.type) {
       case EntityType.NPC:

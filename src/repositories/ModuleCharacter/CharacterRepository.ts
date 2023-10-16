@@ -3,6 +3,7 @@ import { Equipment, IEquipment } from "@entities/ModuleCharacter/EquipmentModel"
 import { Skill } from "@entities/ModuleCharacter/SkillsModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
 import { AnalyticsHelper } from "@providers/analytics/AnalyticsHelper";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { CharacterWeight } from "@providers/character/weight/CharacterWeight";
@@ -45,6 +46,7 @@ export class CharacterRepository extends CRUD {
     super(analyticsHelper);
   }
 
+  @TrackNewRelicTransaction()
   public async createCharacter(newCharacter: CreateCharacterDTO, ownerId: string): Promise<ICharacter> {
     const skills = new Skill({ ownerType: "Character" });
     await skills.save();

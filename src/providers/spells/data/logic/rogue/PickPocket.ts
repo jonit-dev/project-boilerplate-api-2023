@@ -1,6 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { ItemContainer } from "@entities/ModuleInventory/ItemContainerModel";
 import { IItem, Item } from "@entities/ModuleInventory/ItemModel";
+import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemContainer } from "@providers/character/characterItems/CharacterItemContainer";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
@@ -23,6 +24,7 @@ export class PickPocket {
     private characterWeight: CharacterWeight
   ) {}
 
+  @TrackNewRelicTransaction()
   public async handlePickPocket(character: ICharacter, target: ICharacter): Promise<boolean> {
     if (target.type !== "Character") {
       this.socketMessaging.sendErrorMessageToCharacter(character, "You can only stolen from characters!");
