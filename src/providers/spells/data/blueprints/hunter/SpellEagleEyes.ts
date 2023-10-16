@@ -17,7 +17,7 @@ import { SpellCalculator } from "../../abstractions/SpellCalculator";
 export const spellEagleEyes: Partial<ISpell> = {
   key: SpellsBlueprint.SpellEagleEyes,
   name: "Eagle Eyes",
-  description: "A Self Eagle's Eye.",
+  description: "Increase hunter's distance skill for a short period of time.",
   castingType: SpellCastingType.SelfCasting,
   magicWords: "kartal leri",
   manaCost: 60,
