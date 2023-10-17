@@ -2,7 +2,6 @@ import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { socketEventsBinderControl } from "@providers/inversify/container";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
-import { Locker } from "@providers/locks/Locker";
 import { CharacterSocketEvents, ISocket, SocketTypes } from "@rpg-engine/shared";
 import { GeckosIO } from "./GeckosIO";
 import { SocketIO } from "./SocketIO";
@@ -16,8 +15,7 @@ export class SocketAdapter implements ISocket {
   constructor(
     private socketIO: SocketIO,
     private geckosIO: GeckosIO,
-    private socketSessionControl: SocketSessionControl,
-    private locker: Locker
+    private socketSessionControl: SocketSessionControl
   ) {}
 
   public async init(socketType: SocketTypes): Promise<void> {
@@ -38,14 +36,8 @@ export class SocketAdapter implements ISocket {
     this.onConnect();
   }
 
-  public async emitToUser<T>(channel: string, eventName: string, data?: T): Promise<void> {
+  public emitToUser<T>(channel: string, eventName: string, data?: T): void {
     try {
-      const canProceed = await this.locker.lock(`emit-to-user-${channel}-${eventName}`);
-
-      if (!canProceed) {
-        return;
-      }
-
       if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
         console.log("⬆️ (SENDING): ", channel, eventName, JSON.stringify(data));
       }
@@ -58,8 +50,6 @@ export class SocketAdapter implements ISocket {
       SocketAdapter.socketClass?.emitToUser(channel, eventName, data);
     } catch (error) {
       console.error(error);
-    } finally {
-      await this.locker.unlock(`emit-to-user-${channel}-${eventName}`);
     }
   }
 
