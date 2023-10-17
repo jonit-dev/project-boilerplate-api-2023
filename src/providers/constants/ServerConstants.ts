@@ -1,4 +1,10 @@
-import { BattleSocketEvents, ChatSocketEvents, ItemSocketEvents, ViewSocketEvents } from "@rpg-engine/shared";
+import {
+  BattleSocketEvents,
+  ChatSocketEvents,
+  ItemSocketEvents,
+  SpellSocketEvents,
+  ViewSocketEvents,
+} from "@rpg-engine/shared";
 
 import os from "os";
 
@@ -47,15 +53,16 @@ export const LOCKABLE_EVENTS = [
   ViewSocketEvents.Destroy,
 ] as string[];
 
-export const DEBOUNCEABLE_EVENTS_MS_THRESHOLD = 250;
+export const THROTTABLE_EVENTS_MS_THRESHOLD_DISCONNECT = 70;
 
-export const DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT = 70;
+export const THROTTABLE_DEFAULT_MS_THRESHOLD = 1000;
 
-export const DEBOUNCEABLE_EVENTS = [
-  ItemSocketEvents.LoadCraftBook,
-  ItemSocketEvents.CraftItem,
-  ChatSocketEvents.GlobalChatMessageCreate,
-] as string[];
+export const THROTTABLE_EVENTS = {
+  [ItemSocketEvents.LoadCraftBook]: THROTTABLE_DEFAULT_MS_THRESHOLD,
+  [ItemSocketEvents.CraftItem]: 2000,
+  [ChatSocketEvents.GlobalChatMessageCreate]: THROTTABLE_DEFAULT_MS_THRESHOLD,
+  [SpellSocketEvents.CastSpell]: THROTTABLE_DEFAULT_MS_THRESHOLD,
+};
 
 export const PROMISE_DEFAULT_CONCURRENCY = os.cpus().length || 2;
 
