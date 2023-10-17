@@ -8,7 +8,6 @@ import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNe
 import { CharacterSkull } from "@providers/character/CharacterSkull";
 import { CharacterValidation } from "@providers/character/CharacterValidation";
 import { CharacterWeapon } from "@providers/character/CharacterWeapon";
-import { CharacterClass, EntityAttackType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { BattleAttackTarget } from "../BattleAttackTarget/BattleAttackTarget";
 import { BattleCycle } from "../BattleCycle";
@@ -36,22 +35,7 @@ export class BattleCharacterAttack {
       return;
     }
 
-    const attackType = await this.characterWeapon.getAttackType(character);
-
-    let attackIntervalSpeed = character.attackIntervalSpeed;
-
-    if (attackType === EntityAttackType.Ranged) {
-      switch (character.class) {
-        case CharacterClass.Hunter:
-          attackIntervalSpeed = attackIntervalSpeed * 1.2;
-          break;
-        default:
-          attackIntervalSpeed = attackIntervalSpeed * 1.35;
-          break;
-      }
-    }
-
-    await this.battleCycle.init(character, target._id, attackIntervalSpeed, async () => {
+    await this.battleCycle.init(character, target._id, character.attackIntervalSpeed, async () => {
       await this.execCharacterBattleCycleLoop(character, target);
     });
   }

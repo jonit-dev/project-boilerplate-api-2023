@@ -45,6 +45,8 @@ export class NPCFreezer {
           },
         }
       );
+
+      await this.locker.unlock(`npc-${npc._id}-npc-cycle`);
     } catch (error) {
       console.error(error);
     } finally {
