@@ -9,7 +9,7 @@ import nodeCron from "node-cron";
 export class CronJobScheduler {
   constructor(private locker: Locker, private newRelic: NewRelic) {}
 
-  //! Unique in a sense that even if this is scheduled by multiple instances (pm2) or nodes (docker swarm), it will only run in a single instance or node (unique cron job)
+  //! Unique in a sense that even if this is scheduled by multiple instances (pm2) or nodes (docker swarm), it will only run in a single instance or node (unique cron job).
   public uniqueSchedule(id: string, cronString: string, task: Function): void {
     nodeCron.schedule(cronString, async () => {
       const canProceed = await this.locker.lock(`cron-job-unique-schedule-${id}`);
