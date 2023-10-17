@@ -49,10 +49,9 @@ export class CharacterMonitorQueue {
             1
           );
 
-          await this.locker.lock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
-
           await this.execMonitorCallback(character, callbackId, intervalMs);
         } catch (err) {
+          await this.locker.unlock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
           console.error("Error processing character monitor queue", err);
           throw err;
         }
@@ -83,13 +82,11 @@ export class CharacterMonitorQueue {
     callback: CharacterMonitorCallback,
     intervalMs: number = 7000
   ): Promise<void> {
-    const hasLock = await this.locker.hasLock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
+    const canProceed = await this.locker.lock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
 
-    if (hasLock) {
+    if (!canProceed) {
       return;
     }
-
-    await this.locker.lock(`character-monitor-queue-${character._id}-callback-${callbackId}`);
 
     const isJobBeingProcessed = await this.isJobBeingProcessed(callbackId);
 
@@ -210,7 +207,7 @@ export class CharacterMonitorQueue {
     // execute character callback
     const characterCallbacks = this.charactersCallbacks.get(character._id.toString());
 
-    console.log("CharacterMonitorCallback: ", character._id.toString(), callbackId, intervalMs);
+    console.log("CharacterMonitorCallback: ", character.name, `(${character._id.toString()})`, callbackId, intervalMs);
 
     const callback = characterCallbacks?.[callbackId];
 
@@ -236,8 +233,6 @@ export class CharacterMonitorQueue {
       callback(updatedCharacter);
 
       await this.add(character, callbackId, intervalMs);
-    } else {
-      await this.unwatch(callbackId, character);
     }
   }
 }
