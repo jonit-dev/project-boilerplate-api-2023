@@ -1,19 +1,16 @@
 import { ChatLog } from "@entities/ModuleSystem/ChatLogModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-import nodeCron from "node-cron";
+import { CronJobScheduler } from "./CronJobScheduler";
 
 @provide(ChatLogCrons)
 export class ChatLogCrons {
-  constructor(private newRelic: NewRelic) {}
+  constructor(private newRelic: NewRelic, private cronJobScheduler: CronJobScheduler) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 0 * * 7", async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "DeleteOldChatLogs", async () => {
-        await this.deleteOldMessages();
-      });
+    this.cronJobScheduler.uniqueSchedule("chat-log-cron-delete-old-messages", "0 0 * * 7", async () => {
+      await this.deleteOldMessages();
     });
   }
 
