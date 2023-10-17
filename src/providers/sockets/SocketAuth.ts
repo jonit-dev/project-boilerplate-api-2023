@@ -70,74 +70,98 @@ export class SocketAuth {
     character: ICharacter,
     owner: IUser
   ): Promise<void> {
-    if (appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST) {
-      console.log("⬇️ (RECEIVED): ", character.name, character.channelId!, event);
-    }
-
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.SocketEvent, event, async (): Promise<void> => {
-      if (EXHAUSTABLE_EVENTS.includes(event)) {
-        const isExhausted = await this.exhaustValidation.verifyLastActionExhaustTime(character.channelId!, event);
-        if (isExhausted) {
-          this.socketMessaging.sendEventToUser<IUIShowMessage>(channel.id!, UISocketEvents.ShowMessage, {
-            message: "Sorry, you're exhausted!",
-            type: "error",
-          });
-          return;
-        }
+      if (this.shouldLogEvent(event)) {
+        this.logEvent(character, event);
       }
 
-      if (LOGGABLE_EVENTS.includes(event)) {
-        const now = dayjs().toISOString();
-        console.log(
-          `📝 ${character.name} (Id: ${character._id}) - (Channel: ${character.channelId}) => Event: ${event} at ${now}`
-        );
+      if (await this.isExhausted(character, event)) {
+        this.notifyExhaustion(channel);
+        return;
       }
 
-      if (!BYPASS_EVENTS_AS_LAST_ACTION.includes(event as any)) {
+      if (await this.isThrottleViolated(character, event)) {
+        return;
+      }
+
+      if (this.shouldSetLastAction(event)) {
         await this.characterLastAction.setLastAction(character._id, dayjs().toISOString());
       }
 
-      if (Object.keys(THROTTABLE_EVENTS).includes(event)) {
-        const lastActionExecution = await this.characterLastAction.getActionLastExecution(character._id, event);
-
-        if (lastActionExecution) {
-          const diff = dayjs().diff(dayjs(lastActionExecution), "millisecond");
-
-          if (diff < THROTTABLE_EVENTS_MS_THRESHOLD_DISCONNECT) {
-            setTimeout(async () => {
-              await this.characterBan.addPenalty(character);
-            }, 5000);
-
-            this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
-              reason: "You're disconnected for spamming the server with events.",
-            });
-
-            return;
-          }
-
-          if (diff < THROTTABLE_DEFAULT_MS_THRESHOLD) {
-            this.socketMessaging.sendEventToUser<IUIShowMessage>(channel.id!, UISocketEvents.ShowMessage, {
-              message: "Sorry, you're doing it too fast!",
-              type: "error",
-            });
-
-            return;
-          }
-        }
-
-        await this.characterLastAction.setActionLastExecution(character._id, event);
-      }
-
       if (LOCKABLE_EVENTS.includes(event)) {
-        await this.performLockedEvent(character._id, character.name, event, async (): Promise<void> => {
+        await this.performLockedEvent(character._id, character.name, event, async () => {
           await callback(data, character, owner);
         });
-
         return;
       }
 
       await callback(data, character, owner);
     });
+  }
+
+  private shouldSetLastAction(event: string): boolean {
+    return !BYPASS_EVENTS_AS_LAST_ACTION.includes(event as any);
+  }
+
+  private shouldLogEvent(event: string): boolean {
+    return appEnv.general.DEBUG_MODE && !appEnv.general.IS_UNIT_TEST && LOGGABLE_EVENTS.includes(event);
+  }
+
+  private logEvent(character: ICharacter, event: string): void {
+    console.log(
+      `📝 ${character.name} (Id: ${character._id}) - (Channel: ${
+        character.channelId
+      }) => Event: ${event} at ${dayjs().toISOString()}`
+    );
+  }
+
+  private async isExhausted(character: ICharacter, event: string): Promise<boolean> {
+    return (
+      EXHAUSTABLE_EVENTS.includes(event) &&
+      (await this.exhaustValidation.verifyLastActionExhaustTime(character.channelId!, event))
+    );
+  }
+
+  private notifyExhaustion(channel): void {
+    this.socketMessaging.sendEventToUser<IUIShowMessage>(channel.id!, UISocketEvents.ShowMessage, {
+      message: "Sorry, you're exhausted!",
+      type: "error",
+    });
+  }
+
+  private async isThrottleViolated(character: ICharacter, event: string): Promise<boolean> {
+    if (Object.keys(THROTTABLE_EVENTS).includes(event)) {
+      const lastActionExecution = await this.characterLastAction.getActionLastExecution(character._id, event);
+
+      if (lastActionExecution) {
+        const diff = dayjs().diff(dayjs(lastActionExecution), "millisecond");
+
+        if (diff < THROTTABLE_EVENTS_MS_THRESHOLD_DISCONNECT) {
+          setTimeout(async () => {
+            await this.characterBan.addPenalty(character);
+          }, 5000);
+
+          this.socketMessaging.sendEventToUser(character.channelId!, CharacterSocketEvents.CharacterForceDisconnect, {
+            reason: "You're disconnected for spamming the server with events.",
+          });
+
+          return true;
+        }
+
+        if (diff < THROTTABLE_DEFAULT_MS_THRESHOLD) {
+          this.socketMessaging.sendEventToUser<IUIShowMessage>(character.channelId!, UISocketEvents.ShowMessage, {
+            message: "Sorry, you're doing it too fast!",
+            type: "error",
+          });
+
+          return true;
+        }
+      }
+
+      await this.characterLastAction.setActionLastExecution(character._id, event);
+    }
+
+    return false;
   }
 
   private removeListenerIfExists(channel, event: string): void {
@@ -162,27 +186,6 @@ export class SocketAuth {
   }
 
   private async validateCharacterAndProceed(
-    character: ICharacter,
-    channelId: string,
-    runBasicCharacterValidation: boolean
-  ): Promise<boolean> {
-    if (character === null || character.isSoftDeleted) {
-      this.sendDisconnectMessage(channelId, "You don't own this character or cannot play with this character anymore!");
-      return false;
-    }
-
-    if (runBasicCharacterValidation && !this.characterValidation.hasBasicValidation(character)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private sendDisconnectMessage(channelId: string, reason: string): void {
-    this.socketMessaging.sendEventToUser(channelId, CharacterSocketEvents.CharacterForceDisconnect, { reason });
-  }
-
-  private async performValidation(
     character: ICharacter,
     channelId: string,
     runBasicCharacterValidation: boolean
