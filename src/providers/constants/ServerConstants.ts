@@ -20,6 +20,13 @@ export const EXHAUSTABLE_EVENTS = [
   ItemSocketEvents.CraftItem,
 ] as string[];
 
+export const LOGGABLE_EVENTS = [
+  ItemSocketEvents.Use,
+  ItemSocketEvents.UseWith,
+  ItemSocketEvents.CraftItem,
+  "CastSpell",
+];
+
 export const LOCKABLE_EVENTS = [
   ItemSocketEvents.Pickup,
   ItemSocketEvents.Equip,

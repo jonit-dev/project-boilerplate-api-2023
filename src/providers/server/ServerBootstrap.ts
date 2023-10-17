@@ -1,5 +1,4 @@
 import { CharacterConnection } from "@providers/character/CharacterConnection";
-import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
 
 import { CharacterTextureChange } from "@providers/character/CharacterTextureChange";
 import { CharacterBuffActivator } from "@providers/character/characterBuff/CharacterBuffActivator";
@@ -10,10 +9,12 @@ import { PushNotificationHelper } from "@providers/pushNotification/PushNotifica
 import { Seeder } from "@providers/seeds/Seeder";
 
 import { HitTarget } from "@providers/battle/HitTarget";
+import { CharacterConsumptionControl } from "@providers/character/CharacterConsumptionControl";
 import { CharacterMonitorQueue } from "@providers/character/CharacterMonitorQueue";
 import { appEnv } from "@providers/config/env";
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
 import { DiscordBot } from "@providers/discord/DiscordBot";
+import { EntityEffectDurationControl } from "@providers/entityEffects/EntityEffectDurationControl";
 import { blueprintManager } from "@providers/inversify/container";
 import { ItemUseCycleQueue } from "@providers/item/ItemUseCycleQueue";
 import { Locker } from "@providers/locks/Locker";
@@ -34,7 +35,7 @@ export class ServerBootstrap {
     private npcManager: NPCManager,
     private seeder: Seeder,
     private characterConnection: CharacterConnection,
-    private characterFoodConsumption: CharacterFoodConsumption,
+    private characterConsumptionControl: CharacterConsumptionControl,
     private pathfindingQueue: PathfindingQueue,
     private characterBuffActivator: CharacterBuffActivator,
     private spellSilence: SpellSilence,
@@ -50,7 +51,8 @@ export class ServerBootstrap {
     private npcBattleCycleQueue: NPCBattleCycleQueue,
     private characterMonitorQueue: CharacterMonitorQueue,
     private npcCycleQueue: NPCCycleQueue,
-    private itemUseCycleQueue: ItemUseCycleQueue
+    private itemUseCycleQueue: ItemUseCycleQueue,
+    private entityEffectDuration: EntityEffectDurationControl
   ) {}
 
   // operations that can be executed in only one CPU instance without issues with pm2 (ex. setup centralized state doesnt need to be setup in every pm2 instance!)
@@ -104,7 +106,7 @@ export class ServerBootstrap {
     await this.npcManager.disableNPCBehaviors();
 
     await this.characterConnection.resetCharacterAttributes();
-    await this.characterFoodConsumption.clearAllFoodConsumption();
+    await this.characterConsumptionControl.clearAllItemConsumption();
     await this.characterBuffActivator.disableAllTemporaryBuffsAllCharacters();
     await this.partyManagement.clearAllParties();
 
@@ -119,6 +121,7 @@ export class ServerBootstrap {
     await this.inMemoryHashTable.deleteAll("load-craftable-items");
     await this.inMemoryHashTable.deleteAll("channel-bound-events");
     await this.inMemoryHashTable.deleteAll("raids");
+    await this.entityEffectDuration.clearAll();
 
     // Firebase-admin setup, that push notification requires.
     PushNotificationHelper.initialize();

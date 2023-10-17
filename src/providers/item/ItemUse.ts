@@ -11,7 +11,7 @@ import { ItemValidation } from "./validation/ItemValidation";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 import { AnimationEffect } from "@providers/animation/AnimationEffect";
-import { CharacterFoodConsumption } from "@providers/character/CharacterFoodConsumption";
+import { CharacterConsumptionControl } from "@providers/character/CharacterConsumptionControl";
 import { CharacterInventory } from "@providers/character/CharacterInventory";
 import { CharacterItemInventory } from "@providers/character/characterItems/CharacterItemInventory";
 import { blueprintManager } from "@providers/inversify/container";
@@ -23,6 +23,7 @@ import {
   IEquipmentAndInventoryUpdatePayload,
   ItemSocketEvents,
   ItemSubType,
+  ItemType,
 } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 import { ItemUseCycleQueue } from "./ItemUseCycleQueue";
@@ -40,7 +41,7 @@ export class ItemUse {
     private animationEffect: AnimationEffect,
     private characterItemInventory: CharacterItemInventory,
     private characterInventory: CharacterInventory,
-    private characterFoodConsumption: CharacterFoodConsumption,
+    private characterConsumptionControl: CharacterConsumptionControl,
     private newRelic: NewRelic,
     private itemUseCycleQueue: ItemUseCycleQueue
   ) {}
@@ -109,10 +110,13 @@ export class ItemUse {
   }
 
   private async canApplyItemUsage(bluePrintItem: Partial<IItem>, character: ICharacter): Promise<boolean> {
-    if (bluePrintItem.subType === ItemSubType.Food) {
-      const canConsumeFood = await this.characterFoodConsumption.tryConsumingFood(character);
+    if (bluePrintItem.type === ItemType.Consumable) {
+      const canConsume = await this.characterConsumptionControl.tryConsuming(
+        character,
+        bluePrintItem.subType as ItemSubType
+      );
 
-      if (!canConsumeFood) return false;
+      if (!canConsume) return false;
     }
 
     return true;

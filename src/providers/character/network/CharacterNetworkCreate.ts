@@ -36,7 +36,6 @@ import { Locker } from "@providers/locks/Locker";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
 import { clearCacheForKey } from "speedgoose";
 import { CharacterDeath } from "../CharacterDeath";
-import { CharacterMonitorQueue } from "../CharacterMonitorQueue";
 import { CharacterBuffValidation } from "../characterBuff/CharacterBuffValidation";
 import { MagePassiveHabilities } from "../characterPassiveHabilities/MagePassiveHabilities";
 import { WarriorPassiveHabilities } from "../characterPassiveHabilities/WarriorPassiveHabilities";
@@ -64,8 +63,7 @@ export class CharacterNetworkCreate {
     private itemMissingReferenceCleaner: ItemMissingReferenceCleaner,
     private characterBuffValidation: CharacterBuffValidation,
     private battleTargeting: BattleTargeting,
-    private locker: Locker,
-    private characterMonitorQueue: CharacterMonitorQueue
+    private locker: Locker
   ) {}
 
   public onCharacterCreate(channel: SocketChannel): void {

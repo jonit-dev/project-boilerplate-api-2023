@@ -1,15 +1,15 @@
 import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { socketEventsBinderControl } from "@providers/inversify/container";
+import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { Locker } from "@providers/locks/Locker";
 import { CharacterSocketEvents, ISocket, SocketTypes } from "@rpg-engine/shared";
-import { provide } from "inversify-binding-decorators";
 import { GeckosIO } from "./GeckosIO";
 import { SocketIO } from "./SocketIO";
 import { SocketSessionControl } from "./SocketSessionControl";
 import { SocketClasses } from "./SocketsTypes";
 
-@provide(SocketAdapter)
+@provideSingleton(SocketAdapter)
 export class SocketAdapter implements ISocket {
   public static socketClass: SocketClasses; // Setting this method as static is necessary, otherwise it will be undefined after every injection (state does not persist!);
 

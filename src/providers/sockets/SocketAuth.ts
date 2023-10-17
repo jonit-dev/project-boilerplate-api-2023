@@ -14,6 +14,7 @@ import {
   DEBOUNCEABLE_EVENTS_MS_THRESHOLD_DISCONNECT,
   EXHAUSTABLE_EVENTS,
   LOCKABLE_EVENTS,
+  LOGGABLE_EVENTS,
 } from "@providers/constants/ServerConstants";
 import { ExhaustValidation } from "@providers/exhaust/ExhaustValidation";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
@@ -105,6 +106,13 @@ export class SocketAuth {
             });
             return;
           }
+        }
+
+        if (LOGGABLE_EVENTS.includes(event)) {
+          const now = dayjs().toISOString();
+          console.log(
+            `📝 ${character.name} (Id: ${character._id}) - (Channel: ${character.channelId}) => Event: ${event} at ${now}`
+          );
         }
 
         if (!BYPASS_EVENTS_AS_LAST_ACTION.includes(event as any)) {
