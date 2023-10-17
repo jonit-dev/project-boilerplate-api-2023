@@ -5,10 +5,9 @@ import { NPCSpawn } from "@providers/npc/NPCSpawn";
 import { NPCRaidActivator } from "@providers/raid/NPCRaidActivator";
 import { NPCRaidSpawn } from "@providers/raid/NPCRaidSpawn";
 
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 
-import nodeCron from "node-cron";
+import { CronJobScheduler } from "./CronJobScheduler";
 
 @provide(NPCCrons)
 export class NPCCrons {
@@ -17,44 +16,41 @@ export class NPCCrons {
     private newRelic: NewRelic,
     private npcRaidSpawn: NPCRaidSpawn,
     private npcRaidActivator: NPCRaidActivator,
-    private npcFreezer: NPCFreezer
+    private npcFreezer: NPCFreezer,
+    private cronJobScheduler: CronJobScheduler
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("* * * * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("npc-spawn-cron", "* * * * *", async () => {
       // filter all dead npcs that have a nextSpawnTime > now
 
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "NPCSpawn", async () => {
-        const deadNPCs = (await NPC.find({
-          health: 0,
-          isBehaviorEnabled: false,
-          nextSpawnTime: {
-            $exists: true,
-            $lte: new Date(),
-          },
-        }).lean()) as INPC[];
+      const deadNPCs = (await NPC.find({
+        health: 0,
+        isBehaviorEnabled: false,
+        nextSpawnTime: {
+          $exists: true,
+          $lte: new Date(),
+        },
+      }).lean()) as INPC[];
 
-        const deadRaidNPCs = await this.npcRaidSpawn.fetchDeadNPCsFromActiveRaids();
+      const deadRaidNPCs = await this.npcRaidSpawn.fetchDeadNPCsFromActiveRaids();
 
-        deadNPCs.push(...deadRaidNPCs);
+      deadNPCs.push(...deadRaidNPCs);
 
-        for (const deadNPC of deadNPCs) {
-          await this.npcSpawn.spawn(deadNPC, !!deadNPC.raidKey);
-        }
-      });
+      for (const deadNPC of deadNPCs) {
+        await this.npcSpawn.spawn(deadNPC, !!deadNPC.raidKey);
+      }
     });
 
-    nodeCron.schedule("* * * * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("npc-raid-shutdown", "* * * * *", async () => {
       await this.npcRaidActivator.shutdownRaids();
     });
 
-    // Run every hour
-    nodeCron.schedule("0 */6 * * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("npc-raid-activator", "0 */6 * * *", async () => {
       await this.npcRaidActivator.activateRaids();
     });
 
-    // Run every 5 minutes
-    nodeCron.schedule("*/5 * * * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("npc-freezer", "*/5 * * * *", async () => {
       await this.npcFreezer.freezeNPCsWithoutCharactersAround();
     });
   }

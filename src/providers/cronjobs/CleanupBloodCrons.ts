@@ -1,26 +1,23 @@
 import { Item } from "@entities/ModuleInventory/ItemModel";
 import { NewRelic } from "@providers/analytics/NewRelic";
 import { EffectsBlueprint } from "@providers/item/data/types/itemsBlueprintTypes";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { ItemSubType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import nodeCron from "node-cron";
+import { CronJobScheduler } from "./CronJobScheduler";
 
 @provide(CleanupBloodCrons)
 export class CleanupBloodCrons {
-  constructor(private newRelic: NewRelic) {}
+  constructor(private newRelic: NewRelic, private cronJobScheduler: CronJobScheduler) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/1 * * * *", async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupBloodCrons", async () => {
-        const fiveMinAgo = new Date();
-        fiveMinAgo.setMinutes(fiveMinAgo.getMinutes() - 5);
+    this.cronJobScheduler.uniqueSchedule("cleanup-blood-crons", "*/1 * * * *", async () => {
+      const fiveMinAgo = new Date();
+      fiveMinAgo.setMinutes(fiveMinAgo.getMinutes() - 5);
 
-        await Item.deleteMany({
-          createdAt: { $lt: fiveMinAgo },
-          key: EffectsBlueprint.GroundBlood,
-          subType: { $ne: ItemSubType.DeadBody },
-        });
+      await Item.deleteMany({
+        createdAt: { $lt: fiveMinAgo },
+        key: EffectsBlueprint.GroundBlood,
+        subType: { $ne: ItemSubType.DeadBody },
       });
     });
   }

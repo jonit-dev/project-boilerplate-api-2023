@@ -7,7 +7,7 @@ import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { IUIShowMessage, UISocketEvents } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
-import nodeCron from "node-cron";
+import { CronJobScheduler } from "./CronJobScheduler";
 
 @provide(ItemDeleteCrons)
 export class ItemDeleteCrons {
@@ -15,16 +15,16 @@ export class ItemDeleteCrons {
     private socketMessaging: SocketMessaging,
     private newRelic: NewRelic,
     private mapHelper: MapHelper,
-    private itemMissingReferenceCleaner: ItemMissingReferenceCleaner
+    private itemMissingReferenceCleaner: ItemMissingReferenceCleaner,
+    private cronJobScheduler: CronJobScheduler
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 */1 * * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("item-cron-cleanup-floor-items", "*/1 * * * *", async () => {
       await this.cleanupFloorItems();
     });
 
-    // once per day at midnight
-    nodeCron.schedule("0 0 0 * * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("item-cron-delete-items-without-owner", "0 0 0 * * *", async () => {
       await this.deleteItemsWithoutOwner();
     });
   }

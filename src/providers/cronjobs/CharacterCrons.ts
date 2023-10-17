@@ -4,15 +4,11 @@ import { CharacterLastAction } from "@providers/character/CharacterLastAction";
 import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketMessaging } from "@providers/sockets/SocketMessaging";
 import { SocketSessionControl } from "@providers/sockets/SocketSessionControl";
-import {
-  NewRelicMetricCategory,
-  NewRelicSubCategory,
-  NewRelicTransactionCategory,
-} from "@providers/types/NewRelicTypes";
+import { NewRelicMetricCategory, NewRelicSubCategory } from "@providers/types/NewRelicTypes";
 import { CharacterSocketEvents, ICharacterAttributeChanged } from "@rpg-engine/shared";
 import dayjs from "dayjs";
 import { provide } from "inversify-binding-decorators";
-import nodeCron from "node-cron";
+import { CronJobScheduler } from "./CronJobScheduler";
 @provide(CharacterCrons)
 export class CharacterCrons {
   constructor(
@@ -20,12 +16,14 @@ export class CharacterCrons {
     private characterLastAction: CharacterLastAction,
     private newRelic: NewRelic,
     private socketAdapter: SocketAdapter,
-    private socketSessionControl: SocketSessionControl
+    private socketSessionControl: SocketSessionControl,
+    private cronJobScheduler: CronJobScheduler
   ) {}
 
   public schedule(): void {
     // every 15 min, check how many players are online
-    nodeCron.schedule("*/15 * * * *", async () => {
+
+    this.cronJobScheduler.uniqueSchedule("character-cron-online-character-check", "*/15 * * * *", async () => {
       const onlineCharactersCount = await Character.countDocuments({
         isOnline: true,
       });
@@ -38,28 +36,16 @@ export class CharacterCrons {
       );
     });
 
-    nodeCron.schedule("* * * * *", async () => {
-      await this.newRelic.trackTransaction(
-        NewRelicTransactionCategory.CronJob,
-        "LogoutInactiveCharacters",
-        async () => {
-          await this.logoutInactiveCharacters();
-        }
-      );
+    this.cronJobScheduler.uniqueSchedule("character-cron-logout-inactive-characters", "* * * * *", async () => {
+      await this.logoutInactiveCharacters();
     });
 
-    // check banned characters every day
-    nodeCron.schedule("0 0 * * *", async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "UnbanCharacters", async () => {
-        await this.unbanCharacters();
-      });
+    this.cronJobScheduler.uniqueSchedule("character-cron-unban-characters", "0 0 * * *", async () => {
+      await this.unbanCharacters();
     });
 
-    // Check for clean skull from character
-    nodeCron.schedule("* * * * *", async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "CleanupSkullCrons", async () => {
-        await this.cleanSkullCharacters();
-      });
+    this.cronJobScheduler.uniqueSchedule("character-cron-clean-skull-from-character", "* * * * *", async () => {
+      await this.cleanSkullCharacters();
     });
   }
 

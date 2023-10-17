@@ -5,7 +5,7 @@ import { CharacterClass } from "@rpg-engine/shared";
 import { Colors } from "discord.js";
 
 import { provide } from "inversify-binding-decorators";
-import nodeCron from "node-cron";
+import { CronJobScheduler } from "./CronJobScheduler";
 
 type TopCharacterEntry = {
   name: string;
@@ -30,10 +30,10 @@ type CharacterRankingSkill = {
 
 @provide(RankingCrons)
 export class RankingCrons {
-  constructor(private discordBot: DiscordBot) {}
+  constructor(private discordBot: DiscordBot, private cronJobScheduler: CronJobScheduler) {}
 
   public schedule(): void {
-    nodeCron.schedule("0 2 * * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("ranking-crons", "0 2 */3 * *", async () => {
       await this.topLevelGlobal();
       await this.topLevelClass();
       await this.topLevelBySkillType();

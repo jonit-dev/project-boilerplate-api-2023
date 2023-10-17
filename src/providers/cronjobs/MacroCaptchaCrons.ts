@@ -3,35 +3,31 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { CharacterBan } from "@providers/character/CharacterBan";
 import { ANTI_MACRO_PROBABILITY_TRIGGER } from "@providers/constants/AntiMacroConstants";
 import { MacroCaptchaSend } from "@providers/macro/MacroCaptchaSend";
-import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { provide } from "inversify-binding-decorators";
 import _ from "lodash";
-import nodeCron from "node-cron";
+import { CronJobScheduler } from "./CronJobScheduler";
 
 @provide(MacroCaptchaCrons)
 export class MacroCaptchaCrons {
   constructor(
     private characterBan: CharacterBan,
     private newRelic: NewRelic,
-    private macroCaptchaSend: MacroCaptchaSend
+    private macroCaptchaSend: MacroCaptchaSend,
+    private cronJobScheduler: CronJobScheduler
   ) {}
 
   public schedule(): void {
-    nodeCron.schedule("*/2 * * * *", async () => {
-      await this.newRelic.trackTransaction(NewRelicTransactionCategory.CronJob, "BanMacroCharacters", async () => {
-        await this.banMacroCharacters();
-      });
+    this.cronJobScheduler.uniqueSchedule("macro-captcha-cron-ban-macro-characters", "*/2 * * * *", async () => {
+      await this.banMacroCharacters();
     });
 
-    nodeCron.schedule("*/5 * * * *", async () => {
-      await this.newRelic.trackTransaction(
-        NewRelicTransactionCategory.CronJob,
-        "SendMacroCaptchaToActiveCharacters",
-        async () => {
-          await this.sendMacroCaptchaToActiveCharacters();
-        }
-      );
-    });
+    this.cronJobScheduler.uniqueSchedule(
+      "macro-captcha-cron-send-macro-captcha-to-active-characters",
+      "*/5 * * * *",
+      async () => {
+        await this.sendMacroCaptchaToActiveCharacters();
+      }
+    );
   }
 
   private async banMacroCharacters(): Promise<void> {
