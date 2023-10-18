@@ -129,81 +129,61 @@ export class Pathfinder {
       },
     ];
 
-    const nonSolidPositions: {
+    let nonSolidPositions: {
       direction: string;
       x: number;
       y: number;
     }[] = [];
 
-    for (const data of potentialPositions) {
-      const isSolid = await this.movementHelper.isSolid(
-        npc.scene,
-        ToGridX(data.x),
-        ToGridX(data.y),
-        npc.layer,
-        "CHECK_ALL_LAYERS_BELOW"
-      );
+    const solidityCheckPromises = potentialPositions.map((position) => {
+      return this.movementHelper
+        .isSolid(npc.scene, ToGridX(position.x), ToGridY(position.y), npc.layer, "CHECK_ALL_LAYERS_BELOW")
+        .then((isSolid) => ({
+          isSolid,
+          position,
+        }));
+    });
 
-      if (!isSolid) {
-        nonSolidPositions.push(data);
-      }
-    }
+    const solidityResults = await Promise.all(solidityCheckPromises);
 
-    // Now we check for the direction of the target relative to the NPC
+    nonSolidPositions = solidityResults.filter((result) => !result.isSolid).map((result) => result.position);
+
     const dx = targetX - npc.x;
     const dy = targetY - npc.y;
-
     const targetDirection = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "bottom" : "top";
 
-    // First, we try to find a non-solid position in the direction of the target
+    const handleNPCStuck = async (x: number, y: number): Promise<boolean> => {
+      if (previousNPCPosition && ToGridX(x) === previousNPCPosition[0] && ToGridY(y) === previousNPCPosition[1]) {
+        await this.inMemoryHashTable.set("npc-force-pathfinding-calculation", npc._id, true);
+        return true;
+      }
+      return false;
+    };
+
     const targetDirectionPosition = nonSolidPositions.find((pos) => pos.direction === targetDirection);
 
     if (targetDirectionPosition) {
-      // if the next step is the same as the previous NPC position, then we can assume that the NPC is stuck and we should recalculate the path
-      if (
-        previousNPCPosition &&
-        previousNPCPosition[0] === ToGridX(targetDirectionPosition.x) &&
-        previousNPCPosition[1] === ToGridY(targetDirectionPosition.y)
-      ) {
-        await this.inMemoryHashTable.set("npc-force-pathfinding-calculation", npc._id, true);
+      if (await handleNPCStuck(targetDirectionPosition.x, targetDirectionPosition.y)) {
         return [];
       }
-
       return [[ToGridX(targetDirectionPosition.x), ToGridY(targetDirectionPosition.y)]];
     }
 
-    // If there is no non-solid position in the direction of the target, we default to your previous approach
-    const results: {
-      distance: number;
-      direction: string;
-      x: number;
-      y: number;
-    }[] = [];
+    const distancesToTarget = nonSolidPositions.map((position) => ({
+      distance: this.mathHelper.getDistanceBetweenPoints(position.x, position.y, targetX, targetY),
+      ...position,
+    }));
 
-    for (const data of nonSolidPositions) {
-      const distanceToPosition = this.mathHelper.getDistanceBetweenPoints(data.x, data.y, targetX, targetY);
+    const closestPosition = minBy(distancesToTarget, "distance");
 
-      results.push({
-        distance: distanceToPosition,
-        direction: data.direction,
-        x: data.x,
-        y: data.y,
-      });
+    if (closestPosition) {
+      if (await handleNPCStuck(closestPosition.x, closestPosition.y)) {
+        return [];
+      }
+      return [[ToGridX(closestPosition.x), ToGridY(closestPosition.y)]];
     }
 
-    const minDistance = minBy(results, "distance");
-
-    // if the next step is the same as the previous NPC position, then we can assume that the NPC is stuck and we should recalculate the path
-    if (
-      previousNPCPosition &&
-      ToGridX(minDistance?.x!) === previousNPCPosition[0] &&
-      ToGridY(minDistance?.y!) === previousNPCPosition[1]
-    ) {
-      await this.inMemoryHashTable.set("npc-force-pathfinding-calculation", npc._id, true);
-      return [];
-    }
-
-    return [[ToGridX(minDistance!.x), ToGridY(minDistance!.y)]];
+    return [];
   }
 
   private async hasCircularReferenceOnPathfinding(

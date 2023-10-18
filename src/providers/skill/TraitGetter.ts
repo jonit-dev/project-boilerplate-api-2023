@@ -30,39 +30,44 @@ export class TraitGetter {
         throw new Error("Skills owner is undefined");
       }
 
-      const hasCache = await this.inMemoryHashTable.has(`${skills?.owner}-skill-level-with-buff`, skillName);
+      const cacheKey = `${skills.owner}-skill-level-with-buff`;
+      const hasCache = await this.inMemoryHashTable.has(cacheKey, skillName);
 
       if (hasCache) {
-        return this.inMemoryHashTable.get(`${skills?.owner}-skill-level-with-buff`, skillName) as unknown as number;
+        return this.inMemoryHashTable.get(cacheKey, skillName) as unknown as number;
       }
 
       let totalBuffPercentages = 0;
+      const ownerStr = skills.owner.toString();
+
+      const buffPromises: Promise<any>[] = [];
+
       if (skills.ownerType === "Character") {
-        totalBuffPercentages = await this.characterBuffTracker.getAllBuffPercentageChanges(
-          skills.owner?.toString()!,
-          skillName as CharacterTrait
-        );
-
-        const classBonusPenaltiesBuff = await this.characterBonusOrPenalties.getClassBonusOrPenaltiesBuffs(
-          skills.owner?.toString()!
-        );
-
-        totalBuffPercentages += classBonusPenaltiesBuff[skillName] ?? 0;
+        buffPromises.push(this.characterBuffTracker.getAllBuffPercentageChanges(ownerStr, skillName as CharacterTrait));
+        buffPromises.push(this.characterBonusOrPenalties.getClassBonusOrPenaltiesBuffs(ownerStr));
       }
 
-      let skillLevel = skills?.[skillName]?.level;
+      const [allBuffPercentageChanges, classBonusPenaltiesBuff] = await Promise.all(buffPromises);
+
+      if (allBuffPercentageChanges) {
+        totalBuffPercentages += allBuffPercentageChanges;
+      }
+
+      if (classBonusPenaltiesBuff && classBonusPenaltiesBuff[skillName]) {
+        totalBuffPercentages += classBonusPenaltiesBuff[skillName];
+      }
+
+      let skillLevel = skills[skillName]?.level;
 
       if (!skillLevel) {
         skills = await Skill.findById(skills._id).lean();
+        skillLevel = skills[skillName]?.level;
       }
 
-      skillLevel = skills?.[skillName]?.level;
-
-      const skillValue = skillLevel + (skillLevel * totalBuffPercentages) / 100;
-
+      const skillValue = skillLevel * (1 + totalBuffPercentages / 100);
       const result = this.numberFormatter.formatNumber(skillValue);
 
-      await this.inMemoryHashTable.set(`${skills?.owner}-skill-level-with-buff`, skillName, result);
+      await this.inMemoryHashTable.set(cacheKey, skillName, result);
 
       return result;
     } catch (error) {

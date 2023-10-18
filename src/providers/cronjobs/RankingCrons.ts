@@ -14,7 +14,7 @@ type TopCharacterEntry = {
 
 type CharacterRankingClass = {
   class: CharacterClass;
-  top3: TopCharacterEntry[];
+  topPlayers: Array<{ name: string; level: number }>;
 };
 
 type TopSkillEntry = {
@@ -25,7 +25,7 @@ type TopSkillEntry = {
 
 type CharacterRankingSkill = {
   skill: string;
-  top3: TopSkillEntry[];
+  top10: TopSkillEntry[];
 };
 
 @provide(RankingCrons)
@@ -33,7 +33,7 @@ export class RankingCrons {
   constructor(private discordBot: DiscordBot, private cronJobScheduler: CronJobScheduler) {}
 
   public schedule(): void {
-    this.cronJobScheduler.uniqueSchedule("ranking-crons", "0 2 */3 * *", async () => {
+    this.cronJobScheduler.uniqueSchedule("ranking-crons", "0 0 0 0 0", async () => {
       await this.topLevelGlobal();
       await this.topLevelClass();
       await this.topLevelBySkillType();
@@ -41,12 +41,31 @@ export class RankingCrons {
   }
 
   private async topLevelGlobal(): Promise<void> {
-    const topSkill = await Skill.find({ ownerType: "Character" })
-      .lean()
-      .select("owner level")
-      .sort({ level: -1 })
-      .limit(3)
-      .exec();
+    const topSkill = await Skill.aggregate([
+      {
+        $lookup: {
+          from: "characters",
+          localField: "owner",
+          foreignField: "_id",
+          as: "characterInfo",
+        },
+      },
+      { $unwind: "$characterInfo" },
+      {
+        $match: {
+          "characterInfo.name": { $not: /^GM/ },
+          ownerType: "Character",
+        },
+      },
+      { $sort: { level: -1 } },
+      { $limit: 10 },
+      {
+        $project: {
+          owner: 1,
+          level: 1,
+        },
+      },
+    ]).exec();
 
     const result = new Set<TopCharacterEntry>();
 
@@ -63,21 +82,24 @@ export class RankingCrons {
     let index = 1;
 
     result.forEach((char) => {
-      if (index <= 3) {
-        message += `${index}- Name: [${char.name}] - Level: [${char.level}] \n`;
+      if (index <= 10) {
+        message += `${index}- Name: [${char.name}] - Level: [${Math.round(char.level)}] \n`;
         index++;
       }
     });
 
-    const title = "Top 3 Global Level!";
+    const title = "Top 10 Global Level!";
 
-    await this.discordBot.sendMessageWithColor(message, "achievements", title, Colors.Purple);
+    await this.discordBot.sendMessageWithColor(message, "rankings", title, Colors.Purple);
   }
 
   private async topLevelClass(): Promise<void> {
-    const top3ForClass: CharacterRankingClass[] = await Character.aggregate([
+    const top10ForClass: CharacterRankingClass[] = await Character.aggregate([
       {
-        $match: { class: { $in: Object.values(CharacterClass) } },
+        $match: {
+          class: { $in: Object.values(CharacterClass) },
+          name: { $not: /^GM/ },
+        },
       },
       {
         $lookup: {
@@ -91,7 +113,7 @@ export class RankingCrons {
         $unwind: "$skillInfo",
       },
       {
-        $sort: { level: -1 },
+        $sort: { "skillInfo.level": -1 },
       },
       {
         $group: {
@@ -108,17 +130,34 @@ export class RankingCrons {
         $project: {
           class: "$_id",
           _id: 0,
-          top3: { $slice: ["$topPlayers", 3] },
+          topPlayers: { $slice: ["$topPlayers", 10] },
         },
       },
     ]).exec();
 
-    for (const ranking of top3ForClass) {
-      let message = "";
+    const result: Record<string, CharacterRankingClass> = {};
 
-      const title = `Top 3 ${ranking.class}!`;
-      ranking.top3.forEach((char, index) => {
-        message += `${index + 1}- Name: [${char.name}] - Level: [${char.level}]\n`;
+    for (const ranking of top10ForClass) {
+      if (!result[ranking.class]) {
+        result[ranking.class] = { class: ranking.class, topPlayers: [] };
+      }
+
+      ranking.topPlayers.forEach((char) => {
+        result[ranking.class].topPlayers.push({
+          name: char.name,
+          level: char.level,
+        });
+      });
+
+      result[ranking.class].topPlayers.sort((a, b) => b.level - a.level);
+    }
+
+    for (const rank of Object.values(result)) {
+      let message = "";
+      const title = `Top 10 ${rank.class}!`;
+
+      rank.topPlayers.forEach((char, index) => {
+        message += `${index + 1}- Name: [${char.name}] - Level: [${Math.round(char.level)}]\n`;
       });
 
       await this.discordBot.sendMessageWithColor(message, "rankings", title, Colors.Gold);
@@ -148,10 +187,10 @@ export class RankingCrons {
       "blacksmithing",
     ];
 
-    const top3ForAllSkills: CharacterRankingSkill[] = [];
+    const top10ForAllSkills: CharacterRankingSkill[] = [];
 
     for (const skill of skills) {
-      const top3ForSkill = await Skill.aggregate([
+      const top10ForSkill = await Skill.aggregate([
         {
           $lookup: {
             from: "characters",
@@ -164,10 +203,15 @@ export class RankingCrons {
           $unwind: "$characterInfo",
         },
         {
+          $match: {
+            "characterInfo.name": { $not: /GM/ },
+          },
+        },
+        {
           $sort: { [`${skill}.level`]: -1 },
         },
         {
-          $limit: 3,
+          $limit: 10,
         },
         {
           $project: {
@@ -179,14 +223,16 @@ export class RankingCrons {
         },
       ]).exec();
 
-      top3ForAllSkills.push({ skill: skill, top3: top3ForSkill });
+      top10ForAllSkills.push({ skill: skill, top10: top10ForSkill });
     }
 
-    for (const ranking of top3ForAllSkills) {
+    for (const ranking of top10ForAllSkills) {
       let message = "";
 
-      const title = `Top 3 ${ranking.skill.charAt(0).toUpperCase() + ranking.skill.slice(1)} Skill!`;
-      ranking.top3.forEach((char, index) => {
+      ranking.top10.sort((a, b) => b.level - a.level);
+
+      const title = `Top 10 ${ranking.skill.charAt(0).toUpperCase() + ranking.skill.slice(1)} Skill!`;
+      ranking.top10.forEach((char, index) => {
         message += `${index + 1}- Name: [${char.name}] - Level: [${char.level}]\n`;
       });
 

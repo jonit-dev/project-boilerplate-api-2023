@@ -1,7 +1,7 @@
 import { ICharacter } from "@entities/ModuleCharacter/CharacterModel";
 import { INPC } from "@entities/ModuleNPC/NPCModel";
 import { appEnv } from "@providers/config/env";
-import { Time } from "@providers/time/Time";
+import { Locker } from "@providers/locks/Locker";
 import { Job, Queue, Worker } from "bullmq";
 import { provide } from "inversify-binding-decorators";
 import { Pathfinder } from "./Pathfinder";
@@ -12,7 +12,7 @@ export class PathfindingQueue {
   private queue: Queue;
   private worker: Worker;
 
-  constructor(private pathfinder: Pathfinder, private pathfindingResults: PathfindingResults, private time: Time) {
+  constructor(private pathfinder: Pathfinder, private pathfindingResults: PathfindingResults, private locker: Locker) {
     if (appEnv.general.IS_UNIT_TEST) {
       return;
     }
@@ -85,20 +85,32 @@ export class PathfindingQueue {
     startGridY: number,
     endGridX: number,
     endGridY: number
-  ): Promise<Job> {
-    return await this.queue.add(
-      "pathfindingJob",
-      { npc, target, startGridX, startGridY, endGridX, endGridY },
-      {
-        removeOnComplete: true,
-        removeOnFail: true,
-        attempts: 3,
-        backoff: {
-          type: "exponential",
-          delay: 10,
-        },
+  ): Promise<Job | undefined> {
+    try {
+      const canProceed = await this.locker.lock(`pathfinding-${npc._id}`);
+
+      if (!canProceed) {
+        return;
       }
-    );
+
+      return await this.queue.add(
+        "pathfindingJob",
+        { npc, target, startGridX, startGridY, endGridX, endGridY },
+        {
+          removeOnComplete: true,
+          removeOnFail: true,
+          attempts: 3,
+          backoff: {
+            type: "exponential",
+            delay: 10,
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      await this.locker.unlock(`pathfinding-${npc._id}`);
+    }
   }
 
   public async shutdown(): Promise<void> {
