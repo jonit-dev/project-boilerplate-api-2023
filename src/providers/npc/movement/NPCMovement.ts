@@ -185,6 +185,10 @@ export class NPCMovement {
           endGridX,
           endGridY
         );
+        if (!job) {
+          return;
+        }
+
         npcPath = await this.pathfinderPoller(job.id!);
       }
 
@@ -223,39 +227,32 @@ export class NPCMovement {
     }
   }
 
-  private pathfinderPoller(jobId: string): Promise<number[][]> {
+  @TrackNewRelicTransaction()
+  private async pathfinderPoller(jobId: string): Promise<number[][]> {
     if (!jobId) {
       throw new Error("Job ID is required!");
     }
 
-    let interval: NodeJS.Timeout;
     let tries = 0;
 
-    return new Promise<number[][]>((resolve, reject) => {
-      interval = setInterval(async () => {
-        let npcPath: number[][] | null = null;
+    while (tries <= PATHFINDING_MAX_TRIES) {
+      try {
+        const npcPath: number[][] | null = await this.pathfindingResults.getResult(jobId);
 
-        try {
-          npcPath = await this.pathfindingResults.getResult(jobId);
-
-          if (npcPath) {
-            clearInterval(interval);
-            await this.pathfindingResults.deleteResult(jobId);
-            resolve(npcPath);
-          } else {
-            tries++;
-            if (tries > PATHFINDING_MAX_TRIES) {
-              clearInterval(interval);
-              await this.pathfindingResults.deleteResult(jobId);
-              reject(new Error("Error while trying to fetch pathfinding result for NPC. Timeout!"));
-            }
-          }
-        } catch (error) {
-          clearInterval(interval);
-          console.error(error);
-          reject(error);
+        if (npcPath) {
+          await this.pathfindingResults.deleteResult(jobId);
+          return npcPath;
         }
-      }, 1);
-    });
+
+        tries++;
+        await new Promise((resolve) => setTimeout(resolve, 100)); // adjust this timeout as needed
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    }
+
+    await this.pathfindingResults.deleteResult(jobId);
+    throw new Error("Error while trying to fetch pathfinding result for NPC. Timeout!");
   }
 }
