@@ -6,6 +6,7 @@ export const DISCORD_CHANNEL_IDS = {
   marketplaceBotNotifications: "1147031074308882453",
   achievements: "1147358878409969746",
   rankings: "1162809636341153904",
+  announcements: "1064126085480067132",
 };
 
 export type DiscordChannelName = keyof typeof DISCORD_CHANNEL_IDS;
