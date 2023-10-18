@@ -33,7 +33,7 @@ export class RankingCrons {
   constructor(private discordBot: DiscordBot, private cronJobScheduler: CronJobScheduler) {}
 
   public schedule(): void {
-    this.cronJobScheduler.uniqueSchedule("ranking-crons", "0 0 0 0 0", async () => {
+    this.cronJobScheduler.uniqueSchedule("ranking-crons", "0 2 */3 * *", async () => {
       await this.topLevelGlobal();
       await this.topLevelClass();
       await this.topLevelBySkillType();
