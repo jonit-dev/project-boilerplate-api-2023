@@ -58,7 +58,7 @@ export const THROTTABLE_EVENTS_MS_THRESHOLD_DISCONNECT = 70;
 export const THROTTABLE_DEFAULT_MS_THRESHOLD = 1000;
 
 export const THROTTABLE_EVENTS = {
-  [ItemSocketEvents.LoadCraftBook]: THROTTABLE_DEFAULT_MS_THRESHOLD,
+  [ItemSocketEvents.LoadCraftBook]: 500,
   [ItemSocketEvents.CraftItem]: 2000,
   [ChatSocketEvents.GlobalChatMessageCreate]: THROTTABLE_DEFAULT_MS_THRESHOLD,
   [SpellSocketEvents.CastSpell]: THROTTABLE_DEFAULT_MS_THRESHOLD,

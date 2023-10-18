@@ -71,24 +71,33 @@ export class SocketAuth {
     owner: IUser
   ): Promise<void> {
     await this.newRelic.trackTransaction(NewRelicTransactionCategory.SocketEvent, event, async (): Promise<void> => {
-      if (this.shouldLogEvent(event)) {
+      const shouldLog = this.shouldLogEvent(event);
+      const shouldSetLastAction = this.shouldSetLastAction(event);
+      const isLockableEvent = LOCKABLE_EVENTS.includes(event);
+
+      const [isExhausted, isThrottleViolated] = await Promise.all([
+        this.isExhausted(character, event),
+        this.isThrottleViolated(character, event),
+      ]);
+
+      if (shouldLog) {
         this.logEvent(character, event);
       }
 
-      if (await this.isExhausted(character, event)) {
+      if (isExhausted) {
         this.notifyExhaustion(channel);
         return;
       }
 
-      if (await this.isThrottleViolated(character, event)) {
+      if (isThrottleViolated) {
         return;
       }
 
-      if (this.shouldSetLastAction(event)) {
+      if (shouldSetLastAction) {
         await this.characterLastAction.setLastAction(character._id, dayjs().toISOString());
       }
 
-      if (LOCKABLE_EVENTS.includes(event)) {
+      if (isLockableEvent) {
         await this.performLockedEvent(character._id, character.name, event, async () => {
           await callback(data, character, owner);
         });
