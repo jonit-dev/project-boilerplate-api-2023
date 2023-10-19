@@ -4,7 +4,6 @@ import { NewRelic } from "@providers/analytics/NewRelic";
 import { TrackNewRelicTransaction } from "@providers/analytics/decorator/TrackNewRelicTransaction";
 
 import { appEnv } from "@providers/config/env";
-import { BYPASS_EVENTS_AS_LAST_ACTION } from "@providers/constants/EventsConstants";
 import { LOGGABLE_EVENTS } from "@providers/constants/ServerConstants";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
 import { Locker } from "@providers/locks/Locker";
@@ -65,10 +64,6 @@ export class SocketAuth {
 
       await callback(data, owner);
     });
-  }
-
-  private shouldSetLastAction(event: string): boolean {
-    return !BYPASS_EVENTS_AS_LAST_ACTION.includes(event as any);
   }
 
   private shouldLogEvent(event: string): boolean {

@@ -1,1 +1,0 @@
-export const TILE_MAX_REACH_DISTANCE_IN_GRID = 2;

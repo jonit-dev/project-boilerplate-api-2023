@@ -1,3 +1,0 @@
-export const BASE_MAX_USABLE_CONSUMPTION = 5;
-
-export const BASE_CONSUMPTION_INTERVAL = 1000 * 20;
