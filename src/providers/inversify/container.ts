@@ -11,6 +11,10 @@ import { SocketAdapter } from "@providers/sockets/SocketAdapter";
 import { SocketEventsBinder } from "@providers/sockets/SocketEventsBinder";
 import { SocketEventsBinderControl } from "@providers/sockets/SocketEventsBinderControl";
 
+import { LinearInterpolation } from "@providers/math/LinearInterpolation";
+import { MathHelper } from "@providers/math/MathHelper";
+import { NumberFormatter } from "@providers/text/NumberFormatter";
+import { TextFormatter } from "@providers/text/TextFormatter";
 import { UnitTestHelper } from "@providers/unitTests/UnitTestHelper";
 import { Container } from "inversify";
 import { buildProviderModule } from "inversify-binding-decorators";
@@ -61,5 +65,13 @@ export const newRelic = container.get<NewRelic>(NewRelic);
 export const hashGenerator = container.get<HashGenerator>(HashGenerator);
 
 export const locker = container.get<Locker>(Locker);
+
+export const linearInterpolation = container.get<LinearInterpolation>(LinearInterpolation);
+
+export const textFormatter = container.get<TextFormatter>(TextFormatter);
+
+export const numberFormatter = container.get<NumberFormatter>(NumberFormatter);
+
+export const mathHelper = container.get<MathHelper>(MathHelper);
 
 export { container };
