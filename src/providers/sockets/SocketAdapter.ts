@@ -1,4 +1,3 @@
-import { Character } from "@entities/ModuleCharacter/CharacterModel";
 import { appEnv } from "@providers/config/env";
 import { socketEventsBinderControl } from "@providers/inversify/container";
 import { provideSingleton } from "@providers/inversify/provideSingleton";
@@ -75,7 +74,10 @@ export class SocketAdapter implements ISocket {
         if (hasSocketOngoingSession) {
           // force disconnect the previous socket connection
 
-          const previousCharacter = await Character.findById(characterId).lean().select("channelId");
+          // const previousCharacter = await Character.findById(characterId).lean().select("channelId");
+          const previousCharacter = {
+            channelId: "123",
+          }; //! remove this when using
 
           if (!previousCharacter) {
             throw new Error("Character not found!");

@@ -6,7 +6,6 @@ import { appEnv } from "@providers/config/env";
 import {
   cronJobs,
   database,
-  mapLoader,
   newRelic,
   redisManager,
   serverBootstrap,
@@ -46,8 +45,6 @@ const server = app.listen(port, async () => {
 
       cronJobs.start();
       await socketAdapter.init(appEnv.socket.type);
-
-      await mapLoader.init(); // must be the first thing loaded!
 
       app.use(Sentry.Handlers.requestHandler());
       app.use(Sentry.Handlers.tracingHandler());
