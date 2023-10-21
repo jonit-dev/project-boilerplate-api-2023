@@ -5,7 +5,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Set the deployment directory
-DEPLOY_DIR="/home/jonit/definya/api"
+DEPLOY_DIR="/home/jonit/laundrobot/api"
 
 # Set the branch you want to deploy
 BRANCH="release"
@@ -23,12 +23,12 @@ done
 echo "Refreshing source code..."
 GIT_WORK_TREE=$DEPLOY_DIR git checkout -f
 
-cd ~/definya/api
+cd ~/laundrobot/api
 
 echo "🐳 Building and pushing Docker image..."
-docker build -t definya/definya-team:api-latest .
-docker push definya/definya-team:api-latest
+docker build -t laundrobot/laundrobot-team:api-latest .
+docker push laundrobot/laundrobot-team:api-latest
 
 echo "🐳 Updating swarm..."
 
-bash ~/definya/api/environment/api-refresh-containers.sh
+bash ~/laundrobot/api/environment/api-refresh-containers.sh

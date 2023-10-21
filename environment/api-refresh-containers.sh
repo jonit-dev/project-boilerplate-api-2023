@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set the service name
-SERVICE_NAME="swarm-stack_rpg-api"
+SERVICE_NAME="swarm-stack_laundry-api"
 
 # Additional deployment steps
-cd ~/definya/api
+cd ~/laundrobot/api
 
 # Export database
 echo "🐳 Exporting database..."

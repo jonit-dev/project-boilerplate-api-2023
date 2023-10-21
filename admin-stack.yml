@@ -11,7 +11,7 @@ services:
       labels:
         - traefik.enable=true
         # Dashboard router
-        - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.definya.com`)"
+        - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.laundrobot.ai`)"
         - "traefik.http.routers.traefik-dashboard.service=api@internal"
         - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
         - "traefik.http.routers.traefik-dashboard.tls.certresolver=myresolver"
@@ -33,7 +33,7 @@ services:
       # Setup SSL
       - --certificatesresolvers.myresolver.acme.httpchallenge=true
       - --certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web
-      - --certificatesresolvers.myresolver.acme.email=admin@definya.com
+      - --certificatesresolvers.myresolver.acme.email=admin@laundrobot.ai
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
       # Redirect HTTP to HTTPS
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
@@ -81,7 +81,7 @@ services:
       labels:
         - traefik.enable=true
         - traefik.docker.network=public
-        - traefik.http.routers.portainer.rule=Host(`portainer.definya.com`)
+        - traefik.http.routers.portainer.rule=Host(`portainer.laundrobot.ai`)
         - traefik.http.routers.portainer.entrypoints=websecure
         - traefik.http.routers.portainer.tls.certresolver=myresolver
         - traefik.http.services.portainer-service.loadbalancer.server.port=9000

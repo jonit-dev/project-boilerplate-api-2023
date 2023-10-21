@@ -1,7 +1,7 @@
 version: "3"
 services:
-  rpg-api:
-    container_name: rpg-api
+  laundry-api:
+    container_name: laundry-api
     restart: always
     build: .
     logging:
@@ -21,7 +21,7 @@ services:
       FORCE_COLOR: "true"
       CHOKIDAR_USEPOLLING: "true" # enables hot-reloading on windows host
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
-      NEW_RELIC_APP_NAME: "Definya API Dev"
+      NEW_RELIC_APP_NAME: "Laundrobot.AI API Dev"
     links:
       - rpg-db
     depends_on:

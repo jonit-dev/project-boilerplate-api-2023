@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "rpg-api",
+      "name": "laundry-api",
       "script": "./dist/src/server.js",
       "merge_logs": true,
       "max_restarts": 20,

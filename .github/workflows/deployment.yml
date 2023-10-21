@@ -55,8 +55,8 @@ jobs:
 
           # Build the Docker image on Github cloud
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t definya/definya-team:api-latest .
-          docker push definya/definya-team:api-latest
+          docker build -t laundrobot/laundrobot-team:api-latest .
+          docker push laundrobot/laundrobot-team:api-latest
 
       - name: SSH into VPS and update containers
         uses: appleboy/ssh-action@master
@@ -68,14 +68,14 @@ jobs:
           script: |
             # Update Docker image on the VPS
             docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-            docker pull definya/definya-team:api-latest
+            docker pull laundrobot/laundrobot-team:api-latest
 
             # Fix to avoid npm not found (applyboy/ssh-action bug)
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
             # Update repository code
-            cd ~/definya/api  
+            cd ~/laundrobot/api  
 
             # Clean untracked files if any
             git clean -fd 
@@ -83,4 +83,4 @@ jobs:
             git checkout release
             git pull origin release
 
-            bash ~/definya/api/environment/api-refresh-containers.sh
+            bash ~/laundrobot/api/environment/api-refresh-containers.sh

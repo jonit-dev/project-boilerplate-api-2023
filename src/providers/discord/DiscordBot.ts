@@ -99,9 +99,9 @@ export class DiscordBot {
       .setTitle(title || "")
       .setColor(color ?? Colors.Orange)
       .setAuthor({
-        name: "Definya Bot",
+        name: "Laundrobot.AI Bot",
         iconURL: "https://i.imgur.com/VVy83d8.png",
-        url: "https://play.definya.com/",
+        url: "https://laundrobot.ai/",
       })
       .setDescription(message);
 

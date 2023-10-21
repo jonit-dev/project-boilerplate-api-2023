@@ -42,7 +42,7 @@ case $1 in
   ;;
 esac
 
-echo "✅ Done! Note that you should run 'docker-compose build rpg-api' to rebuild your container with the new changes applied."
+echo "✅ Done! Note that you should run 'docker-compose build laundry-api' to rebuild your container with the new changes applied."
 
 echo "
 ⚠️ WARNING: Make sure you change your CLIENT environment to match your API environment, otherwise it won't work!"

@@ -5,13 +5,13 @@
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Set the deployment directory
-DEPLOY_DIR="/home/jonit/definya/client"
+DEPLOY_DIR="/home/jonit/laundrobot/client"
 
 # Set the branch you want to deploy
 BRANCH="release"
 
 # Get the repository directory
-REPO_DIR="/home/jonit/definya/client.git"
+REPO_DIR="/home/jonit/laundrobot/client.git"
 
 while read oldrev newrev refname; do
     branch=$(git rev-parse --symbolic --abbrev-ref $refname)
@@ -27,18 +27,18 @@ git --work-tree=$DEPLOY_DIR --git-dir=$REPO_DIR checkout -f $BRANCH
 
 
 # Build React and Docker image
-cd ~/definya/client
+cd ~/laundrobot/client
 
 echo "🐳 Building React..."
 npm run build
 
 echo "🐳Building Docker image..."
-docker build -t definya/definya-team:client-latest .
-docker push definya/definya-team:client-latest
+docker build -t laundrobot/laundrobot-team:client-latest .
+docker push laundrobot/laundrobot-team:client-latest
 
 # Update the service to restart containers and force image update
 echo "🐳Restarting swarm service..."
 
-docker service update --force swarm-stack_rpg-client
+docker service update --force swarm-stack_laundry-client
 
 docker container prune -f
