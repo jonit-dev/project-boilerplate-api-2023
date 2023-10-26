@@ -59,8 +59,8 @@ services:
       - "$REDIS_PORT"
     env_file: .env
     volumes:
-      - ./config/redis.conf:/redis.conf
-    command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
       - rpg-network
 

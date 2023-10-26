@@ -2,10 +2,11 @@ import { appEnv } from "@providers/config/env";
 import { PM2Helper } from "@providers/server/PM2Helper";
 import { EnvType } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
+import { RedisCrons } from "./RedisCrons";
 
 @provide(Cronjob)
 export class Cronjob {
-  constructor(private pm2Helper: PM2Helper) {}
+  constructor(private pm2Helper: PM2Helper, private redisCrons: RedisCrons) {}
 
   public start(): void {
     this.scheduleCrons();
@@ -16,13 +17,13 @@ export class Cronjob {
 
     switch (appEnv.general.ENV) {
       case EnvType.Development:
-        // schedule here
+        this.redisCrons.schedule();
         break;
       case EnvType.Staging:
       case EnvType.Production:
         // make sure it only runs in one instance
         if (process.env.pm_id === this.pm2Helper.pickLastCPUInstance()) {
-          // schedule here
+          this.redisCrons.schedule();
         }
         break;
     }

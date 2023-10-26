@@ -1,4 +1,4 @@
-import { RedisManager } from "@providers/database/RedisManager";
+import { RedisManager } from "@providers/database/RedisManager/RedisManager";
 import { IResource } from "@rpg-engine/shared";
 import { provide } from "inversify-binding-decorators";
 

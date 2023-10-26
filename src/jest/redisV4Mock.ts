@@ -29,5 +29,21 @@ const v4Client = {
   pSetEx: (key: string, ms: number, value: string) => setEx(key, ms / 1000, value),
   on: () => undefined,
   // Add additional functions as needed...
+
+  // IORedis compatible functions
+  hset: promisify(client.hset).bind(client),
+  keys: promisify(client.keys).bind(client),
+  hkeys: promisify(client.hkeys).bind(client),
+  hsetnx: promisify(client.hsetnx).bind(client),
+  hget: promisify(client.hget).bind(client),
+  hdel: promisify(client.hdel).bind(client),
+  hgetall: promisify(client.hgetall).bind(client),
+
+  hexists: promisify(client.hexists).bind(client),
+  flushall: promisify(client.flushall).bind(client),
+  setex: promisify(client.setex).bind(client),
+  mget: promisify(client.mget).bind(client),
+  pttl: promisify(client.pttl).bind(client),
+  psetex: (key: string, ms: number, value: string) => setEx(key, ms / 1000, value),
 };
 export default { ...redis, createClient: () => v4Client };

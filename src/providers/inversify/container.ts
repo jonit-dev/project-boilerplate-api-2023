@@ -1,7 +1,7 @@
 import { NewRelic } from "@providers/analytics/NewRelic";
 
 import { InMemoryHashTable } from "@providers/database/InMemoryHashTable";
-import { RedisManager } from "@providers/database/RedisManager";
+import { RedisManager } from "@providers/database/RedisManager/RedisManager";
 import { HashGenerator } from "@providers/hash/HashGenerator";
 import { Locker } from "@providers/locks/Locker";
 
