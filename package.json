@@ -1,5 +1,5 @@
 {
-  "name": "@engine/api",
+  "name": "@laundry-engine/api",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
