@@ -21,7 +21,7 @@ PORT=$(awk -F'=' '/^MONGO_PORT/ { print $2}' "$PROD_ENV")
 [ ! -f "$DB_DUMP_ZIP" ] && echo "Backup file does not exist! Please, create one before proceeding." && exit
 
 # Find the Task ID of the Running MongoDB Service
-TASK_ID=$(docker service ps -q --filter 'desired-state=running' swarm-stack_rpg-db)
+TASK_ID=$(docker service ps -q --filter 'desired-state=running' swarm-stack_laundy-db)
 
 # Find the Container ID Associated with the Task ID
 CONTAINER_ID=$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $TASK_ID)

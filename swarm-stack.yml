@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  rpg-api:
+  laundry-api:
     image: definya/definya-team:api-latest
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:5002"]
@@ -28,23 +28,23 @@ services:
       labels:
         # Basic setup for API
         - traefik.enable=true
-        - traefik.http.routers.rpg-api.rule=Host(`na.definya.com`)
-        - traefik.http.routers.rpg-api.entrypoints=websecure
-        - traefik.http.routers.rpg-api.tls.certresolver=myresolver
-        - traefik.http.services.rpg-api-service.loadbalancer.server.port=5002
-        - traefik.http.routers.rpg-api.service=rpg-api-service
+        - traefik.http.routers.laundry-api.rule=Host(`na.definya.com`)
+        - traefik.http.routers.laundry-api.entrypoints=websecure
+        - traefik.http.routers.laundry-api.tls.certresolver=myresolver
+        - traefik.http.services.laundry-api-service.loadbalancer.server.port=5002
+        - traefik.http.routers.laundry-api.service=laundry-api-service
 
         # Websockets
-        - traefik.http.routers.rpg-api-socket.rule=Host(`na.definya.com`) && Path(`/socket.io/`)
-        - traefik.http.routers.rpg-api-socket.entrypoints=websecure
-        - traefik.http.routers.rpg-api-socket.tls.certresolver=myresolver
-        - traefik.http.services.rpg-api-socket-service.loadbalancer.server.port=5101
-        - traefik.http.routers.rpg-api-socket.service=rpg-api-socket-service
+        - traefik.http.routers.laundry-api-socket.rule=Host(`na.definya.com`) && Path(`/socket.io/`)
+        - traefik.http.routers.laundry-api-socket.entrypoints=websecure
+        - traefik.http.routers.laundry-api-socket.tls.certresolver=myresolver
+        - traefik.http.services.laundry-api-socket-service.loadbalancer.server.port=5101
+        - traefik.http.routers.laundry-api-socket.service=laundry-api-socket-service
 
         # Add sticky session for websockets
-        - "traefik.http.services.rpg-api-socket-service.loadbalancer.sticky=true"
-        - "traefik.http.services.rpg-api-socket-service.loadbalancer.sticky.cookie.name=StickyCookie"
-        - "traefik.http.services.rpg-api-socket-service.loadbalancer.sticky.cookie.secure=true"
+        - "traefik.http.services.laundry-api-socket-service.loadbalancer.sticky=true"
+        - "traefik.http.services.laundry-api-socket-service.loadbalancer.sticky.cookie.name=StickyCookie"
+        - "traefik.http.services.laundry-api-socket-service.loadbalancer.sticky.cookie.secure=true"
     logging:
       options:
         max-size: "10m"
@@ -54,9 +54,9 @@ services:
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Definya API"
     networks:
-      - rpg-network
+      - laundry-network
 
-  rpg-client:
+  laundry-client:
     image: definya/definya-team:client-latest
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080"]
@@ -73,17 +73,17 @@ services:
         condition: on-failure
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.rpg-client.rule=Host(`play.definya.com`)"
-        - "traefik.http.routers.rpg-client.entrypoints=websecure"
-        - "traefik.http.routers.rpg-client.tls.certresolver=myresolver"
-        - "traefik.http.services.rpg-client.loadbalancer.server.port=8080"
+        - "traefik.http.routers.laundry-client.rule=Host(`play.definya.com`)"
+        - "traefik.http.routers.laundry-client.entrypoints=websecure"
+        - "traefik.http.routers.laundry-client.tls.certresolver=myresolver"
+        - "traefik.http.services.laundry-client.loadbalancer.server.port=8080"
       placement:
         constraints:
           - node.role == manager
     networks:
-      - rpg-network
+      - laundry-network
 
-  rpg-db:
+  laundy-db:
     image: mongo:7.0.0
     command: mongod --port ${MONGO_PORT}
     logging:
@@ -91,7 +91,7 @@ services:
         max-size: "10m"
         max-file: "3"
     volumes:
-      - rpg-db-data:/data/db
+      - laundy-db-data:/data/db
       - ./docker_scripts/:/docker-entrypoint-initdb.d
     ports:
       - "${MONGO_PORT}:${MONGO_PORT}"
@@ -110,18 +110,18 @@ services:
       timeout: 15s
       retries: 3
     networks:
-      - rpg-network
+      - laundry-network
 
-  rpg-redis:
+  laundry-redis:
     image: redis:7.2.0
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
-      - rpg-redis-data:/data
+      - laundry-redis-data:/data
       - ./config/redis.conf:/usr/local/etc/redis/redis.conf
     command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
-      - rpg-network
+      - laundry-network
     deploy:
       placement:
         constraints:
@@ -149,9 +149,9 @@ services:
       - SYS_PTRACE
 
 networks:
-  rpg-network:
+  laundry-network:
     external: true
 
 volumes:
-  rpg-db-data:
-  rpg-redis-data:
+  laundy-db-data:
+  laundry-redis-data:

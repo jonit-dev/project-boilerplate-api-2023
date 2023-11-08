@@ -50,7 +50,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./letsencrypt:/letsencrypt
     networks:
-      - rpg-network
+      - laundry-network
       - public
   agent:
     image: portainer/agent
@@ -91,7 +91,7 @@ networks:
     name: private
   public:
     external: true
-  rpg-network:
+  laundry-network:
     external: true
 
 volumes:

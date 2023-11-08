@@ -17,7 +17,7 @@ PASSWORD=$(awk -F'=' '/^MONGO_INITDB_ROOT_PASSWORD/ { print $2}' "$PROD_ENV")
 PORT=$(awk -F'=' '/^MONGO_PORT/ { print $2}' "$PROD_ENV")
 
 # Find the Task ID of the Running MongoDB Service
-TASK_ID=$(docker service ps -q --filter 'desired-state=running' swarm-stack_rpg-db)
+TASK_ID=$(docker service ps -q --filter 'desired-state=running' swarm-stack_laundy-db)
 
 # Find the Container ID Associated with the Task ID
 CONTAINER_ID=$(docker inspect --format '{{.Status.ContainerStatus.ContainerID}}' $TASK_ID)

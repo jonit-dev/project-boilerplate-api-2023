@@ -23,14 +23,14 @@ services:
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Laundrobot.AI API Dev"
     links:
-      - rpg-db
+      - laundy-db
     depends_on:
-      - rpg-db
-      - rpg-redis
+      - laundy-db
+      - laundry-redis
     networks:
-      - rpg-network
-  rpg-db:
-    container_name: rpg-db
+      - laundry-network
+  laundy-db:
+    container_name: laundy-db
     image: mongo
     restart: always
     command: mongod --port ${MONGO_PORT}
@@ -48,9 +48,9 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
-      - rpg-network
-  rpg-redis:
-    container_name: rpg-redis
+      - laundry-network
+  laundry-redis:
+    container_name: laundry-redis
     restart: always
     image: redis:latest
     ports:
@@ -62,19 +62,18 @@ services:
       - ./config/redis.conf:/usr/local/etc/redis/redis.conf
     command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
-      - rpg-network
+      - laundry-network
 
-  redis-commander:
-    container_name: redis-commander
+  laundry-redis-commander:
+    container_name: laundry-redis-commander
     restart: always
     image: rediscommander/redis-commander:latest
     ports:
       - "8081:8081"
     environment:
-      REDIS_HOSTS: "redis:rpg-redis:6380"
+      REDIS_HOSTS: "redis:laundry-redis:6380"
     networks:
-      - rpg-network
+      - laundry-network
 
 networks:
-  rpg-network:
-    external: true
+  laundry-network:
