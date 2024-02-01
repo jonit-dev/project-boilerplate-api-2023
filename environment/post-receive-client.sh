@@ -39,6 +39,6 @@ docker push laundrobot/laundrobot-team:client-latest
 # Update the service to restart containers and force image update
 echo "🐳Restarting swarm service..."
 
-docker service update --force swarm-stack_laundry-client
+docker service update --force swarm-stack_boilerplate-client
 
 docker container prune -f

@@ -20,4 +20,5 @@ export interface IServerBootstrapVars {
   language: string;
   phoneLocale: string;
   port: string | number;
+  bootstrapTime: number;
 }

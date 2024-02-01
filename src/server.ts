@@ -19,26 +19,26 @@ import { NewRelicTransactionCategory } from "@providers/types/NewRelicTypes";
 import { EnvType } from "@rpg-engine/shared/dist";
 import * as Sentry from "@sentry/node";
 import * as Tracing from "@sentry/tracing";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 
 const port = appEnv.general.SERVER_PORT || 3002;
+
+dayjs.extend(duration);
 
 if (!appEnv.general.IS_UNIT_TEST) {
   require("newrelic");
 }
+
+const startTime = Date.now();
 
 const server = app.listen(port, async () => {
   await newRelic.trackTransaction(
     NewRelicTransactionCategory.Operation,
     "ServerBootstrap",
     async () => {
-      serverHelper.showBootstrapMessage({
-        appName: appEnv.general.APP_NAME!,
-        port: appEnv.general.SERVER_PORT!,
-        timezone: appEnv.general.TIMEZONE!,
-        adminEmail: appEnv.general.ADMIN_EMAIL!,
-        language: appEnv.general.LANGUAGE!,
-        phoneLocale: appEnv.general.PHONE_LOCALE!,
-      });
+      const endTime = Date.now();
+      const bootstrapTime = endTime - startTime;
 
       await database.initialize();
       await redisManager.connect();
@@ -77,6 +77,16 @@ const server = app.listen(port, async () => {
 
         console.log(`✅ Application started succesfully on PMID ${process.env.pm_id}`);
       }
+
+      serverHelper.showBootstrapMessage({
+        appName: appEnv.general.APP_NAME!,
+        port: appEnv.general.SERVER_PORT!,
+        timezone: appEnv.general.TIMEZONE!,
+        adminEmail: appEnv.general.ADMIN_EMAIL!,
+        language: appEnv.general.LANGUAGE!,
+        phoneLocale: appEnv.general.PHONE_LOCALE!,
+        bootstrapTime,
+      });
     },
     appEnv.general.ENV === EnvType.Development
   );

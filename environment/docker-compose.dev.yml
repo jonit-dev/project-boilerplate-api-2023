@@ -1,7 +1,7 @@
 version: "3"
 services:
-  laundry-api:
-    container_name: laundry-api
+  boilerplate-api:
+    container_name: boilerplate-api
     restart: always
     build: .
     logging:
@@ -23,14 +23,14 @@ services:
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Laundrobot.AI API Dev"
     links:
-      - laundy-db
+      - boilerplate-db
     depends_on:
-      - laundy-db
-      - laundry-redis
+      - boilerplate-db
+      - boilerplate-redis
     networks:
-      - laundry-network
-  laundy-db:
-    container_name: laundy-db
+      - boilerplate-network
+  boilerplate-db:
+    container_name: boilerplate-db
     image: mongo
     restart: always
     command: mongod --port ${MONGO_PORT}
@@ -48,9 +48,9 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
-      - laundry-network
-  laundry-redis:
-    container_name: laundry-redis
+      - boilerplate-network
+  boilerplate-redis:
+    container_name: boilerplate-redis
     restart: always
     image: redis:latest
     ports:
@@ -62,18 +62,18 @@ services:
       - ./config/redis.conf:/usr/local/etc/redis/redis.conf
     command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
-      - laundry-network
+      - boilerplate-network
 
-  laundry-redis-commander:
-    container_name: laundry-redis-commander
+  boilerplate-redis-commander:
+    container_name: boilerplate-redis-commander
     restart: always
     image: rediscommander/redis-commander:latest
     ports:
       - "8081:8081"
     environment:
-      REDIS_HOSTS: "redis:laundry-redis:6380"
+      REDIS_HOSTS: "redis:boilerplate-redis:6380"
     networks:
-      - laundry-network
+      - boilerplate-network
 
 networks:
-  laundry-network:
+  boilerplate-network:

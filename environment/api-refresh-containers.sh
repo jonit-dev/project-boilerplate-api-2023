@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the service name
-SERVICE_NAME="swarm-stack_laundry-api"
+SERVICE_NAME="swarm-stack_boilerplate-api"
 
 # Additional deployment steps
 cd ~/laundrobot/api

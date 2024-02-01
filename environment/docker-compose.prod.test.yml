@@ -1,8 +1,8 @@
 version: "3"
 
 services:
-  laundry-api:
-    container_name: laundry-api
+  boilerplate-api:
+    container_name: boilerplate-api
     restart: always
     build: .
     logging:
@@ -14,11 +14,11 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     links:
-      - laundy-db
-      - laundry-redis
+      - boilerplate-db
+      - boilerplate-redis
     depends_on:
-      - laundy-db
-      - laundry-redis
+      - boilerplate-db
+      - boilerplate-redis
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
       - "$SOCKET_PORT:$SOCKET_PORT"
@@ -33,10 +33,10 @@ services:
       NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
       NEW_RELIC_APP_NAME: "Laundrobot.AI API"
     networks:
-      - laundry-network
+      - boilerplate-network
 
-  laundy-db:
-    container_name: laundy-db
+  boilerplate-db:
+    container_name: boilerplate-db
     image: mongo
     restart: always
     command: mongod --port ${MONGO_PORT}
@@ -54,10 +54,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
-      - laundry-network
+      - boilerplate-network
 
-  laundry-redis:
-    container_name: laundry-redis
+  boilerplate-redis:
+    container_name: boilerplate-redis
     restart: always
     image: redis:latest
     ports:
@@ -69,8 +69,8 @@ services:
       - ./config/redis.conf:/redis.conf
     command: ["redis-server", "/redis.conf", "--port", "${REDIS_PORT}"]
     networks:
-      - laundry-network
+      - boilerplate-network
 
 networks:
-  laundry-network:
+  boilerplate-network:
     external: true

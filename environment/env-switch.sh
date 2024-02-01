@@ -36,13 +36,20 @@ case $1 in
   cp -fr ./environment/Dockerfile.prod Dockerfile
   ;;
 
+"debug")
+  echo "Generating Production WSL environment .env files"
+  cp -fr ./environment/dev.env .env
+  cp -fr ./environment/docker-compose.dev.yml docker-compose.yml
+  cp -fr ./environment/Dockerfile.debug Dockerfile
+  ;;
+
 *)
   echo "Invalid environment option. Please provide 'dev', 'prod', or 'prod:wsl-local'."
   exit 1
   ;;
 esac
 
-echo "✅ Done! Note that you should run 'docker-compose build laundry-api' to rebuild your container with the new changes applied."
+echo "✅ Done! Note that you should run 'docker-compose build boilerplate-api' to rebuild your container with the new changes applied."
 
 echo "
 ⚠️ WARNING: Make sure you change your CLIENT environment to match your API environment, otherwise it won't work!"

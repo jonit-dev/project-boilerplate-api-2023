@@ -50,7 +50,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./letsencrypt:/letsencrypt
     networks:
-      - laundry-network
+      - boilerplate-network
       - public
   agent:
     image: portainer/agent
@@ -91,7 +91,7 @@ networks:
     name: private
   public:
     external: true
-  laundry-network:
+  boilerplate-network:
     external: true
 
 volumes:

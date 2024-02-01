@@ -4,7 +4,6 @@ import { Server } from "http";
 import { provide } from "inversify-binding-decorators";
 import { appEnv } from "../config/env";
 import { ConsoleHelper } from "../console/ConsoleHelper";
-import { TS } from "../translation/TranslationHelper";
 import { IServerBootstrapVars } from "../types/ServerTypes";
 
 @provide(ServerHelper)
@@ -17,6 +16,7 @@ export class ServerHelper {
       timezone,
       adminEmail,
       // phoneLocale,
+      bootstrapTime,
     } = config;
 
     const consoleHelper = new ConsoleHelper();
@@ -35,13 +35,7 @@ export class ServerHelper {
     }
 
     consoleHelper.coloredLog(
-      `🤖: ${TS.translate("global", "serverRunning", {
-        env: appEnv.general.ENV!,
-        port: String(port),
-        language,
-        timezone,
-        adminEmail,
-      })}`,
+      `🤖: Server is running on ${appEnv.general.ENV} | Port: ${port} | Language: ${language} | Timezone: ${timezone} | Admin: ${adminEmail} | Bootstrap time: ${bootstrapTime}s`,
       terminalColor
     );
   }
