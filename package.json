@@ -72,7 +72,6 @@
     "@babel/preset-env": "^7.16.11",
     "@jonit-dev/decorators-utils": "^0.1.4",
     "@rpg-engine/shared": "^0.8.68",
-    "@shelf/jest-mongodb": "^2.2.1",
     "@swc/core": "^1.3.20",
     "@swc/helpers": "^0.4.14",
     "@swc/jest": "^0.2.22",
