@@ -35,7 +35,7 @@ export class ServerHelper {
     }
 
     consoleHelper.coloredLog(
-      `🤖: Server is running on ${appEnv.general.ENV} | Port: ${port} | Language: ${language} | Timezone: ${timezone} | Admin: ${adminEmail} | Bootstrap time: ${bootstrapTime}s`,
+      `🤖: Server is running on ${appEnv.general.ENV} | Port: ${port} | Language: ${language} | Timezone: ${timezone} | Admin: ${adminEmail} | Bootstrap time: ${bootstrapTime}ms`,
       terminalColor
     );
   }
