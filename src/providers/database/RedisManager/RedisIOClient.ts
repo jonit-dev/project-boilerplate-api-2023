@@ -75,8 +75,6 @@ export class RedisIOClient {
       const clientList = await this.client.client("LIST"); // Assuming this.client is the IORedis client
       clientCount = clientList.split("\n").length - 1; // Each client info is separated by a newline
 
-      console.log("📕 Redis - Total connected clients: ", clientCount);
-
       this.newRelic.trackMetric(
         NewRelicMetricCategory.Count,
         NewRelicSubCategory.Server,
